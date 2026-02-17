@@ -73,14 +73,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Check for wiki conflicts
-        working-directory: scripts
-        env:
-          WIKI_URL: ${{ secrets.WIKI_URL }}
-          WIKI_USER: ${{ secrets.WIKI_USER }}
-          WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
-        run: python sync_to_wiki.py --check-conflicts
-
       - name: Deploy to wiki
         if: ${{ github.event.inputs.dry_run != 'true' }}
         working-directory: scripts
