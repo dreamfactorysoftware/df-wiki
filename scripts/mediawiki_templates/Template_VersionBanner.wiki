@@ -1,0 +1,22 @@
+<noinclude>
+This template creates a version banner for documentation pages.
+
+== Usage ==
+<pre>
+{{VersionBanner|version=7.x|current=yes}}
+{{VersionBanner|version=6.x|color=#f3e5f5|border=#ab47bc}}
+</pre>
+
+== Parameters ==
+* '''version''' - The DreamFactory version (e.g., "7.x", "6.x")
+* '''current''' - Set to "yes" if this is current version documentation
+* '''color''' - Background color (default: #e3f2fd)
+* '''border''' - Border color (default: #2196f3)
+
+[[Category:Templates]]
+[[Category:Version Templates]]
+</noinclude><includeonly><div style="background:{{{color|#e3f2fd}}}; border:1px solid {{{border|#2196f3}}}; padding:15px; margin-bottom:20px; border-radius:4px;">
+'''DreamFactory {{{version}}} Documentation'''{{#ifeq:{{{current|no}}}|yes|| — ''This documentation is for an older version.''}}
+
+[[Main Page|View Current Documentation]] {{!}} [[:Category:DreamFactory {{{version}}}|All {{{version}}} Docs]]
+</div>[[Category:DreamFactory {{{version}}}]]</includeonly>

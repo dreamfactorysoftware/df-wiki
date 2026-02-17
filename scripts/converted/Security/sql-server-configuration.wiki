@@ -1,0 +1,34 @@
+= Configuring Windows Authentication for SQL Server =
+<span id="configuring-windows-authentication-for-sql-server"></span>
+= Configuring Windows Authentication for SQL Server =
+
+<span id="overview"></span>
+== Overview ==
+
+Simple steps to setup Windows Authentication for the SQL Server connector.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+DreamFactory and SQL Server must be installed on the same Windows Server.
+
+It might be possible to achieve the same result if SQL Server is installed on Linux. However, this would require adding the Linux server to an Active Directory Domain. More detailed information can be found [https://blog.netwrix.com/2022/11/01/join-linux-hosts-to-active-directory-domain/ here].
+
+<span id="sql-server-connector-configuration"></span>
+== SQL Server Connector Configuration ==
+
+To enable Windows Authentication, leave the <code>Username</code> and <code>Password</code> fields empty.
+
+If something goes wrong at this step, try adding DreamFactory's IIS application pool identity to SQL Server by running the following query in SQL Server Management Studio (SSMS). Make sure to replace <code>YourDatabase</code> with the actual database you want to grant access to.
+
+```sql CREATE LOGIN [IIS APPPOOL] FROM WINDOWS; USE [YourDatabase]; CREATE USER [IIS APPPOOL] FOR LOGIN [IIS APPPOOL]; ALTER ROLE db_datareader ADD MEMBER [IIS APPPOOL]; ALTER ROLE db_datawriter ADD MEMBER [IIS APPPOOL];
+
+== See also ==
+* [[Security/Authentication_Apis|Authenticating your APIs]]
+* [[Security/Security_Faq|Security FAQ]]
+* [[Security/Role_Based_Access|Role Based Access Control (RBAC)]]
+* [[Security/Rate_Limiting|Rate Limiting]]
+
+[[Category:Security]]
+[[Category:Configuring]]
+[[Category:Windows]]

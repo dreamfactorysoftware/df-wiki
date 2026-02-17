@@ -1,0 +1,15 @@
+<noinclude>
+This template creates a note/info box for highlighting important information.
+
+== Usage ==
+<pre>
+{{Note|Your note text here}}
+</pre>
+
+== Parameters ==
+* '''1''' - The note text (required)
+
+[[Category:Templates]]
+</noinclude><includeonly><div style="background-color:#e3f2fd; border-left:4px solid #2196f3; padding:12px 15px; margin:15px 0;">
+'''ℹ️ Note:''' {{{1}}}
+</div></includeonly>

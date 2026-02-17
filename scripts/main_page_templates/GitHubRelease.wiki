@@ -1,0 +1,20 @@
+<noinclude>
+Single release entry for the releases section.
+
+== Parameters ==
+* '''version''' — release tag (e.g., "v5.1.0")
+* '''date''' — release date (e.g., "2024-12-15")
+* '''notes''' — short release notes summary
+* '''url''' — link to GitHub release page
+
+== Usage ==
+<pre>
+{{GitHubRelease|version=v5.1.0|date=2024-12-15|notes=Bug fixes and performance improvements|url=https://github.com/dreamfactorysoftware/dreamfactory/releases/tag/5.1.0}}
+</pre>
+</noinclude><includeonly><div class="mp-release-entry">
+<div class="mp-release-header">
+<span class="mp-release-version">[{{{url}}} {{{version}}}]</span>
+<span class="mp-release-date">{{{date}}}</span>
+</div>
+<div class="mp-release-notes">{{{notes}}}</div>
+</div></includeonly>

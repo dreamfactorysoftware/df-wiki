@@ -1,0 +1,11 @@
+<noinclude>
+Banner template for DreamFactory 2.x documentation.
+
+== Usage ==
+<pre>
+{{V2Doc}}
+</pre>
+
+[[Category:Templates]]
+[[Category:Version Templates]]
+</noinclude><includeonly>{{VersionBanner|version=2.x|color=#ffebee|border=#ef5350}}</includeonly>

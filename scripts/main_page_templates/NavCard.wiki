@@ -1,0 +1,20 @@
+<noinclude>
+Navigation card for the Main Page quick-start grid.
+
+== Parameters ==
+* '''icon''' — emoji or symbol
+* '''title''' — card heading
+* '''link''' — wiki page link target
+* '''description''' — short description text
+
+== Usage ==
+<pre>
+{{NavCard|icon=🐳|title=Docker Install|link=Getting Started/Docker Installation|description=Get running in minutes with Docker Compose}}
+</pre>
+</noinclude><includeonly><div class="mp-nav-card">
+<div class="mp-nav-icon">{{{icon|📄}}}</div>
+<div class="mp-nav-body">
+<div class="mp-nav-title">[[{{{link}}}|{{{title}}}]]</div>
+<div class="mp-nav-desc">{{{description}}}</div>
+</div>
+</div></includeonly>

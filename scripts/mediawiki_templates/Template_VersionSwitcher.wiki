@@ -1,0 +1,31 @@
+<noinclude>
+This template creates a version switcher navigation box for pages that exist across multiple versions.
+
+== Usage ==
+<pre>
+{{VersionSwitcher|page=Docker_Installation}}
+</pre>
+
+== Parameters ==
+* '''page''' - The base page name (without version namespace prefix)
+
+The template will create links to the same page in all version namespaces.
+
+[[Category:Templates]]
+[[Category:Version Templates]]
+</noinclude><includeonly>{| class="wikitable" style="float:right; margin-left:1em; font-size:90%;"
+|-
+! colspan="2" | Version Documentation
+|-
+| '''Current (7.x)''' || [[{{{page}}}]]
+|-
+| 6.x || [[V6:{{{page}}}|{{{page}}}]]
+|-
+| 5.x || [[V5:{{{page}}}|{{{page}}}]]
+|-
+| 4.x || [[V4:{{{page}}}|{{{page}}}]]
+|-
+| 3.x || [[V3:{{{page}}}|{{{page}}}]]
+|-
+| 2.x || [[V2:{{{page}}}|{{{page}}}]]
+|}</includeonly>

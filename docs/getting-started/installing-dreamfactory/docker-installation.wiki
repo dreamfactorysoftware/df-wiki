@@ -1,0 +1,182 @@
+= Docker Installation =
+'''Install DreamFactory using Docker and docker-compose with MySQL, Redis, and a sample PostgreSQL database for testing.'''
+
+<span id="docker-installation"></span>
+= Docker installation =
+
+Our Docker container includes everything you need to run DreamFactory, including Ubuntu 22.04, PHP 8.1, and the NGINX web server. It also includes all required PHP extensions and a sample Postgres Database. With these tools you can begin experimenting with the latest DreamFactory version as quickly as you can spin up the container!
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+* Git
+** See: https://www.github.com
+* Docker
+** See: https://docs.docker.com/installation
+* Docker Compose
+** See: https://docs.docker.com/compose/install
+
+<span id="overview"></span>
+== Overview ==
+
+The DreamFactory docker application is set up to use docker-compose. To build and deploy the application, follow these steps:
+
+# Clone the [https://github.com/dreamfactorysoftware/df-docker.git docker repo]
+
+<syntaxhighlight lang="text">
+cd ~/repos (or wherever you want the clone of the repo to be)
+git clone https://github.com/dreamfactorysoftware/df-docker.git
+cd df-docker
+</syntaxhighlight>
+<ol start="2" style="list-style-type: decimal;">
+<li>Edit the docker-compose.yml file (optional)</li></ol>
+
+<pre>The docker-compose yaml file has default settings for installing DreamFactory, but you may wish to edit the persistent or sample database details, usernames and passwords, or ports to access the application. You must edit the docker-compose file prior to building and running DreamFactory for these changes to take effect.</pre>
+<ol start="3" style="list-style-type: decimal;">
+<li>Build images with <code>docker-compose build</code></li></ol>
+
+{{Warning|title=Backup your APP_KEY|Running this after an initial deployment rebuilds the entire application unless you save and re-use the APP_KEY as described below.}}
+<ol start="4" style="list-style-type: decimal;">
+<li>Start containers with <code>docker-compose up -d</code></li></ol>
+
+<pre>This command spins up 4 containers:
+<syntaxhighlight lang="text">
+df-docker-web
+  - The DreamFactory application and web portal.
+mysql:5.7
+  - A MySQL container for the system database.
+redis
+  - A Redis instance used for caching.
+aa8y/postgres-dataset
+  - A PostGreSQL Database with over 100k records for testing.
+</syntaxhighlight>
+
+Your terminal output should look like this:
+</pre>
+[[File:docker-compose-up-terminal-output.png|thumb|docker-compose up -d terminal output]]
+<ol start="5" style="list-style-type: decimal;">
+<li>Access the Admin UI</li></ol>
+
+<pre>By default, docker-compose is on localhost port 80. To access the application, open `http://localhost` or `http://127.0.0.1` in a browser window.
+
+The first time docker-compose is executed, it may take a few minutes to load and accept traffic. If port 80 is taken by another application, edit the docker-compose yaml file to use a different port (e.g. 8080) and return to step 3 above.
+
+Once the web server is live, a splash screen displays briefly:
+
+</pre>
+[[File:docker-compose-splash-page.png|thumb|docker splash screen]]
+<pre>
+
+Continue waiting for the application to load and do not click back or refresh at this time. Occasionally the page loads before the DB migrations are completed. If that happens a light red screen with an error message displays. In that case it is safe to allow the jobs to finish and refresh the page. After a few minutes the **Create a System Administrator** page displays:
+
+</pre>
+[[File:initial-login-create-admin-page.png|thumb|docker create admin page]]
+<pre>
+
+Complete the required fields and DreamFactory is ready to use!</pre>
+<span id="persisting-system-database-configs"></span>
+== Persisting system database configs ==
+
+After you have spun up your DreamFactory instance, you should save the APP_KEY value from the .env file located in the web container's /opt/dreamfactory directory. This can be done with the following command while DreamFactory is running:
+
+<code>docker-compose exec web cat .env | grep APP_KEY</code>
+
+A few lines of output are display, but only need to copy the APP_KEY itself (everything after <code>APP_KEY=</code> through the final <code>=</code> sign).
+
+[[File:app-key-output.png|thumb|app key output]]
+Should you ever need to rebuild, set this value as the APP_KEY value in the docker-compose.yml file. Uncomment the line in services -&gt; web -&gt; environment and paste your key from the above output, wrapped in single quotes. This allows the new build to access the previous encrypted settings and prevent data loss and errors in the application.
+
+[[File:app-key-docker-compose.png|thumb|app key in docker-compose]]
+:::caution Backup your docker-compose file If you've overridden other defaults such as database settings or ports, ensure that you backup your entire docker-compose file and compare your old values with the latest file. Skipping this step will lead to issues when upgrading. :::
+
+<span id="testing-data"></span>
+== Testing data ==
+
+We mount a PostGres container with over 100k records to test without connecting your own data sets. To utilize the container, use the following connection details:
+
+To retrieve the host IP, run: <code>docker inspect &lt;container-id for postgres&gt; | grep &quot;IPAddress&quot;</code>
+
+<pre>Host: The docker IP from above
+Port: 5432
+Database Name: dellstore
+Username: postgres
+Password: root_pw</pre>
+Use the settings above to add a new Database API Connection. This generates a fully documented and secure API from the PostGres container.
+
+<span id="adding-a-commercial-license"></span>
+== Adding a commercial license ==
+
+If you are a commercial customer and have a license key for DreamFactory, you should:
+
+# Add the license files to the <code>df-docker</code> directory
+# Uncomment lines 25 and 36 of the <code>Dockerfile</code>
+# Add the license key to line 36 of <code>Dockerfile</code> the following image shows what we are wanting to uncomment to add commercial files and licensing [[File:dockerfile-uncomment-commercial.png|thumb|lines to uncomment in Dockerfile]]
+# continue with steps 2-5 above
+
+<span id="installing-oracle-drivers"></span>
+== Installing Oracle Drivers ==
+
+To enable Oracle database connectivity in your DreamFactory Docker container, see the [[Getting_Started/Installing_Additional_Drivers#enabling_oracle_in_docker|Installing Additional Drivers]] guide for detailed instructions on installing Oracle Instant Client and the PHP OCI8 extension in Docker containers.
+
+<span id="upgrading-your-docker-instance"></span>
+== Upgrading your Docker instance ==
+
+As new features and enhancements are added to DreamFactory, you may want to upgrade to a newer version. To install a newer version of DreamFactory, you should:
+
+# Backup your existing environment
+
+<pre>As a best practice, you should back up your files and system database before attempting to upgrade to a new version.  This includes extracting your `APP_KEY` from the existing docker container (see the Persisting system database configs section above).</pre>
+<ol start="2" style="list-style-type: decimal;">
+<li><p>Update your repo with <code>git pull</code> and <code>git tag --list</code> to see the tagged versions available.</p></li>
+<li><p>Stop the DreamFactory container without deleting it with <code>docker-compose stop</code> (this brings the instance offline until the upgrade is complete).</p></li>
+<li><p>Check out the newer tagged version with <code>git checkout tags/{version}</code>.</p></li>
+<li><p>Add the <code>APP_KEY</code> to the docker-compose file (see above for instructions).</p></li></ol>
+
+{{Tip|title=Ensure that you enclose the `APP_KEY` with single quotes.|}}
+<ol start="6" style="list-style-type: decimal;">
+<li><p>Modify any other settings in docker-compose as needed for your environment (compare the old docker-compose file with the new one as needed).</p></li>
+<li><p>Save your changes and rebuild the container with <code>docker-compose up -d --build</code>.</p></li>
+<li><p>Double-check that all services are running as expected with <code>docker-compose ps</code>.</p></li></ol>
+
+<pre>If any of the containers are not in a good state, you can view the logs with `docker-compose logs web` (or whatever container had the error).</pre>
+<ol start="9" style="list-style-type: decimal;">
+<li>Once the containers are all up and running, check if the system DB schema needs a migration with <code>docker-compose exec web php artisan migrate:status</code>. The output should look similar to this:</li></ol>
+
+[[File:docker-artisan-migrate-status.png|thumb|artisan migrate:status]]
+<pre>
+
+If any rows don't show `Ran` for the job, you must manually run the migration with `docker-compose exec web php artisan migrate`.</pre>
+<ol start="10" style="list-style-type: decimal;">
+<li>The final step is to clear the configuration and cache with:</li></ol>
+
+<pre>```
+docker-compose exec web php artisan config:clear
+
+docker-compose exec web php artisan cache:clear
+```
+
+After clearing the cache, open DreamFactory and verify the environment is operational.</pre>
+<span id="platform-specific-instructions"></span>
+== Platform-specific instructions ==
+
+The containerized application should be compatible with any platform that supports docker and docker-compose, but depending on your system configuration, you may need to edit the <code>docker-compose.yml</code> to meet your needs.
+
+### Mac M-series processors
+
+The docker containers were built on amd64 architecture. Docker Desktop for Mac allows you to specify the platform, even if you are running an M-Series (M1/M2/M3) processor, by adding <code>platform: linux/amd64</code> to each service in the<code>docker-compose.yml</code> file.
+
+e.g. <code>version: '3'   services:     mysql:       platform: linux/amd64       environment:       ...       ...     redis:       platform: linux/amd64       image: redis       ...       ...     web:       platform: linux/amd64       depends_on:         - mysql       environment:       ...       ...</code>
+
+After adding the platform setting, you can deploy the application on MacBook M-series processors using the instructions above.
+
+== See also ==
+* [[Getting_Started/Windows_Installation|Windows Installation]]
+* [[Getting_Started/Installing_Dreamfactory|Installing DreamFactory]]
+* [[Getting_Started/Helm_Installation|helm-installation]]
+
+[[Category:Docker]]
+[[Category:Docker-Compose]]
+[[Category:Dreamfactory_Installation]]
+[[Category:Installation]]
+[[Category:Getting_Started]]
+[[Category:Difficulty_Beginner]]

@@ -1,0 +1,121 @@
+= User Management =
+'''Manage users and admins via the System API with endpoints for creating, updating, and deleting accounts'''
+
+<span id="user-management"></span>
+= User Management =
+
+Users and Admins can be managed using the <code>/system/user</code> and <code>/system/admin</code> endpoints respectively.
+
+For the below examples, replace <code>user</code> with <code>admin</code> when managing admins.
+
+<span id="get-user-admin-details"></span>
+== Get User / Admin Details ==
+
+'''Endpoint:''' <code>GET https://{url}/api/v2/system/user</code>
+
+'''Curl Equivalent:'''
+
+<syntaxhighlight lang="bash">curl -X GET "https://{url}/api/v2/system/user" -H "accept: application/json" \
+-H "X-DreamFactory-Session-Token: <session_token>"</syntaxhighlight>
+You can retrieve an individual user / admin's details using the <code>?ids=&lt;id_number&gt;</code> parameter. If you don't know the id number off hand, you can filter by any field which you do know, such as an email address by using the filter parameter. For example:
+
+<syntaxhighlight lang="text">https://{url}/api/v2/system/user?filter=email=tomo@example.com</syntaxhighlight>
+<span id="creating-a-user-admin"></span>
+== Creating a User / Admin ==
+
+<span id="without-email-invitation"></span>
+=== Without Email Invitation ===
+
+'''Endpoint:''' <code>POST https://{url}/api/v2/system/user</code>
+
+You will need to provide your session token in a <code>X-DreamFactory-Session-Token</code> header.
+
+'''Request Body:'''
+
+<syntaxhighlight lang="json">{
+  "resource": [
+    {
+      "name": "display_name",           // Required field
+      "first_name": "first_name",
+      "last_name": "user_last_name",
+      "email": "email_address",         // Required field
+      "password": "password"
+    }
+  ]
+}</syntaxhighlight>
+'''Curl Equivalent:'''
+
+<syntaxhighlight lang="bash">curl -X POST "https://<url>/api/v2/system/user" \
+-H "accept: application/json" -H "Content-Type: application/json" \
+-H "X-DreamFactory-Session-Token: <sessionToken>" \
+-d "{\"resource\":[{\"name\":\"<display_name>\",\"first_name\":\"<first_name>\",\"last_name\":\"<last_name>\",\"email\":\"<email_address>\",\"password\":\"<password>\"}]}"</syntaxhighlight>
+<span id="with-email-invitation"></span>
+=== With Email Invitation ===
+
+'''Endpoint:''' <code>POST https://{url}/api/v2/system/user?send_invite=true</code>
+
+'''Request Body:'''
+
+<syntaxhighlight lang="json">{
+  "resource": [
+    {
+      "name": "display_name",           // Required field
+      "first_name": "first_name",
+      "last_name": "user_last_name",
+      "email": "email_address",         // Required field
+    }
+  ]
+}</syntaxhighlight>
+'''Curl Equivalent:'''
+
+<syntaxhighlight lang="bash">curl -X POST "https://<url>/api/v2/system/user?send_invite=true" \
+-H "accept: application/json" -H "Content-Type: application/json" \
+-H "X-DreamFactory-Session-Token: <sessionToken>" \
+-d "{\"resource\":[{\"name\":\"<userName>\",\"first_name\":\"<firstName>\",\"last_name\":\"<lastName>\",\"email\":\"<emailAddress>\"}]}"</syntaxhighlight>
+<span id="updating-a-user-admin"></span>
+== Updating a User / Admin ==
+
+To update a pre-existing User / Admin, a PATCH request can be made referencing the ID of the user to be changed with the <code>?ids=&lt;ID&gt;</code> parameter. You will need to provide your session token in a <code>X-DreamFactory-Session-Token</code> header.
+
+'''Endpoint:''' <code>PATCH https://{url}/api/v2/system/user?ids=&lt;ID_number&gt;</code>
+
+'''Request Body:'''
+
+<syntaxhighlight lang="json">{
+  "resource": [
+    {
+     "field_to_change": "value",
+     ...
+    }
+  ]
+}</syntaxhighlight>
+'''Curl Equivalent:'''
+
+<syntaxhighlight lang="bash">curl -X PATCH "https://{url}/api/v2/system/user?ids=<ID_number>" \
+-H "accept: application/json" -H "Content-Type: application/json" \
+-H "X-DreamFactory-Session-Token: <session_token>" \
+-d "{\"resource\":[{\"<field_to_update\":\"value\"}]}"</syntaxhighlight>
+<span id="deleting-a-user-admin"></span>
+== Deleting a User / Admin ==
+
+To delete a pre-existing User / Admin, simply send a delete request with the corresponding user ID by using the <code>?ids=&lt;ID&gt;</code> parameter.
+
+'''Endpoint:''' <code>DELETE https://{url}/api/v2/system/user?ids=&lt;ID_number&gt;</code>
+
+'''Curl Equivalent:'''
+
+<syntaxhighlight lang="bash">curl -X DELETE "https://{url}/api/v2/system/user?ids=<ID_number>" \
+-H "accept: application/json" -H "Content-Type: application/json" \
+-H "X-DreamFactory-Session-Token: <session_token>"</syntaxhighlight>
+
+== See also ==
+* [[System_Settings/05_Api_Key_Management|API Key Management]]
+* [[System_Settings/01_System_Api_Brief|Using the System APIs]]
+* [[System_Settings/04_Role_Management|Role Management]]
+* [[System_Settings/03_Service_Management|Service Management]]
+
+[[Category:User_Management]]
+[[Category:Admin_Api]]
+[[Category:System_Api]]
+[[Category:API]]
+[[Category:Difficulty_Intermediate]]

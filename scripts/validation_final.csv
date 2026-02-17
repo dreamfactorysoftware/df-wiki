@@ -1,0 +1,69 @@
+file,type,severity,description
+/root/wikimigration/documentation-consolidation/scripts/converted/api-generation-and-connections/advanced-database-api-features.wiki,Content Variance,Minor,"Word count variance: source=1143, wiki=1515 (32.5%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/api-generation-and-connections/interacting-with-api.wiki,Content Variance,Minor,"Word count variance: source=2227, wiki=2807 (26.0%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/AI/mcp-custom-login-page.wiki,Content Variance,Minor,"Word count variance: source=459, wiki=1283 (179.5%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/AI/mcp-service-creation.wiki,Content Variance,Minor,"Word count variance: source=862, wiki=564 (34.6%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/Security/authentication-apis.wiki,Content Variance,Minor,"Word count variance: source=2580, wiki=1099 (57.4%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/system-settings/logstash.wiki,Content Variance,Minor,"Word count variance: source=1696, wiki=2354 (38.8%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/introduction/introduction.wiki,Content Variance,Minor,"Word count variance: source=667, wiki=343 (48.6%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/upgrades-and-migrations/upgrading-migrating-dreamfactory.wiki,Content Variance,Minor,"Word count variance: source=889, wiki=1172 (31.8%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/upgrades-and-migrations/upgrading-to-php-8_1.wiki,Content Variance,Minor,"Word count variance: source=2162, wiki=2825 (30.7%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/installing-dreamfactory/installing-additional-drivers.wiki,Content Variance,Minor,"Word count variance: source=733, wiki=1538 (109.8%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/installing-dreamfactory/helm-installation.wiki,Content Variance,Minor,"Word count variance: source=726, wiki=1293 (78.1%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/installing-dreamfactory/raspberrypi-install.wiki,Content Variance,Minor,"Word count variance: source=516, wiki=1095 (112.2%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/dreamfactory-configuration/basic-configuration.wiki,Content Variance,Minor,"Word count variance: source=613, wiki=764 (24.6%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/dreamfactory-configuration/date-time.wiki,Content Variance,Minor,"Word count variance: source=301, wiki=559 (85.7%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/optimizing-dreamfactory/php-laravel.wiki,Content Variance,Minor,"Word count variance: source=464, wiki=658 (41.8%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/getting-started/optimizing-dreamfactory/webserver.wiki,Content Variance,Minor,"Word count variance: source=308, wiki=636 (106.5%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/api-generation-and-connections/api-types/scripting/scripting-resources.wiki,Content Variance,Minor,"Word count variance: source=1124, wiki=780 (30.6%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/api-generation-and-connections/api-types/database/querying-filtering.wiki,Content Variance,Minor,"Word count variance: source=516, wiki=759 (47.1%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/system-settings/the-system-api/02-user-management.wiki,Content Variance,Minor,"Word count variance: source=177, wiki=437 (146.9%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/system-settings/the-system-api/04-role-management.wiki,Content Variance,Minor,"Word count variance: source=573, wiki=871 (52.0%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/system-settings/the-system-api/05-api-key-management.wiki,Content Variance,Minor,"Word count variance: source=422, wiki=947 (124.4%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/system-settings/the-system-api/03-service-management.wiki,Content Variance,Minor,"Word count variance: source=643, wiki=1150 (78.8%)"
+/root/wikimigration/documentation-consolidation/scripts/converted/system-settings/the-system-api/01-system-api-brief.wiki,Content Variance,Minor,"Word count variance: source=737, wiki=934 (26.7%)"
+df-docs/df-docs/docs/introduction/introduction.md,Not Migrated,Major,Source file not migrated: Introduction
+df-docs/df-docs/docs/introduction/introducing-rest-dreamfactory.md,Not Migrated,Major,Source file not migrated: Introducing REST and DreamFactory
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/docker-installation.md,Not Migrated,Major,Source file not migrated: Docker Installation
+df-docs/df-docs/docs/Security/sql-server-configuration.md,Not Migrated,Major,Source file not migrated: Configuring Windows Authentication for SQL Server
+df-docs/df-docs/docs/Security/authentication-apis.md,Not Migrated,Major,Source file not migrated: Authenticating your APIs
+df-docs/df-docs/docs/Security/security-faq.md,Not Migrated,Major,Source file not migrated: Security FAQ
+df-docs/df-docs/docs/Security/role-based-access.md,Not Migrated,Major,Source file not migrated: Role Based Access Control (RBAC)
+df-docs/df-docs/docs/Security/creating-your-auth-service/okta-setup.md,Not Migrated,Major,Source file not migrated: okta-setup
+df-docs/df-docs/docs/Security/creating-your-auth-service/azure-ad-oauth.md,Not Migrated,Major,Source file not migrated: azure-ad-oauth
+df-docs/df-docs/docs/Security/creating-your-auth-service/github-oauth.md,Not Migrated,Major,Source file not migrated: github-oauth
+df-docs/df-docs/docs/getting-started/dreamfactory-configuration/basic-configuration.md,Not Migrated,Major,Source file not migrated: Basic Configuration
+df-docs/df-docs/docs/getting-started/dreamfactory-configuration/date-time.md,Not Migrated,Major,Source file not migrated: Date and Time Configuration
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/windows-installation.md,Not Migrated,Major,Source file not migrated: Windows Installation
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/installing-dreamfactory.md,Not Migrated,Major,Source file not migrated: Installing DreamFactory
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/helm-installation.md,Not Migrated,Major,Source file not migrated: helm-installation
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/installing-additional-drivers.md,Not Migrated,Major,Source file not migrated: Installing Additional Drivers
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/raspberrypi-install.md,Not Migrated,Major,Source file not migrated: raspberrypi-install
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/linux-installation.md,Not Migrated,Major,Source file not migrated: Linux Installation
+df-docs/df-docs/docs/getting-started/optimizing-dreamfactory/database.md,Not Migrated,Major,Source file not migrated: Database APIs
+df-docs/df-docs/docs/system-settings/logstash.md,Not Migrated,Major,Source file not migrated: Logstash
+df-docs/df-docs/docs/api-generation-and-connections/event-scripts.md,Not Migrated,Major,Source file not migrated: Event Scripts
+df-docs/df-docs/docs/api-generation-and-connections/api-keys.md,Not Migrated,Major,Source file not migrated: API Keys
+df-docs/df-docs/docs/api-generation-and-connections/interacting-with-api.md,Not Migrated,Major,Source file not migrated: Interacting With the API
+df-docs/df-docs/docs/api-generation-and-connections/advanced-database-api-features.md,Not Migrated,Major,Source file not migrated: Advanced Database API Features
+df-docs/df-docs/docs/system-settings/the-system-api/05-api-key-management.md,Not Migrated,Major,Source file not migrated: API Key Management
+df-docs/df-docs/docs/system-settings/the-system-api/02-user-management.md,Not Migrated,Major,Source file not migrated: User Management
+df-docs/df-docs/docs/system-settings/the-system-api/01-system-api-brief.md,Not Migrated,Major,Source file not migrated: Using the System APIs
+df-docs/df-docs/docs/system-settings/the-system-api/04-role-management.md,Not Migrated,Major,Source file not migrated: Role Management
+df-docs/df-docs/docs/system-settings/the-system-api/03-service-management.md,Not Migrated,Major,Source file not migrated: Service Management
+df-docs/df-docs/docs/system-settings/config/cors-ssl.md,Not Migrated,Major,Source file not migrated: CORS and SSL
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/converting-excel-to-json.md,Not Migrated,Major,Source file not migrated: Converting Excel to a JSON Response
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/creating-aws-s3-rest-api.md,Not Migrated,Major,Source file not migrated: Creating an AWS S3 REST API
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/creating-sftp-rest-api.md,Not Migrated,Major,Source file not migrated: Creating an SFTP REST API
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/index.md,Not Migrated,Major,Source file not migrated: File System APIs
+df-docs/df-docs/docs/api-generation-and-connections/api-types/database/generating-database-backed-api.md,Not Migrated,Major,Source file not migrated: Generating a Database-backed API
+df-docs/df-docs/docs/api-generation-and-connections/api-types/database/sql-server.md,Not Migrated,Major,Source file not migrated: Microsoft SQL Server
+df-docs/df-docs/docs/api-generation-and-connections/api-types/database/querying-filtering.md,Not Migrated,Major,Source file not migrated: Querying and Filtering Records
+df-docs/df-docs/docs/api-generation-and-connections/api-types/scripting/scripted-services-and-endpoints.md,Not Migrated,Major,Source file not migrated: Creating Scripted Services and Endpoints
+df-docs/df-docs/docs/api-generation-and-connections/api-types/scripting/scripting-resources.md,Not Migrated,Major,Source file not migrated: Scripting Resources
+df-docs/df-docs/docs/AI/mcp-service-creation.md,Not Migrated,Major,Source file not migrated: Creating an MCP Server Service
+df-docs/df-docs/docs/AI/mcp-service.md,Not Migrated,Major,Source file not migrated: MCP Server
+df-docs/df-docs/docs/AI/mcp-custom-login-page.md,Not Migrated,Major,Source file not migrated: Custom Login Page for MCP
+df-docs/df-docs/docs/upgrades-and-migrations/upgrading-php-windows.md,Not Migrated,Major,Source file not migrated: Upgrading PHP On Windows
+df-docs/df-docs/docs/upgrades-and-migrations/upgrading-migrating-dreamfactory.md,Not Migrated,Major,Source file not migrated: Upgrading and Migrating DreamFactory
+df-docs/df-docs/docs/upgrades-and-migrations/upgrading-to-php-8_1.md,Not Migrated,Major,Source file not migrated: Upgrading to PHP 8.1

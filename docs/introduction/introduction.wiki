@@ -1,0 +1,122 @@
+= Introduction =
+'''DreamFactory is an open-source REST API platform that auto-generates secure, documented APIs for databases, files, and services.'''
+
+<span id="welcome-to-dreamfactory-documentation"></span>
+= Welcome to DreamFactory Documentation =
+
+DreamFactory is an open-source REST API platform that automatically generates secure, fully documented APIs for any data source in minutes. Whether you're connecting to databases, external services, or file systems, DreamFactory eliminates the need to write backend code.
+
+-----
+
+<span id="getting-started"></span>
+== Getting Started ==
+
+New to DreamFactory? Start here to get up and running quickly.
+
+* '''[[introduction/introducing-rest-and-dreamfactory|Introducing REST &amp; DreamFactory]]''' - Understanding REST APIs and how DreamFactory works
+* '''[[Getting_Started/Docker_Installation|Docker Installation]]''' - Quick start with Docker containers
+* '''[[Getting_Started/Helm_Installation|Helm/Kubernetes Installation]]''' - Deploy to Kubernetes clusters
+* '''[[Getting_Started/Linux_Installation|Linux Installation]]''' - Traditional Linux server installation
+* '''[[Getting_Started/Windows_Installation|Windows Installation]]''' - Install on Windows servers
+* '''[[Getting_Started/Basic_Configuration|Basic Configuration]]''' - Essential setup after installation
+
+-----
+
+<span id="api-generation-connections"></span>
+== API Generation &amp; Connections ==
+
+Learn how to create and manage APIs for your data sources.
+
+<span id="database-apis"></span>
+=== Database APIs ===
+
+* '''[[api-generation-and-connections/api-types/database/generating-a-database-backed-api|Generating Database-Backed APIs]]''' - Connect MySQL, PostgreSQL, MongoDB, SQL Server, Oracle, and more
+* '''[[api-generation-and-connections/api-types/database/querying-and-filtering|Querying &amp; Filtering]]''' - Advanced database queries, filtering, sorting, and pagination
+* '''[[Sql_Server|SQL Server]]''' - SQL Server specific configuration
+
+<span id="file-storage-apis"></span>
+=== File Storage APIs ===
+
+* '''[[api-generation-and-connections/api-types/file/creating-an-aws-s3-rest-api|Creating AWS S3 REST API]]''' - S3 file storage integration
+* '''[[api-generation-and-connections/api-types/file/creating-an-sftp-rest-api|Creating SFTP REST API]]''' - SFTP server integration
+* '''[[Converting_Excel_To_Json|Converting Excel to JSON]]''' - Transform Excel files to JSON
+
+<span id="scripting"></span>
+=== Scripting ===
+
+* '''[[Scripted_Services_And_Endpoints|Scripted Services &amp; Endpoints]]''' - Add custom business logic with JavaScript, PHP, or Python
+* '''[[Event_Scripts|Event Scripts]]''' - Trigger scripts before/after API calls
+* '''[[Scripting_Resources|Scripting Resources]]''' - Available scripting libraries and examples
+
+<span id="general"></span>
+=== General ===
+
+* '''[[Api_Keys|API Keys]]''' - Generate and manage API keys
+* '''[[api-generation-and-connections/interacting-with-the-api|Interacting with APIs]]''' - Making API calls and using the API Docs tab
+* '''[[Advanced_Database_Api_Features|Advanced Database Features]]''' - Stored procedures, relationships, and virtual fields
+
+-----
+
+<span id="security-access-control"></span>
+== Security &amp; Access Control ==
+
+Implement enterprise-grade security for your APIs.
+
+* '''[[Security/Role_Based_Access|Role-Based Access Control]]''' - Define granular permissions for users and endpoints
+* '''[[Security/authenticating-your-apis|Authentication APIs]]''' - API-based authentication workflows
+* '''[[Security/Okta_Setup|Okta Setup]]''' - Integrate with Okta OAuth
+* '''[[Security/sqlsrv-config|SQL Server Security]]''' - SQL Server authentication configuration
+* '''[[Security/Security_Faq|Security FAQ]]''' - Common security questions answered
+
+-----
+
+<span id="system-api"></span>
+== System API ==
+
+Programmatically manage DreamFactory for automation and DevOps workflows.
+
+* '''[[system-settings/the-system-api/using-the-system-apis|System API Overview]]''' - Introduction to the System API
+* '''[[System_Settings/02_User_Management|User Management]]''' - Manage users programmatically
+* '''[[System_Settings/03_Service_Management|Service Management]]''' - Manage services via API
+* '''[[System_Settings/04_Role_Management|Role Management]]''' - Manage roles via API
+* '''[[System_Settings/05_Api_Key_Management|API Key Management]]''' - Manage API keys via API
+
+-----
+
+<span id="configuration"></span>
+== Configuration ==
+
+* '''[[system-settings/config/cors-and-ssl|CORS &amp; SSL]]''' - Configure CORS and SSL settings
+* '''[[getting-started/dreamfactory-configuration/date-and-time-configuration|Date &amp; Time]]''' - Time zone and date format settings
+
+-----
+
+<span id="optimization-performance"></span>
+== Optimization &amp; Performance ==
+
+* '''[[getting-started/optimizing-dreamfactory/database-apis|Database Optimization]]''' - Database caching and connection pooling
+
+-----
+
+<span id="upgrades-migrations"></span>
+== Upgrades &amp; Migrations ==
+
+Keep your DreamFactory instance up to date.
+
+* '''[[upgrades-and-migrations/upgrading-and-migrating-dreamfactory|Upgrading &amp; Migrating DreamFactory]]''' - Move between environments
+* '''[[upgrades-and-migrations/upgrading-to-php-8.1|Upgrading to PHP 8.1]]''' - PHP 8.1 migration guide
+* '''[[upgrades-and-migrations/upgrading-php-on-windows|Upgrading PHP on Windows]]''' - Windows-specific PHP upgrades
+
+-----
+
+<span id="additional-resources"></span>
+== Additional Resources ==
+
+* '''[https://blog.dreamfactory.com DreamFactory Blog]''' - Tutorials, use cases, and product updates
+* '''[https://github.com/dreamfactorysoftware/dreamfactory GitHub Repository]''' - Contribute to the open-source project
+* '''[https://guide.dreamfactory.com/docs Legacy Guide]''' - Previous version documentation
+
+[[Category:Dreamfactory]]
+[[Category:Rest_Api]]
+[[Category:Api_Platform]]
+[[Category:Difficulty_Beginner]]

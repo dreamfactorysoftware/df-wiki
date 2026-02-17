@@ -1,0 +1,133 @@
+{{#seo:
+|title=DreamFactory Documentation Wiki
+|title_mode=replace
+|description=Official documentation for DreamFactory — a secure, self-hosted enterprise data access platform that provides governed API access to any data source, connecting enterprise applications and on-prem LLMs with role-based access and identity passthrough.
+|keywords=DreamFactory, AI data gateway, REST API, API generation, governed data access, database API, API security, MCP, LLM, documentation
+|type=website
+|site_name=DreamFactory Wiki
+|locale=en_US
+|image_alt=DreamFactory Documentation
+}}
+__NOTOC__
+__NOEDITSECTION__
+<div class="mp-root">
+
+<!-- ═══════════════════ HERO BANNER ═══════════════════ -->
+<div class="mp-hero">
+<div class="mp-hero-content">
+<div class="mp-hero-text">
+<h1 class="mp-hero-title">DreamFactory Documentation</h1>
+<p class="mp-hero-tagline">Let AI query your data. Not your database.</p>
+<p class="mp-hero-desc">DreamFactory is a secure, self-hosted enterprise data access platform that provides governed API access to any data source, connecting enterprise applications and on-prem LLMs with role-based access and identity passthrough. This wiki contains the complete reference documentation for installation, configuration, and day-to-day use.</p>
+<div class="mp-hero-badges">
+<span class="mp-badge">MediaWiki {{CURRENTVERSION}}</span>
+<span class="mp-badge">{{NUMBEROFPAGES}} pages</span>
+<span class="mp-badge">{{NUMBEROFARTICLES}} articles</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════ QUICK START ═══════════════════ -->
+<div class="mp-section" id="quick-start">
+<h2 class="mp-section-heading">Quick Start</h2>
+<div class="mp-nav-grid">
+{{NavCard|icon=🐳|title=Docker Install|link=Getting Started/Docker Installation|description=Get running in minutes with Docker Compose}}
+{{NavCard|icon=🐧|title=Linux Install|link=Getting Started/Linux Installation|description=Install DreamFactory on Ubuntu, Debian, CentOS, or RHEL}}
+{{NavCard|icon=🔐|title=Authentication|link=Security/Authentication Apis|description=Secure your APIs with key-based and role-based access}}
+{{NavCard|icon=🗄️|title=Database APIs|link=API/Generating A Database-Backed API|description=Instantly generate a governed REST API for any SQL or NoSQL database}}
+{{NavCard|icon=👥|title=Role-Based Access|link=Security/Role Based Access|description=Fine-grained access control for API endpoints and data}}
+{{NavCard|icon=⚡|title=Scripted Services|link=Scripted Services And Endpoints|description=Add custom logic with server-side scripting}}
+{{NavCard|icon=📁|title=File APIs|link=Creating Aws S3 Rest Api|description=Manage S3, Azure Blob, SFTP, and local file storage via REST}}
+{{NavCard|icon=🤖|title=MCP / AI Services|link=AI Services/Mcp Service|description=Give AI agents governed access to your data via Model Context Protocol}}
+</div>
+</div>
+
+<!-- ═══════════════════ CONNECTORS ═══════════════════ -->
+<div class="mp-section" id="connectors">
+<h2 class="mp-section-heading">Supported API Connectors</h2>
+<div class="mp-connector-grid">
+{{ConnectorType|type=SQL Databases|icon=🗄️|items=MySQL, PostgreSQL, SQL Server, Oracle, SQLite, IBM Db2, SAP SQL Anywhere, Firebird|link=API/Generating A Database-Backed API}}
+{{ConnectorType|type=NoSQL|icon=🍃|items=MongoDB, AWS DynamoDB, Azure Cosmos DB, CouchDB|link=Advanced Database Api Features}}
+{{ConnectorType|type=File Storage|icon=📂|items=AWS S3, Azure Blob, Google Cloud Storage, SFTP, FTP, Local|link=Creating Aws S3 Rest Api}}
+{{ConnectorType|type=Remote APIs|icon=🌐|items=HTTP, SOAP, Push Notifications, Email (SMTP), Apple Push|link=Remote HTTP And SOAP Connectors}}
+{{ConnectorType|type=Scripting|icon=⚡|items=PHP, Python, Node.js, server-side JavaScript|link=Scripted Services And Endpoints}}
+{{ConnectorType|type=Enterprise Auth|icon=🔒|items=LDAP, Active Directory, SAML 2.0, OAuth 2.0 (Okta, Azure AD, GitHub)|link=Security/Okta Setup}}
+</div>
+</div>
+
+<!-- ═══════════════════ RELEASES ═══════════════════ -->
+<div class="mp-section" id="releases">
+<h2 class="mp-section-heading">Latest Releases</h2>
+<div class="mp-releases-container">
+{{DreamFactory Releases}}
+</div>
+<p class="mp-releases-link">[https://github.com/dreamfactorysoftware/dreamfactory/releases View all releases on GitHub]</p>
+</div>
+
+<!-- ═══════════════════ POPULAR PAGES ═══════════════════ -->
+<div class="mp-section" id="popular-pages">
+<h2 class="mp-section-heading">Popular Pages</h2>
+<div class="mp-popular-grid">
+<div class="mp-popular-col">
+<h3>Getting Started</h3>
+* [[Getting Started/Docker Installation|Docker Installation]]
+* [[Getting Started/Linux Installation|Linux Installation]]
+* [[Getting Started/Windows Installation|Windows Installation]]
+* [[Getting Started/Helm Installation|Helm / Kubernetes]]
+* [[Getting Started/Basic Configuration|Basic Configuration]]
+</div>
+<div class="mp-popular-col">
+<h3>APIs &amp; Data</h3>
+* [[API/Generating A Database-Backed API|Database-Backed APIs]]
+* [[Advanced Database Api Features|Advanced DB Features]]
+* [[Querying Filtering|Querying &amp; Filtering]]
+* [[Creating Aws S3 Rest Api|AWS S3 File API]]
+* [[Creating Sftp Rest Api|SFTP File API]]
+</div>
+<div class="mp-popular-col">
+<h3>Security &amp; Config</h3>
+* [[Security/Authentication Apis|Authentication]]
+* [[Security/Role Based Access|Role-Based Access]]
+* [[Security/Okta Setup|Okta SSO Setup]]
+* [[Security/Azure Ad Oauth|Azure AD OAuth]]
+* [[Security/Rate Limiting|Rate Limiting]]
+</div>
+<div class="mp-popular-col">
+<h3>Reference</h3>
+* [[Event Scripts|Event Scripts]]
+* [[Scripting Resources|Scripting Resources]]
+* [[Appendix Configuration Parameters|Configuration Reference]]
+* [[System Settings/Cors Ssl|CORS &amp; SSL]]
+* [[Upgrading Migrating Dreamfactory|Upgrading]]
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════ EXTERNAL LINKS ═══════════════════ -->
+<div class="mp-section" id="external-links">
+<h2 class="mp-section-heading">Links &amp; Resources</h2>
+<div class="mp-ext-grid">
+<div class="mp-ext-col">
+<h3>Official</h3>
+{{ExternalLink|icon=🌐|label=DreamFactory Website|url=https://www.dreamfactory.com}}
+{{ExternalLink|icon=📝|label=Blog|url=https://blog.dreamfactory.com}}
+{{ExternalLink|icon=💬|label=Community Forum|url=https://community.dreamfactory.com}}
+</div>
+<div class="mp-ext-col">
+<h3>Source Code</h3>
+{{ExternalLink|icon=💻|label=DreamFactory (GitHub)|url=https://github.com/dreamfactorysoftware/dreamfactory}}
+{{ExternalLink|icon=📦|label=df-docker|url=https://github.com/dreamfactorysoftware/df-docker}}
+{{ExternalLink|icon=📦|label=df-helm|url=https://github.com/dreamfactorysoftware/df-helm}}
+</div>
+<div class="mp-ext-col">
+<h3>Social</h3>
+{{ExternalLink|icon=🐦|label=X (Twitter)|url=https://x.com/dfsoftwareinc}}
+{{ExternalLink|icon=💼|label=LinkedIn|url=https://www.linkedin.com/company/dreamfactory-software}}
+{{ExternalLink|icon=▶️|label=YouTube|url=https://www.youtube.com/dreamfactorysoftware}}
+</div>
+</div>
+</div>
+
+</div>
+[[Category:Main Page]]

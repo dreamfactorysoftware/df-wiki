@@ -1,0 +1,120 @@
+= PHP and Laravel =
+<span id="php-and-laravel-optimization"></span>
+= PHP and Laravel Optimization =
+
+DreamFactory is built on PHP and the Laravel framework. Properly configuring the PHP runtime and leveraging Laravel's built-in optimization features can significantly improve API response times and overall throughput. This guide covers the key settings and techniques for getting the best performance from your DreamFactory installation.
+
+<span id="php-version-requirements"></span>
+== PHP Version Requirements ==
+
+DreamFactory 7.4.x requires '''PHP 8.1 or higher'''. Each new PHP release includes performance improvements in the Zend engine, so running the latest stable PHP version (currently PHP 8.2 or 8.3) is recommended for optimal performance.
+
+<span id="opcache-configuration"></span>
+== OPcache Configuration ==
+
+OPcache is a PHP bytecode caching extension that eliminates the need to parse and compile PHP scripts on every request. It is included with PHP by default and should always be enabled in production.
+
+Add or verify the following settings in your <code>php.ini</code> or a dedicated OPcache configuration file:
+
+<syntaxhighlight lang="ini">[opcache]
+opcache.enable=1
+opcache.memory_consumption=256
+opcache.max_accelerated_files=20000
+opcache.validate_timestamps=0
+opcache.interned_strings_buffer=16
+opcache.fast_shutdown=1</syntaxhighlight>
+Setting <code>opcache.validate_timestamps=0</code> provides the best performance because PHP will not check whether files have changed on disk. However, you must restart PHP-FPM (or the web server) after deploying code changes to clear the OPcache.
+<span id="jit-compilation"></span>
+== JIT Compilation ==
+
+PHP 8.1+ includes a Just-In-Time (JIT) compiler that can further improve performance for CPU-intensive operations. To enable JIT for DreamFactory workloads:
+
+<syntaxhighlight lang="ini">opcache.jit=1255
+opcache.jit_buffer_size=128M</syntaxhighlight>
+The <code>1255</code> value enables tracing JIT mode, which is the recommended setting for web applications. Benchmark your specific workload to confirm JIT provides a measurable benefit — for I/O-bound workloads (e.g., database queries), the improvement may be modest.
+
+<span id="laravel-optimization-commands"></span>
+== Laravel Optimization Commands ==
+
+Laravel provides several Artisan commands that cache configuration, routes, and views to eliminate file system reads on every request. Run these commands after every deployment:
+
+<syntaxhighlight lang="bash"># Cache the merged configuration files
+php artisan config:cache
+
+# Cache the route definitions
+php artisan route:cache
+
+# Compile and cache all Blade view templates
+php artisan view:cache</syntaxhighlight>
+These three commands can reduce first-request latency by 50-100ms by avoiding redundant file parsing.
+
+To clear these caches (e.g., during development):
+
+<syntaxhighlight lang="bash">php artisan config:clear
+php artisan route:clear
+php artisan view:clear</syntaxhighlight>
+<span id="environment-configuration"></span>
+== Environment Configuration ==
+
+Several <code>.env</code> file settings directly affect performance:
+
+<syntaxhighlight lang="bash"># CRITICAL: Disable debug mode in production
+APP_DEBUG=false
+
+# Set the environment to production
+APP_ENV=production
+
+# Use Redis or Memcached for caching instead of file-based
+CACHE_DRIVER=redis
+
+# Use Redis for session storage in load-balanced environments
+SESSION_DRIVER=redis</syntaxhighlight>
+Never run with <code>APP_DEBUG=true</code> in production. Debug mode enables detailed error traces and significantly increases response times due to extra logging and stack trace generation.
+<span id="queue-worker-configuration"></span>
+== Queue Worker Configuration ==
+
+DreamFactory can offload time-consuming operations (such as broadcast events and script execution) to background queue workers. Configure the queue driver in your <code>.env</code>:
+
+<syntaxhighlight lang="bash">QUEUE_CONNECTION=redis</syntaxhighlight>
+Then start a queue worker process:
+
+<syntaxhighlight lang="bash">php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600</syntaxhighlight>
+In production, use a process supervisor like '''systemd''' or '''Supervisor''' to keep the queue worker running:
+
+<syntaxhighlight lang="ini">[program:dreamfactory-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /opt/dreamfactory/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+numprocs=2
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/log/dreamfactory-worker.log</syntaxhighlight>
+<span id="memory-and-execution-time"></span>
+== Memory and Execution Time ==
+
+For API endpoints that process large payloads (bulk inserts, file uploads, complex queries), you may need to adjust PHP's memory and time limits:
+
+<syntaxhighlight lang="ini">; In php.ini or php-fpm pool config
+memory_limit=512M
+max_execution_time=120
+post_max_size=100M
+upload_max_filesize=100M</syntaxhighlight>
+Adjust these values based on your actual workload requirements. For most DreamFactory installations, 256-512MB of memory is sufficient.
+
+<span id="composer-autoloader-optimization"></span>
+== Composer Autoloader Optimization ==
+
+Laravel uses Composer's autoloader to resolve class locations. Optimizing the autoloader creates a class map that speeds up class loading:
+
+<syntaxhighlight lang="bash">composer install --optimize-autoloader --no-dev</syntaxhighlight>
+The <code>--no-dev</code> flag excludes development dependencies, reducing the number of files PHP needs to manage.
+
+== See also ==
+* [[Getting_Started/Webserver|Web Server]]
+* [[Getting_Started/Database|Database APIs]]
+
+[[Category:Php_Optimization]]
+[[Category:Laravel]]
+[[Category:Opcache]]
+[[Category:Getting_Started]]

@@ -1,0 +1,201 @@
+= Integrating Salesforce Data using DreamFactory =
+[https://www.salesforce.com/ Salesforce] is the de facto standard CRM solution used by companies large and small to manage customer information and interactions. Although many competing solutions exist, Salesforce's dominance is made clear in the company's [https://s23.q4cdn.com/574569502/files/doc_financials/2019/Salesforce-FY-2019-Annual-Report.pdf 2019 annual report] in which it states 95% of the Fortune 100 run at least one application from the company's suite of solutions.
+
+Many companies desire to access and manage Salesforce data into other applications. DreamFactory can greatly reduce the amount of work required to do so thanks to the native Salesforce database connector. In this chapter you'll learn how to configure the connector, and then interact with your Salesforce database using the DreamFactory-generated REST API.
+
+<span id="configuring-the-salesforce-service"></span>
+== Configuring the Salesforce Service ==
+
+Connecting your Salesforce account to DreamFactory is easily accomplished in a few short steps. As with all DreamFactory services, you'll begin by logging into your DreamFactory instance, selecting the <code>Services</code> tab, and clicking the <code>Create</code> link located in the left-hand menubar. From there you'll choose the <code>Salesforce</code> service located within the <code>Database</code> category:
+
+[[File:choose-salesforce.png|thumb|Creating a DreamFactory SalesForce Service]]
+Next you'll assign a name, label, and description. Recall from earlier chapters that the name will play a role as a namespace for the generated API URI structure, therefore you'll need to use alphanumeric characters only. I'll use the name <code>salesforce</code> for purposes of this tutorial. The label and description are used as referential information and can be assigned anything you please.
+
+Next, click on the <code>Config</code> tab. Here you'll enter authentication credentials used to connect to your Salesforce environment. DreamFactory supports two authentication options: OAuth and non-OAuth. I'll show you how to configure the latter. To configure non-OAuth authentication, you'll need to complete the following <code>Config</code> tab fields:
+
+* Username: This is the e-mail address you use to login to your Salesforce account.
+* Password: This is the password associated with your Salesforce account.
+* Security Token: This is an alphanumeric key that is supplied to the Salesforce API along with your username and password. It is intended to serve as an additional safeguard should the account username and password be compromised. I'll show you how to find your account's security token in a moment.
+* Organization WSDL: The organization WSDL defines the web service endpoints associated with your specific organization. I'll show you how to obtain and install this document in a moment.
+
+<span id="obtaining-the-security-token"></span>
+=== Obtaining the Security Token ===
+
+I'll presume you know your Salesforce account username and password, so let's turn attention to the security token. Login to your Salesforce account, and click on your account avatar located at the top right of the page:
+
+[[File:account-settings.png|thumb|Obtaining a SalesForce Security Token]]
+Click the <code>Settings</code> link. On the left-side of the page you'll see a link titled <code>Reset My Security Token</code>. Click the <code>Reset Security Token</code> button to generate a new token. the new token will be emailed to the e-mail address associated with your account. Paste this token into DreamFactory's <code>Security Token</code> field.
+
+{{Warning|Keep in mind that if you've previously generated a security token, clicking this button will ''replace'' the old token, meaning any Salesforce integrations you've created using the original token will no longer work. Therefore if you already possess a security token, there is no need to generate a new one.}}
+
+<span id="obtaining-the-enterprise-wsdl"></span>
+=== Obtaining the Enterprise WSDL ===
+
+Next, let's obtain the Enterprise WSDL document. Login to your Salesforce account, and enter API in the search box located at the top of the page. Select API from the list of candidate results. You'll be taken to the following page:
+
+[[File:api-wsdl.png|thumb|Obtaining the SalesForce Enterprise WSDL Document]]
+Click the <code>Generate Enterprise WSDL</code> link to generate the required WSDL document. A new tab will open containing the document contents. Copy the contents into a file named <code>enterprise.wsdl</code> (you can actually call the file anything you want, just made sure it uses the <code>wsdl</code> extension). Some browsers such as Chrome will prepend a warning message of sorts about the document content. For instance this is what Chrome adds:
+
+<pre>This XML file does not appear to have any style information
+associated with it. The document tree is shown below.</pre>
+You'll need to remove any such messages found at the beginning of the WSDL document because it is invalid syntax. After saving the changes, upload the document to your DreamFactory server and place it within your DreamFactory <code>storage/wsdl</code> directory. Then return to the <code>Config</code> tab and set the <code>Organization WSDL</code> field to just the name of the WSDL file (do not include the path).
+
+After completing the <code>Username</code>, <code>Password</code>, <code>Security Token</code>, and <code>Organization WSDL</code> fields, save the changes by pressing the <code>Save</code> button. Congratulations, your Salesforce API has just been generated!
+
+<span id="interacting-with-the-salesforce-api"></span>
+== Interacting with the Salesforce API ==
+
+After saving your new Salesforce API, head over to the <code>API Docs</code> tab to learn more about the generated endpoints. Perhaps most notably in the exploratory stages, you'll want to check out the <code>GET /_table Retrieve one or more Tables</code> endpoint because executing it will present a list of all tables you can query and modify. At the time of this writing almost 500 tables were exposed, giving you all sorts of capabilities regarding managing Salesforce data.
+
+Among the available tables is one named <code>Account</code>. You can retrieve data from this table by navigating to the next available endpoint presented in the <code>API Docs</code> interface. It's named <code>GET /_table/{table_name} Retrieve one or more records</code>. Click the <code>Try it out</code> button, enter <code>Account</code> in the <code>table_name</code> field, and press <code>Execute</code>. In return you'll receive an array of accounts managed in your Salesforce database. Below I've pasted in a partial example of one of the example records found in the example Salesforce database:
+
+<pre>{
+  &quot;attributes&quot;: {
+    &quot;type&quot;: &quot;Account&quot;,
+    &quot;url&quot;: &quot;/services/data/v46.0/sobjects/Account/0016A00000MJRN9QAP&quot;
+  },
+  &quot;Id&quot;: &quot;0016A00000MJRN9QAP&quot;,
+  &quot;IsDeleted&quot;: false,
+  &quot;MasterRecordId&quot;: null,
+  &quot;Name&quot;: &quot;United Oil &amp; Gas Corp.&quot;,
+  &quot;Type&quot;: &quot;Customer - Direct&quot;,
+  &quot;ParentId&quot;: null,
+  &quot;BillingStreet&quot;: &quot;1301 Avenue of the Americas \r\nNew York, NY 10019\r\nUSA&quot;,
+  &quot;BillingCity&quot;: &quot;New York&quot;,
+  &quot;BillingState&quot;: &quot;NY&quot;,
+  &quot;BillingPostalCode&quot;: null,
+  &quot;BillingCountry&quot;: null,
+  ...
+  &quot;CustomerPriority__c&quot;: &quot;High&quot;,
+  &quot;SLA__c&quot;: &quot;Platinum&quot;,
+  &quot;Active__c&quot;: &quot;Yes&quot;,
+  &quot;NumberofLocations__c&quot;: 955,
+  &quot;UpsellOpportunity__c&quot;: &quot;Yes&quot;,
+  &quot;SLASerialNumber__c&quot;: &quot;6654&quot;,
+  &quot;SLAExpirationDate__c&quot;: &quot;2018-10-04&quot;
+},</pre>
+<span id="retrieving-a-specific-account-record"></span>
+=== Retrieving a Specific Account Record ===
+
+To retrieve a specific account, you can use the <code>GET /_table/{table_name}/{id}</code> endpoint. For instance the above example "United Oil &amp; Gas Corp" account is associated with id <code>0016A00000MJRN9QAP</code>. Therefore you can obtain this specific record by requesting the following URI:
+
+<pre>/api/v2/salesforce/_table/account/0016A00000MJRN9QAP</pre>
+<span id="retrieving-specific-fields"></span>
+=== Retrieving Specific Fields ===
+
+Accounts are associated with dozens of attributes, many of which might not be of any interest to you. You can use the <code>fields</code> parameter to identify which specific attributes you'd like returned:
+
+<pre>/api/v2/salesforce/_table/account/0016A00000MJRN9QAP?fields=Name,Type,BillingCity</pre>
+This request returns the following response:
+
+<syntaxhighlight lang="text">
+{
+  &quot;attributes&quot;: {
+    &quot;type&quot;: &quot;Account&quot;,
+    &quot;url&quot;: &quot;/services/data/v46.0/sobjects/Account/0016A00000MJRN9QAP&quot;
+  },
+  &quot;Name&quot;: &quot;United Oil &amp; Gas Corp.&quot;,
+  &quot;Type&quot;: &quot;Customer - Direct&quot;,
+  &quot;BillingCity&quot;: &quot;New York&quot;,
+  &quot;Id&quot;: &quot;0016A00000MJRN9QAP&quot;
+}
+</syntaxhighlight>
+<span id="updating-a-record"></span>
+=== Updating a Record ===
+
+Many DreamFactory users use the Salesforce connector to facilitate updating records outside of the Salesforce web interface. You can easily do so using the <code>PATCH /_table/{table_name}</code> endpoint. For instance, suppose you want to update the "United Oil &amp; Gas Corp." account record to include the billing latitude and longitude. After all, one can never be too exacting when it comes to billing requirements.
+
+To update the record you'll send a <code>PATCH</code> request to:
+
+<pre>/api/v2/salesforce/_table/account/0016A00000MJRN9QAP</pre>
+The request body would look like this:
+
+<syntaxhighlight lang="text">
+{
+  &quot;BillingLatitude&quot;: &quot;40.762025&quot;,
+  &quot;BillingLongitude&quot;: &quot;-73.980074&quot;
+}
+</syntaxhighlight>
+In response to the PATCH request you'll receive just the record ID in return:
+
+<syntaxhighlight lang="text">
+{
+  &quot;Id&quot;: &quot;0016A00000MJRN9QAP&quot;
+}
+</syntaxhighlight>
+If you'd like additional fields to be returned in the response, use the <code>fields</code> parameter:
+
+/api/v2/salesforce/_table/account/0016A00000MJRN9QAP?fields=Name,BillingCity
+
+Upon successful update, the following response is returned:
+
+<syntaxhighlight lang="text">
+{
+  &quot;attributes&quot;: {
+    &quot;type&quot;: &quot;Account&quot;,
+    &quot;url&quot;: &quot;/services/data/v46.0/sobjects/Account/0016A00000MJRN9QAP&quot;
+  },
+  &quot;Name&quot;: &quot;United Oil &amp; Gas Corp.&quot;,
+  &quot;BillingCity&quot;: &quot;New York&quot;,
+  &quot;Id&quot;: &quot;0016A00000MJRN9QAP&quot;
+}
+</syntaxhighlight>
+<span id="synchronizing-salesforce-data-with-mysql"></span>
+=== Synchronizing Salesforce Data with MySQL ===
+
+Many DreamFactory users desire to synchronize Salesforce data with a database such as MySQL. This can be accomplished using a few different approaches. The easiest involves adding business logic to one of the exposed Salesforce API endpoints. For instance, suppose we wanted to additionally check a MySQL database for the existence of an account record every time a particular account record was retrieved via the Salesforce API. If the record doesn't exist in the MySQL database, we'll add it.
+
+To do so, navigate to the <code>Scripts</code> tab inside your DreamFactory administration console, choose the <code>salesforce</code> API, and then drill down until you reach the <code>salesforce._table.Account.get.post_process</code> endpoint. The <code>post_process</code> event handler was chosen because the associated business logic will execute ''after'' the account data has been returned from Salesforce.
+
+Here you'll be presented with the scripting interface. Four scripting engines are supported, including PHP, Python (2 and 3), and NodeJS. You can link to a script found in a repository hosted on GitHub, GitLab, or BitBucket, however for the purposes of this example I'll just use the glorified text area included in the interface.
+
+Returning to our earlier example, recall that this request:
+
+<pre>/api/v2/salesforce/_table/account/0016A00000MJRN9QAP?fields=Name,BillingCity</pre>
+Will return this response:
+
+<syntaxhighlight lang="text">
+{
+  &quot;attributes&quot;: {
+    &quot;type&quot;: &quot;Account&quot;,
+    &quot;url&quot;: &quot;/services/data/v46.0/sobjects/Account/0016A00000MJRN9QAP&quot;
+  },
+  &quot;Name&quot;: &quot;United Oil &amp; Gas Corp.&quot;,
+  &quot;BillingCity&quot;: &quot;New York&quot;,
+  &quot;Id&quot;: &quot;0016A00000MJRN9QAP&quot;
+}
+</syntaxhighlight>
+The JSON will automatically be converted into an array and made available to your script within the <code>$event</code> array which is injected into the script. Specifically, you'll find it within <code>$event['response']['content']</code>. The following example script retrieves this array, and repurposes the desired data within another array named <code>$record</code> which is subsequently POSTed to another API named <code>mysql</code>, specifically to the API's <code>billing</code> table:
+
+<syntaxhighlight lang="php">
+$api = $platform['api'];
+
+// Retrieve the response body. This contains the returned records.
+$responseBody = $event['response']['content'];
+
+$record = [];
+
+$record[&quot;resource&quot;] = [
+    [
+        'name' =&gt; $responseBody[&quot;Name&quot;],
+        'billing_city' =&gt; $responseBody[&quot;BillingCity&quot;]
+    ]
+];
+
+$url = &quot;mysql/_table/billing/&quot;;
+$post = $api-&gt;post;
+
+$result = $post($url, $record, []);
+
+return $result;
+</syntaxhighlight>
+Keep in mind the supported scripting engines (PHP, Python, NodeJS) are not incomplete or hobbled versions. These are the very same engines installed on the same server as DreamFactory, and as such you are free to take advantage of any language-specific packages or libraries simply by installing them on the server.
+
+<span id="conclusion"></span>
+== Conclusion ==
+
+DreamFactory's Salesforce connector dramatically reduces the amount of time and effort required to integrate Salesforce with other systems. If you'd like to learn more about what DreamFactory can do for you, e-mail us at <a href="mailto:info@dreamfactory.com">info@dreamfactory.com</a>!
+
+[[Category:Salesforce]]
+[[Category:Legacy_Guide]]
+[[Category:Integrating]]

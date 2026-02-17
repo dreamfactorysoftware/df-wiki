@@ -1,0 +1,20 @@
+<noinclude>
+API connector category card for the Main Page connectors grid.
+
+== Parameters ==
+* '''type''' — connector category name (e.g., "SQL Databases")
+* '''icon''' — emoji or symbol
+* '''items''' — comma-separated list of connector names
+* '''link''' — wiki page link target
+
+== Usage ==
+<pre>
+{{ConnectorType|type=SQL Databases|icon=🗄️|items=MySQL, PostgreSQL, SQL Server, Oracle, SQLite, IBM Db2|link=API/Generating A Database-Backed API}}
+</pre>
+</noinclude><includeonly><div class="mp-connector-card">
+<div class="mp-connector-header">
+<span class="mp-connector-icon">{{{icon|🔌}}}</span>
+<span class="mp-connector-type">[[{{{link}}}|{{{type}}}]]</span>
+</div>
+<div class="mp-connector-items">{{{items}}}</div>
+</div></includeonly>

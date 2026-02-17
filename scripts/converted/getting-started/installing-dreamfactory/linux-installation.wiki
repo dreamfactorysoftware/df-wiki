@@ -1,0 +1,79 @@
+= Linux Installation =
+<span id="linux-installation"></span>
+= Linux installation =
+
+DreamFactory can be installed on most common Linux platforms using our automated installer. The installer is designed to deploy DreamFactory as the primary application on the server (the site is published on port 80 of the local host). This guide provides instructions for downloading and running the installer on a new Linux server.
+
+<span id="supported-operating-systems"></span>
+== Supported operating Systems ==
+
+DreamFactory currently supports the following flavors of Linux:
+
+* CentOS 7
+* RHEL 7/8/9
+* Oracle Linux 7/8
+* Debian 10/11
+* Fedora 36/37
+* Ubuntu 22/24
+
+<span id="automated-installer"></span>
+== Automated installer ==
+
+The installer can be found in [https://github.com/dreamfactorysoftware/dreamfactory/tree/master/installers DreamFactory's GitHub repository].
+
+Follow these steps to execute the script on your Linux machine:
+
+<ol style="list-style-type: decimal;">
+<li><p>Download the script from GitHub:</p>
+<p><code>wget https://github.com/dreamfactorysoftware/dreamfactory/raw/master/installers/dfsetup.run</code></p></li>
+<li><p>Make the installer executable:</p>
+<p><code>chmod +x dfsetup.run</code></p></li>
+<li><p>Run the installer as sudo:</p>
+<p><code>sudo ./dfsetup.run</code></p></li></ol>
+
+<span id="using-the-installer"></span>
+=== Using the installer ===
+
+Once the installer opens, an interactive menu displays:
+
+[[File:df-linux-installer-start.png|thumb|linux installer start]]
+A typical installation uses options 0, 5, and 8 for a default build of the latest version of DreamFactory with NGINX as a web server. MariaDB is installed and configured as the system database, and a debug log is available in the <code>/tmp/</code> directory.
+
+If using the options for Oracle or Trino drivers please refer to [[Getting_Started/Installing_Additional_Drivers|Installing Additional Drivers]]
+
+The installer verifies the Linux platform is supported and then begins installing dependencies. As each dependency is installed, a progress bar (…) is visible along with any issues that are encountered. You can also tail the log file in the <code>/tmp</code> directory if needed.
+
+[[File:df-linux-installer-installing.png|thumb|linux installer installing]]
+The rest of the installer's process provides prompts for you to enter the location of commercial license files, database settings, and initial admin user information. Ensure that you record the system DB details before closing the terminal.
+
+[[File:df-linux-installer-complete.png|thumb|linux installer complete]]
+You can now access the DreamFactory UI from a web browser by pointing to the server IP address and using the credentials created during the installer process.
+
+[[File:df-login-page.png|thumb|DreamFactory login page]]
+<span id="about-the-system-database"></span>
+== About The system database ==
+
+During the installation, you must point DreamFactory's installation to a system database. This database holds the entire configuration for your DreamFactory instance and can be used to replicate, restore, or upgrade an instance in the future. While the default configuration above can set up a system database on localhost, many users, especially those at scale, prefer the system database to be hosted elsewhere. This configuration can be (re)entered by running the following command from the <code>/opt/dreamfactory/</code> directory:
+
+<code>php artisan df:env</code>
+
+The configuration can also be changed manually by editing <code>/opt/dreamfactory/.env</code>. For more information, refer to our [[Getting_Started/Basic_Configuration|DreamFactory Basic Configuration]] documentation.
+
+<span id="supported-system-databases"></span>
+=== Supported system databases ===
+
+Currently, the supported system database types are:
+
+* SQLite
+* MySQL (MariaDB)
+* PostgreSQL
+* SQL Server
+
+== See also ==
+* [[Getting_Started/Docker_Installation|Docker Installation]]
+* [[Getting_Started/Windows_Installation|Windows Installation]]
+* [[Getting_Started/Installing_Dreamfactory|Installing DreamFactory]]
+
+[[Category:Installation]]
+[[Category:Getting_Started]]
+[[Category:Linux]]

@@ -1,0 +1,327 @@
+<span id="helm-installation"></span>
+= Helm Installation =
+
+This guide covers how to install DreamFactory 7.x using the official Helm chart.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+<span id="install-helm"></span>
+=== Install Helm ===
+
+Before proceeding with the DreamFactory Helm installation, ensure you have Helm installed on your system. See the [https://helm.sh/docs/intro/install/ official Helm installation guide] for detailed instructions.
+
+<span id="installation-steps"></span>
+== Installation Steps ==
+
+<span id="clone-the-df-helm-repository"></span>
+=== 1. Clone the df-helm Repository ===
+
+Navigate to your desired directory and clone the repository:
+
+<syntaxhighlight lang="bash">cd ~/repos  # or wherever you want the clone of the repo to be
+git clone https://github.com/dreamfactorysoftware/df-helm.git
+cd df-helm</syntaxhighlight>
+<span id="configure-the-installation"></span>
+=== 2. Configure the Installation ===
+
+Edit the <code>values.yaml</code> file to customize your installation. At minimum, update the MySQL root password to a secure value:
+
+<syntaxhighlight lang="yaml"># Update this value in values.yaml
+mysql:
+  rootPassword: "your-secure-password"</syntaxhighlight>
+Change replica count to 1 to start so when we get to the post installation steps we can grab the APP_KEY before scaling up the deployment:
+
+<syntaxhighlight lang="yaml"># Update this value in values.yaml
+ image:
+    repository: dreamfactorysoftware/df-docker
+    tag: latest
+  replicaCount: 1</syntaxhighlight>
+<span id="install-dreamfactory"></span>
+=== 3. Install DreamFactory ===
+
+Start the DreamFactory pods using Helm:
+
+<syntaxhighlight lang="bash">helm install dreamfactory .</syntaxhighlight>
+<span id="verify-installation"></span>
+=== 4. Verify Installation ===
+
+Check that all pods are running correctly:
+
+<syntaxhighlight lang="bash">kubectl get pods</syntaxhighlight>
+You should see: - 2 DreamFactory pods - 1 MySQL pod for system config storage - 1 Redis pod for caching
+
+<span id="commercial-instance-creation"></span>
+== Commercial Instance Creation ==
+
+For commercial DreamFactory installations, you'll need to build a custom Docker image that includes your commercial components and license key. Follow these steps:
+
+<span id="pull-the-base-dreamfactory-image"></span>
+=== 1. Pull the Base DreamFactory Image ===
+
+<syntaxhighlight lang="bash">docker pull dreamfactorysoftware/df-docker:latest</syntaxhighlight>
+<span id="replace-commercial-composer-files"></span>
+=== 2. Replace Commercial Composer Files ===
+
+The DreamFactory Docker image comes with 3 composer files that need to be replaced with your commercial versions:
+
+* <code>composer.json</code>
+* <code>composer.lock</code><br />
+
+* <code>composer.json-dist</code>
+
+Replace these files in the Docker image directory with the commercial versions provided to you. The composer installation and dependency management is handled automatically during the Docker build process.
+
+<span id="modify-the-dockerfile"></span>
+=== 3. Modify the Dockerfile ===
+
+Edit the existing <code>Dockerfile</code> that comes with the DreamFactory image. You need to uncomment two specific lines:
+
+# '''Uncomment the composer files copy line''' (around line 25):
+
+<syntaxhighlight lang="docker"># Add commercial files if running a licensed version
+COPY composer.* /opt/dreamfactory/</syntaxhighlight>
+<ol start="2" style="list-style-type: decimal;">
+<li>'''Uncomment and update the license key line''' (around line 35):</li></ol>
+
+<syntaxhighlight lang="docker"># Replace YOUR_LICENSE_KEY with your license key, keeping the comma at the end
+RUN sed -i "s,\#DF_REGISTER_CONTACT=,DF_LICENSE_KEY=your-actual-license-key," /opt/dreamfactory/.env</syntaxhighlight>
+<span id="build-the-custom-image"></span>
+=== 4. Build the Custom Image ===
+
+Build your custom Docker image (do not deploy yet):
+
+<syntaxhighlight lang="bash">docker build -t your-registry/dreamfactory-commercial:latest .</syntaxhighlight>
+<span id="push-to-your-private-registry"></span>
+=== 5. Push to Your Private Registry ===
+
+Push the image to your private Docker registry or DevOps platform:
+
+<syntaxhighlight lang="bash"># For Docker Hub
+docker push your-registry/dreamfactory-commercial:latest
+
+# For other registries (replace with your registry URL)
+docker tag your-registry/dreamfactory-commercial:latest your-registry.com/dreamfactory-commercial:latest
+docker push your-registry.com/dreamfactory-commercial:latest</syntaxhighlight>
+<span id="configure-helm-chart-to-use-custom-image"></span>
+=== 6. Configure Helm Chart to Use Custom Image ===
+
+Update your <code>values.yaml</code> file to reference your custom image:
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  image:
+    repository: your-registry/dreamfactory-commercial
+    tag: latest
+    pullPolicy: Always
+  
+  # If using a private registry, add image pull secrets
+  imagePullSecrets:
+    - name: your-registry-secret</syntaxhighlight>
+<span id="create-image-pull-secret-if-using-private-registry"></span>
+=== 7. Create Image Pull Secret (if using private registry) ===
+
+If your custom image is in a private registry, create a Kubernetes secret:
+
+<syntaxhighlight lang="bash">kubectl create secret docker-registry your-registry-secret \
+    --docker-server=your-registry.com \
+    --docker-username=your-username \
+    --docker-password=your-password \
+    --docker-email=your-email@example.com</syntaxhighlight>
+<span id="deploy-with-custom-image"></span>
+=== 8. Deploy with Custom Image ===
+
+Install or upgrade your DreamFactory deployment:
+
+<syntaxhighlight lang="bash"># For new installation
+helm install dreamfactory . -f 
+
+# For existing installation
+helm upgrade dreamfactory . -f values.yaml</syntaxhighlight>
+<span id="accessing-dreamfactory"></span>
+== Accessing DreamFactory ==
+
+<span id="method-1-port-forwarding-without-ingress"></span>
+=== Method 1: Port Forwarding (Without Ingress) ===
+
+For local development or testing, you can access DreamFactory using port forwarding:
+
+<syntaxhighlight lang="bash">kubectl port-forward svc/dreamfactory-dreamfactory 8080:80</syntaxhighlight>
+Then navigate to <code>http://127.0.0.1:8080</code> in your browser. The initial setup may take some time, but you'll eventually be prompted to create your first admin user.
+
+<span id="method-2-ingress-controller"></span>
+=== Method 2: Ingress Controller ===
+
+For production deployments, configure an ingress controller to access DreamFactory externally.
+
+<span id="basic-configuration"></span>
+==== Basic Configuration ====
+
+Update the ingress section in your <code>values.yaml</code>:
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: nginx  # or your preferred ingress controller
+    annotations:
+      # Add any required annotations for your ingress controller
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod  # if using cert-manager
+    hosts:
+      - your-domain.example.com
+    tls: true</syntaxhighlight>
+Apply the configuration:
+
+<syntaxhighlight lang="bash">helm upgrade dreamfactory . -f values.yaml</syntaxhighlight>
+<span id="ingress-configuration-examples"></span>
+== Ingress Configuration Examples ==
+
+<span id="basic-http-setup-existing-nginx-ingress-with-no-tls"></span>
+=== Basic HTTP Setup (Existing NGINX Ingress with no TLS) ===
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: nginx
+    hosts:
+      - df.example.com
+    tls: false
+    pathType: Prefix</syntaxhighlight>
+<span id="https-with-tls-existing-nginx-ingress-with-tls"></span>
+=== HTTPS with TLS (Existing NGINX Ingress with TLS) ===
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-issuer-name
+    hosts:
+      - df.example.com
+    tls: true
+    pathType: Prefix</syntaxhighlight>
+<span id="aws-alb-setup"></span>
+=== AWS ALB Setup ===
+
+'''Prerequisites''': AWS Load Balancer Controller must be installed. See the [https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/deploy/installation/ installation guide].
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: alb
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/ssl-redirect: '443'
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-2017-01
+      alb.ingress.kubernetes.io/certificate-arn: '' # Certificate needs to exist in AWS Certificate Manager
+    hosts:
+      - df.example.com
+    tls: false
+    pathType: Prefix</syntaxhighlight>
+<span id="contour-ingress-setup"></span>
+=== Contour Ingress Setup ===
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: contour
+    annotations:
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      projectcontour.io/max-connections: "1024"
+      projectcontour.io/response-timeout: 30s
+      projectcontour.io/websocket-routes: /
+    hosts:
+      - df.example.com
+    tls: true
+    pathType: Prefix</syntaxhighlight>
+<span id="gcp-ingress-setup-google-managed-certificates"></span>
+=== GCP Ingress Setup (Google Managed Certificates) ===
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: gce
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: "dreamfactory-ip"  # Optional: if you want a static IP
+      networking.gke.io/v1beta1.FrontendConfig: "dreamfactory-ssl-redirect"
+      networking.gke.io/managed-certificates: "dreamfactory-cert"
+    hosts:
+      - df.example.com
+    tls: false
+    pathType: Prefix</syntaxhighlight>
+<span id="gcp-ingress-setup-letsencrypt"></span>
+=== GCP Ingress Setup (LetsEncrypt) ===
+
+<syntaxhighlight lang="yaml">dreamfactory:
+  ingress:
+    enabled: true
+    ingressClass: gce
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: "dreamfactory-ip"  # Optional: if you want a static IP
+      networking.gke.io/v1beta1.FrontendConfig: "dreamfactory-ssl-redirect"
+      cert-manager.io/cluster-issuer: letsencrypt-issuer-name
+    hosts:
+      - df.example.com
+    tls: true
+    pathType: Prefix</syntaxhighlight>
+<span id="post-installation-steps"></span>
+== Post-Installation Steps ==
+
+<span id="verify-ingress-creation"></span>
+=== 1. Verify Ingress Creation ===
+
+After applying the configuration, verify the ingress was created:
+
+<syntaxhighlight lang="bash">kubectl get ingress</syntaxhighlight>
+<span id="configure-dns"></span>
+=== 2. Configure DNS ===
+
+Ensure your DNS is configured to point to the ingress controller's address.
+
+<span id="access-dreamfactory"></span>
+=== 3. Access DreamFactory ===
+
+Access DreamFactory at the configured host (e.g., <code>https://df.example.com</code>).
+
+'''Note''': TLS configuration requires either cert-manager installed in your cluster or manually created TLS secrets.
+
+<span id="obtaining-the-app-key"></span>
+== Obtaining the APP Key ==
+
+After your DreamFactory instance is running, you'll need the APP_KEY value from the <code>.env</code> file. Retrieve it using:
+
+<syntaxhighlight lang="bash">kubectl exec -it <pod-name> -- env | grep APP_KEY</syntaxhighlight>
+Replace <code>&lt;pod-name&gt;</code> with the actual name of your DreamFactory pod.
+
+The APP_KEY is a critical component of your DreamFactory instance. You will need to save it as it is what is used to encrypt your data entered into and retrieved from your system DB.
+
+In the Helm chart after successfully deploying the first time you will need to add the APP_KEY into your secrets.yaml file so that the APP_KEY is injected into all future pods. The line in question is:
+
+<syntaxhighlight lang="bash">app-key: {{ randAlphaNum 32 | b64enc | quote }} -- replace the braces and all with your APP_KEY in quotes</syntaxhighlight>
+By default it will create a random number, after initial install we only want to use the key that was generated at the very start.
+
+<span id="uninstalling-dreamfactory"></span>
+== Uninstalling DreamFactory ==
+
+To remove DreamFactory and all associated resources:
+
+<syntaxhighlight lang="bash">helm uninstall dreamfactory</syntaxhighlight>
+This will stop and uninstall all DreamFactory pods, MySQL, and Redis instances.
+
+<span id="additional-resources"></span>
+== Additional Resources ==
+
+* [http://guide.dreamfactory.com/ Getting Started Guide]
+* [http://wiki.dreamfactory.com DreamFactory Wiki]
+* [http://community.dreamfactory.com/ Community Support]
+* [https://www.dreamfactory.com/demo/ Commercial Licenses and Support]
+
+== See also ==
+* [[Getting_Started/Docker_Installation|Docker Installation]]
+* [[Getting_Started/Windows_Installation|Windows Installation]]
+* [[Getting_Started/Installing_Dreamfactory|Installing DreamFactory]]
+* [[Getting_Started/Installing_Additional_Drivers|Installing Additional Drivers]]
+
+[[Category:Installation]]
+[[Category:Getting_Started]]

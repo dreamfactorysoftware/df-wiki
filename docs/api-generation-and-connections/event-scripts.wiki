@@ -1,0 +1,158 @@
+= Event Scripts =
+'''Execute custom scripts on API events to validate requests, modify responses, and add business logic to your APIs'''
+
+<span id="event-scripts"></span>
+= Event Scripts =
+
+Event Scripting is a powerful feature in DreamFactory that allows you to execute custom scripts when specific system events occur. These scripts can modify requests and responses, perform additional actions, or interrupt the API call flow based on custom logic. These scripts are added to existing API services and can be used to extend the functionality of the API.
+
+<span id="event-format"></span>
+== Event Format ==
+
+API-generated events typically follow this format:
+
+service[.resource].verb[.type]
+
+Where: - '''service''': The name of the service/API - '''resource''': Optional resource path (replacing '/' with '.') - '''verb''': The HTTP verb used in the request (GET, POST, PUT, etc.) - '''type''': The type of event (pre_process, post_process, etc.)
+
+Example: <code>db._table.{table_name}.get.pre_process</code>
+
+This would be a script that is executed before a GET request to the <code>db._table.{table_name}</code> API, which would be all tables within the API.
+
+Example: <code>db._table.customer.get.pre_process</code>
+
+This would be a script that is executed before a GET request to the <code>db._table.customer</code> API, which is the API for only the <code>customer</code> table.
+
+<span id="scriptable-event-types"></span>
+== Scriptable Event Types ==
+
+DreamFactory supports three main types of event scripts:
+
+# '''Pre-Process''': Executed after authentication but before the API call is processed.
+# '''Post-Process''': Executed after the API call is processed but before the response is sent to the client.
+# '''Queued''': Executed asynchronously after the API call is completed.
+
+<span id="configuring-event-scripts"></span>
+== Configuring Event Scripts ==
+
+To create or update an event script, follow these steps:
+
+# Within the DreamFactory UI, navigate to "API Generation &amp; Connections" &gt; "Event Scripts"
+# Click the plus (+) button to create a new script
+# Select the service from the service dropdown
+# Select the event type and method from the dropdowns
+# If applicable, choose the table name for the script in the Table Name dropdown.
+# Optionally, change the script name
+# Choose the script language from the Script Type dropdown.
+# Mark the script as active, and if the script should modify the event (such as changing the payload or response), check the Allow Event Modification checkbox.
+# Add your script content, and save when complete.
+
+<span id="scripting-examples"></span>
+== Scripting Examples ==
+
+Explore a variety of scripting examples in the [https://github.com/dreamfactorysoftware/example-scripts df-scriptingexamples] repository. This repository contains numerous scripts demonstrating how to leverage DreamFactory's scripting capabilities to enhance your APIs.
+
+<span id="highlighted-scripts"></span>
+=== Highlighted Scripts ===
+
+<ul>
+<li><p>'''Pre-Process Validation Script''': Validates incoming request payloads to ensure required fields are present and modifies the payload as needed.</p>
+<syntaxhighlight lang="php"><?php
+// Check if the required field 'name' is present
+if (!isset($event['request']['payload']['name'])) {
+    $event['response']['status_code'] = 400;
+    $event['response']['content'] = ['error' => 'Name field is required'];
+}
+// Modify the payload
+$event['request']['payload']['timestamp'] = date('Y-m-d H:i:s');
+?></syntaxhighlight></li>
+<li><p>'''Post-Process Data Enrichment Script''': Enhances the response by adding additional data from related services.</p>
+<syntaxhighlight lang="php"><?php
+// Add a custom field to the response
+$event['response']['content']['custom_field'] = 'Added by post-process script';
+
+// Call another service to get related data
+$relatedData = $platform->api->get('related_service/data');
+$event['response']['content']['related_data'] = $relatedData;
+?></syntaxhighlight></li></ul>
+
+These examples illustrate how you can use event scripts to implement custom business logic, validate data, and enrich API responses. For more examples and detailed scripts, visit the [https://github.com/dreamfactorysoftware/df-scriptingexamples df-scriptingexamples] repository.
+
+<span id="programmatic-resources-available-to-a-script"></span>
+== Programmatic Resources Available to a Script ==
+
+When an event script is executed, DreamFactory provides two primary resources:
+
+* '''Event Resource''': Contains data about the event triggering the script.
+* '''Platform Resource''': Allows access to configuration, system states, and internal API calls.
+
+<span id="event-resource"></span>
+=== Event Resource ===
+
+The event resource includes properties such as <code>request</code>, <code>response</code>, and <code>resource</code>, which represent the inbound REST API call, the response, and any additional resource names, respectively.
+
+{| class="wikitable"
+|-
+! '''Property'''
+! '''Type'''
+! '''Description'''
+|-
+| '''request'''
+| resource
+| Represents the inbound REST API call, i.e. the HTTP request
+|-
+| '''response'''
+| resource
+| Represents the response to an inbound REST API call, i.e the HTTP response
+|-
+| '''resource'''
+| string
+| Any additional resource names typically represented as a replaceable part of the path, i.e. <code>table name</code> on a <code>db/_table/{table_name}</code> call
+|}
+
+<span id="platform-resource"></span>
+=== Platform Resource ===
+
+The platform resource provides access to the instance's REST API, configuration settings, and session information. It includes methods for making internal API calls using REST verbs like <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, and <code>delete</code>.
+
+{| class="wikitable"
+|-
+! '''Property'''
+! '''Type'''
+! '''Description'''
+|-
+| '''api'''
+| resource
+| An array/object that allows access to the instance's REST API
+|-
+| '''config'''
+| resource
+| An array/object consisting of the current configuration of the instance
+|-
+| '''session'''
+| resource
+| An array/object consisting of the current session information
+|}
+
+<span id="troubleshooting-tips"></span>
+== Troubleshooting Tips ==
+
+# '''Check script syntax''': Ensure your script has correct syntax for the chosen language.
+# '''Enable error logging''': Use DreamFactory's logging features to capture script errors.
+# '''Test incrementally''': Start with simple scripts and gradually add complexity.
+# '''Use platform.api for debugging''': Make API calls within your script to test functionality.
+# '''Monitor performance''': Be mindful of script execution time, especially for pre- and post-process scripts.
+
+By mastering event scripts, you can extend DreamFactory's functionality and create powerful, customized API behaviors tailored to your specific needs.
+
+== See also ==
+* [[Api_Keys|API Keys]]
+* [[Interacting_With_Api|Interacting With the API]]
+* [[Advanced_Database_Api_Features|Advanced Database API Features]]
+* [[Api_Creation_Management|api-creation-management]]
+
+[[Category:Event_Scripts]]
+[[Category:Pre-Process]]
+[[Category:Post-Process]]
+[[Category:API]]
+[[Category:Difficulty_Intermediate]]

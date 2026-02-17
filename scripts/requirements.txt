@@ -1,0 +1,5 @@
+# Python dependencies for migration scripts
+PyYAML>=6.0
+mwclient>=0.10.1
+requests>=2.28.0
+beautifulsoup4>=4.11.0

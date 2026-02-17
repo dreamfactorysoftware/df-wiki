@@ -1,0 +1,41 @@
+= Converting Excel to a JSON Response =
+<span id="converting-excel-to-a-json-response"></span>
+= Converting Excel to a JSON Response =
+
+DreamFactory's Excel connector is capable of turning an entire Excel workbook or specific worksheet into a JSON response (CSV files are also supported). Workbooks can be retrieved from any DreamFactory supported file-system (AWS S3, SFTP, and Azure Blob Storage, among others), or as in the example we will run through below, uploaded directly to the server's local file system. Access is controlled just like any other connector with role-based access control and API keys.
+
+<span id="creating-an-excel-connector-service"></span>
+== Creating an Excel Connector Service ==
+
+To create an Excel connector, log in to your DreamFactory instance using an administrator account and select the '''API Generation &amp; Connections''' tab. Set your API Type to '''File''', and then click the purple plus button to establish a new connection:
+
+[[File:file-api-creation.png|thumb|file api creation]]
+Navigate to the '''Excel''' option in the available service types:
+
+[[File:excel-api-selection.png|thumb|excel api selection]]
+Next, provide a name, label and description for your Excel connector service:
+
+[[File:excel-service-info.png|thumb|excel service info]]
+In the configuration section, you'll need to set the file storage service. If you have already setup an AWS S3 API or other file service, then that service will be available to you. For this example, we will use the local file storage service, and we will put our Excel file in <code>/opt/dreamfactory/storage/app</code> which means we will set the container path as <code>/</code> (the 'root' of where DreamFactory will look for locally stored files).
+
+[[File:excel-service-configuration.png|thumb|excel service configuration]]
+The root location for local file storage is <code>/opt/dreamfactory/storage/app</code>. If you store an Excel file(s) here, your Storage Container Path will be <code>/</code>. If you create a folder in here, e.g. <code>/opt/dreamfactory/storage/app/my-folder</code> then your Storage Container Path will be <code>/my-folder/</code>.
+<span id="using-the-excel-api"></span>
+== Using the Excel API ==
+
+Once configured, you will be able to access the API endpoint documentation via the API Docs tab. Here we have an example call to our workbook <code>financial-sample.xlsx</code>:
+
+[[File:excel-api-documentation.png|thumb|excel api documentation]]
+After configuring your Role and generating an API Key, you can interact with the Excel service. The below is a <code>GET</code> call to <code>/api/v2/&lt;excelServiceName&gt;/_spreadsheet/&lt;excelFilename&gt;</code>:
+
+[[File:excel-api-with-postman.png|thumb|excel api with postman]]
+When creating a role for your Excel connector, you will also need to provide service access to the relevant file storage service, in addition to the Excel service. For local file storage this will be the default "files" service.
+
+== See also ==
+* [[Creating_Aws_S3_Rest_Api|Creating an AWS S3 REST API]]
+* [[Creating_Sftp_Rest_Api|Creating an SFTP REST API]]
+* [[File|File System APIs]]
+
+[[Category:API]]
+[[Category:Converting]]
+[[Category:Excel]]

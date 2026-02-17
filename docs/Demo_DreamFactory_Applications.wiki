@@ -1,0 +1,152 @@
+= Demo DreamFactory Applications =
+We regularly receive requests for examples involving connecting DreamFactory to a web interface. In this chapter we'll include several examples involving modern JavaScript technologies, and in the near future will provide a GitHub repository where these and other examples can be downloaded.
+
+<span id="dynamic-dashboard-with-pagination-sorting-and-filtering"></span>
+== Dynamic Dashboard with Pagination, Sorting, and Filtering ==
+
+R&amp;D departments and others interested in rapid prototype development regularly turn to DreamFactory for quickly exposing data through an API which can then be connected to a web-based interface such as a dashboard. This sort of project is particularly easy since numerous interactive table-oriented JavaScript libraries can be configured to consume an API endpoint. One such solution is [https://tabulator.info/ Tabulator].
+
+In this example (screenshot below), viewable at https://tabulator.demo.dreamfactory.com/ and with the source code available on [https://github.com/dreamfactorysoftware/dreamfactory-tabulator GitHub], we've configured a MySQL database API containing almost 5 million records, and used Tabulator to present 300,000 records residing in one of the tables.
+
+{{Tip|You can interact with a live version of this application at https://tabulator.demo.dreamfactory.com/.}}
+
+[[File:tabulator.png|thumb|Example DreamFactory Application with Tabulator]]
+
+Check out the [https://github.com/dreamfactorysoftware/dreamfactory-tabulator GitHub project README] for information regarding how DreamFactory was configured to expose this API, and how you can easily configure this project to consume your own API.
+
+<span id="progressive-web-application"></span>
+== Progressive Web Application ==
+
+The above dashboard example certainly has its purposes, however web applications are often much more involved. For instance, you might connect to multiple data sources such as Salesforce and MySQL, and require users to authenticate via an authentication services provider such as Okta. Further, the interface must be responsive, capable of suiting different screen sizes (phone, tablet, and desktop).
+
+We've created a demo application (screenshots below) to suit this more ambitious set of requirements. It's live at https://pwa.demo.dreamfactory.com/, and the source code is downloadable via [https://github.com/dreamfactorysoftware/dreamfactory-demo-pwa GitHub].
+
+{{Tip|You can interact with a live version of this application at https://pwa.demo.dreamfactory.com/. Use the test credentials alex.smith@dreamfactory.com / TE%W2E%g0Lud0q8Gej to login!}}
+
+[[File:pwa-departments-mobile.png|thumb|Progressive Web Application Powered by DreamFactory]] [[File:pwa-customers-mobile.png|thumb|DreamFactory PWA Application Customers Screen]] [[File:pwa-customer-mobile.png|thumb|DreamFactory PWA Application Customer Show Page]]
+
+<span id="creating-a-simple-status-dashboard"></span>
+== Creating a Simple Status Dashboard ==
+
+This example demonstrates how to create a simple dashboard which will display status information (enabled or disabled) for a series of devices. Because a picture is worth a thousand words, let's start with a screenshot of the finished product:
+
+[[File:status-dashboard.png|thumb|Status Dashboard Application Powered by DreamFactory]]
+
+The device information is stored in a database table called <code>devices</code>. Naturally any DreamFactory-supported database could be used, however for sake of example we'll include the MySQL table creation statement here:
+
+<syntaxhighlight lang="sql">
+CREATE TABLE `devices` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+</syntaxhighlight>
+After generating the API within your DreamFactory instance (see [[../generating-a-database-backed-api/|Generating a Database-backed API]] to learn how to create a database-based API), it's time to create the web page which will interact with the API and present the data. We started by creating a new web page containing a simple HTML5 template. There are plenty such templates online, however we're fans of the version provided by [https://www.sitepoint.com/a-basic-html5-template/ SitePoint]. Here's what the starter file looks like:
+
+<syntaxhighlight lang="text">
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+
+  &lt;title&gt;Status Dashboard&lt;/title&gt;
+  &lt;meta name=&quot;description&quot; content=&quot;Simple status dashboard&quot;&gt;
+  &lt;meta name=&quot;author&quot; content=&quot;&quot;&gt;
+
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</syntaxhighlight>
+Next, we're going to take advantage of three popular open source/free solutions for executing AJAX calls and page design. These include:
+
+* [https://getbootstrap.com/ Bootstrap]: Bootstrap is the world's most popular front-end component data, used on hundreds of thousands if not millions of websites around the globe. We'll use Bootstrap's CSS styles for stylizing the tabular layout.
+* [https://github.com/axios/axios Axios]: Axios is a JavaScript-based HTTP client. We'll use Axios to craft AJAX calls which will talk to the database API.
+* [https://fontawesome.com/ Font Awesome]: FontAwesome is a very popular icon library. We'll use two of FontAwesome's icons to visually depict device status.
+
+With these libraries added, the template looks like this:
+
+<syntaxhighlight lang="text">
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+
+  &lt;title&gt;Status Dashboard&lt;/title&gt;
+  &lt;meta name=&quot;description&quot; content=&quot;Simple status dashboard&quot;&gt;
+  &lt;meta name=&quot;author&quot; content=&quot;&quot;&gt;
+
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css&quot;
+  integrity=&quot;sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS&quot;
+  crossorigin=&quot;anonymous&quot;&gt;
+
+  &lt;link href=&quot;//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css&quot; type=&quot;text/css&quot; rel=&quot;stylesheet&quot;&gt;
+
+  &lt;script src=&quot;https://unpkg.com/axios/dist/axios.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</syntaxhighlight>
+Next up is the JavaScript. We've purposely chosen to use standard JavaScript for this project rather than using more convenient third-party libraries such as React or VueJS. That said, we recognize there are far more eloquent JavaScript-based approaches to this problem, but didn't want to provide an example which required an additional learning curve or potentially extra configuration. With that said, add the following snippet to the <code>head</code> tag of your template, directly below the libraries we referenced in the previous snippet:
+
+<syntaxhighlight lang="text">
+&lt;script&gt;
+
+  var error = '';
+  var rows = '';
+  var disabled = &quot;&lt;i class='fa fa-exclamation-triangle' style='color: red;'&gt;&lt;/i&gt;&quot;;
+  var enabled = &quot;&lt;i class='fa fa-thumbs-up' style='color: green;'&gt;&lt;/i&gt;&quot;;
+  window.onload = function() {
+    axios.get('https://example.com/api/v2/mysql/_table/devices', { 'headers': { 'X-DreamFactory-Api-Key': 'YOUR_API_KEY_GOES_HERE' }})
+    .then(function (response) {
+
+      for (var i= 0; i &lt; response.data.resource.length; i++) {
+        if (response.data.resource[i].status == 0) {
+          var status = disabled;
+        } else {
+          var status = enabled;
+        }
+        rows += &quot;&lt;tr&gt;&lt;td&gt;&quot; + response.data.resource[i].name + &quot;&lt;/td&gt;&lt;td&gt;&quot; + status + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+
+      }
+      document.getElementById('rows').innerHTML = rows;
+    })
+    .catch(function (error) {
+      error = error;
+
+   });
+};
+&lt;/script&gt;
+</syntaxhighlight>
+The only required change you'll need to make to the above snippet is replacement of the <code>YOUR_API_KEY_GOES_HERE</code> with the actual API key you've configured to communicate with the API. If you don't know how to configure an API key, please refer to [[../generating-a-database-backed-api/|Generating a Database Backed Api]].
+
+All that remains is the HTML. In the following snippet you'll see we've defined a simple HTML table, adorned with CSS classes exposed by the Bootstrap library. The <code>tbody</code> element is assigned the <code>rows</code> ID, which is what the above JavaScript will use to insert the table rows into the appropriate page location:
+
+<syntaxhighlight lang="text">
+&lt;div class=&quot;container&quot;&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;div class=&quot;col&quot;&gt;
+      &lt;h1&gt;Status Dashboard&lt;/h1&gt;
+      &lt;table class=&quot;table table-striped table-bordered&quot;&gt;
+        &lt;thead class=&quot;thead-dark&quot;&gt;
+          &lt;th&gt;Device&lt;/th&gt;
+          &lt;th&gt;Status&lt;/th&gt;
+        &lt;/thead&gt;
+        &lt;tbody id=&quot;rows&quot;&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</syntaxhighlight>
+<span id="conclusion"></span>
+== Conclusion ==
+
+Return to this chapter often as we'll be periodically updating it with new examples!
+
+[[Category:Legacy_Guide]]
+[[Category:Demo]]
+[[Category:DreamFactory]]

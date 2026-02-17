@@ -1,0 +1,1265 @@
+DreamFactory supports server-side scripting to quickly and easily customize almost all of the platform's REST API endpoints to include business logic on the server, such as field validation, workflow triggers, runtime calculations, and more. Developers can easily attach scripts to any existing API endpoint, for both pre- and post-processing of the request and response. You can also write your own custom REST APIs with server-side script services. Starting with release 2.3.0, scripts can even be queued for later processing. This section provides an overview of how scripting works. Please see the [[DreamFactory/Tutorials/Server_Side_Scripting|tutorials]] section for example scripts.
+
+== Supported Scripting Languages ==
+DreamFactory scripting supports several modern scripting languages. To get a list of which ones are installed and setup on a particular instance use the following API.
+<pre>http:/example.com/api/v2/system/script_type</pre>
+
+<source lang=javascript>
+{
+  "resource": [
+    {
+      "name": "nodejs",
+      "label": "Node.js",
+      "description": "Server-side JavaScript handler using the Node.js engine.",
+      "sandboxed": false
+    },
+    {
+      "name": "php",
+      "label": "PHP",
+      "description": "Script handler using native PHP.",
+      "sandboxed": false
+    },
+    {
+      "name": "python",
+      "label": "Python",
+      "description": "Script handler using native Python.",
+      "sandboxed": false
+    },
+    {
+      "name": "v8js",
+      "label": "V8js",
+      "description": "Server-side JavaScript handler using the V8js engine.",
+      "sandboxed": true
+    }
+  ]
+}
+</source>
+
+'''Note''': The '''sandbox''' setting means that the script execution is bound by memory and time and is not allowed access to other operating system functionalities outside of PHP's context. This is currently only the case for V8Js. Therefore, be aware that DreamFactory cannot control what is done inside scripts using non-sandboxed languages on a server.
+
+The following are typically supported on most installs:
+* [[DreamFactory/Features/Scripting/V8Js_Scripting|V8Js]]
+* [[DreamFactory/Features/Scripting/NodeJs|Node.js]]
+* [[DreamFactory/Features/Scripting/PHP|PHP]]
+* [[DreamFactory/Features/Scripting/Python_Scripting|Python]]
+
+== Where Scripting Can Be Used ==
+Server-side scripts can be used in two areas of a DreamFactory instance. One of which is attached to system events which may be triggered by internal events, API calls, or other scripts.
+For more on events and how to apply scripting to them, go to [[DreamFactory/Features/Scripting/Event Scripting|Event Scripting]].
+
+The other way to use server-side scripts in DreamFactory is to use customizable script services. There is a scripting service type for each supported scripting language. For more on using scripting as a service, go to [[DreamFactory/Features/Scripting/Script Services|Script Services]].
+
+== Resources Available To A Script ==
+
+When a script is executed, DreamFactory passes in two very useful resources that allow each script to access many parts of the system including system states, configuration, and even a means to call other services or external APIs. They are the '''''event''''' resource and the '''''platform''''' resource.
+
+'''Note:''' The term "resource" is used generically here, based on the scripting language used, the resource could either be an object (i.e. V8js or Node.js) or an array (i.e. PHP).
+
+=== The Event Resource ===
+
+The '''event''' resource contains the structured data about the event triggered ([[DreamFactory/Features/Scripting/Event Scripting|Event Scripting]]) or from the API service call ([[DreamFactory/Features/Scripting/Script Services|Script Services]]). As seen below, this includes things like the request and response information available to this "event".
+
+'''Note:''' Determined by the type of event triggering the script, parts of this '''event''' resource are writable. Modifications to this resource while executing the script do not result in a change to that resource (i.e. request or response) in further internal handling of the API call, unless the event script is configured with the '''allow_event_modification''' setting to true, or it is the response on a script service. Prior to 2.1.2, the '''allow_event_modification''' was accomplished by setting a '''content_changed''' element in the request or response object to true.
+
+The '''event''' resource has the following properties:
+
+{|
+!Property||Type||Description
+|-
+| '''request''' || resource || A resource representing the inbound REST API call, i.e. the HTTP request.
+|-
+| '''response''' || resource || A resource representing the response to an inbound REST API call, i.e. the HTTP response.
+|-
+| '''resource''' || string || Any additional resource names typically represented as a replaceable part of the path, i.e. "table name" on a db/_table/{table_name} call.
+|}
+
+==== Event Request ====
+
+The "request" resource contains all the components of the original HTTP request.
+This resource is always available, and is writable during pre-process event scripting.
+
+{|
+!Property||Type||Description
+|-
+| '''api_version''' || string || The API version used for the request (i.e. 2.0).
+|-
+| '''method || string || The HTTP method of the request (i.e. GET, POST, PUT).
+|-
+| '''parameters''' || resource || An object/array of query string parameters received with the request, indexed by the parameter name.
+|-
+| '''headers''' || resource || An object/array of HTTP headers from the request, indexed by the lowercase header name.
+|-
+| '''content''' || string || The body of the request in raw string format.
+|-
+| '''content_type''' || string || The format type (i.e. "application/json") of the raw '''content''' of the request.
+|-
+| '''payload''' || resource || The body (POST body) of the request, i.e. the '''content''', converted to an internally usable object/array if possible.
+|}
+
+Any allowed changes to this data will overwrite existing data in the request, before further listeners are called and/or the request is handled by the called service.
+
+==== Event Response ====
+
+The '''response''' resource contains the data being sent back to the client from the request.
+
+'''Note:''' This resource is only available/relevant on '''post-process''' event and script service scripts.
+
+{|
+!Property||Type||Description
+|-
+| '''status_code''' || integer || The HTTP status code of the response (i.e. 200, 404, 500, etc).
+|-
+| '''headers''' || resource || An object/array of HTTP headers for the response back to the client.
+|-
+| '''content''' || mixed || The body of the request as an object if the '''content_type''' is not set, or in raw string format.
+|-
+| '''content_type''' || string || The content type (i.e. json) of the raw '''content''' of the request.
+|}
+
+Just like '''request''', any allowed changes to '''response''' will overwrite existing data in the response, before it is sent back to the caller.
+
+=== The Platform Resource ===
+
+This '''platform''' resource may be used to access configuration and system states, as well as, the REST API of your instance via '''inline''' calls.
+This makes internal requests to other services directly without requiring an HTTP call.
+
+The '''platform''' resource has the following properties:
+{|
+! Field || Type || Description
+|-
+| '''api''' || resource || An array/object that allows access to the instance's REST API.
+|-
+| '''config''' || resource || An array/object consisting of the current configuration of the instance.
+|-
+| '''session''' || resource || An array/object consisting of the current session information.
+|}
+
+==== Platform API ====
+
+The '''api''' resource contains methods for instance API access. This object contains a method for each type of REST verb.
+
+{|
+! Function || Description
+|-
+| '''get''' || GET a resource
+|-
+| '''post''' || POST a resource
+|-
+| '''put''' || PUT a resource
+|-
+| '''patch''' || PATCH a resource
+|-
+| '''delete''' || DELETE a resource
+|}
+
+They all accept the same arguments:
+
+<source lang="javascript">
+method( "service[/resource_path]"[, payload[, options]] );
+</source>
+
+* '''method''' - Required. The method/verb listed above.
+* '''service''' - Required. The service name (as used in API calls) or external URI.
+* '''resource_path''' - Optional depending on your call. Resources of the service called.
+* '''payload''' - Optional, but must contain a valid object for the language of the script.
+* '''options''' - Optional, may contain headers, query parameters, and cURL options.
+
+Calling internally only requires the relative URL without the '''/api/v2/''' portion. You can pass absolute URLs like 'http://example.com/my_api' to these methods to access external resources. See the [[DreamFactory/Tutorials/Server_Side_Scripting|scripting tutorials]] for more examples of calling platform.api methods from scripts.
+
+<source lang="javascript">
+// V8js
+
+var url = 'db/_table/contact';
+var result = platform.api.get(url);
+var_dump(result);
+</source>
+
+<source lang="javascript">
+// Node.js
+
+var url = 'db/_table/contact';
+var options = null;
+platform.api.get(url, options, function(body, response) {
+        var result = JSON.parse(body);
+        console.log(result);
+});
+</source>
+
+<pre>
+// PHP
+
+$url = 'db/_table/contact';
+$api = $platform['api'];
+$get = $api->get;
+$result = $get($url);
+var_dump($result);
+</pre>
+
+<source lang="python">
+// Python
+
+url = 'db/_table/contact'
+result = platform.api.get(url)
+data = result.read()
+print data
+jsonData = bunchify(json.loads(data))
+</source>
+
+==== Modifying Request Parameters ====
+
+<source lang="python">
+event.request.parameters.limit = 2
+</source>
+
+==== Retrieving a Request Parameter ====
+
+To retrieve a request parameter using PHP, you'll reference it the parameter name via the '''$event['request']['parameters']''' associative array:
+
+<source lang="php">
+// PHP
+$customerKey = $event['request']['parameters']['customer_key'];
+</source>
+
+To retrieve the filter parameter, reference the '''filter''' key:
+
+<source lang="php">
+// PHP
+$filter = $event['request']['parameters']['filter']
+</source>
+
+This will return the key/value pair, such as "id=50". Therefore you'll want to use a string parsing function such as PHP's explode() to retrieve the key value:
+
+<source lang="php">
+// PHP
+$id = explode("=", $event['request']['parameters']['filter'])[1];
+</source>
+
+To retrieve a header value:
+
+<source lang="python">
+# Python
+request = event.request
+print request.headers['x-dreamfactory-api-key']
+</source>
+
+==== Throwing an Exception ====
+
+If a parameter such as filter is missing, can throw an exception like so:
+
+<source lang="php">
+// PHP
+if (! array_key_exists('filter', $event['request']['parameters'])) {
+    throw new \DreamFactory\Core\Exceptions\BadRequestException('Missing filter');
+}
+</source>
+
+==== Adding HTTP headers, query parameters, or cURL options to '''api''' calls ====
+
+You can specify any combination of headers and query parameters when calling platform.api functions from a script. This is supported by all script types using the '''options''' argument.
+
+<source lang="javascript">
+// V8js
+
+var url = 'http://example.com/my_api';
+var payload = {"name":"test"};
+var options = {
+    'headers': {
+        'Content-Type': 'application/json'
+    },
+    'parameters': {
+        'api_key': 'my_api_key'
+    },
+};
+var result = platform.api.post(url, payload, options);
+var_dump(result);
+</source>
+
+<source lang="javascript">
+// Node.js
+
+var url = 'http://example.com/my_api';
+var payload = {"name":"test"};
+var options = {
+    'headers': {
+        'Content-Type': 'application/json'
+    },
+    'parameters': {
+        'api_key': 'my_api_key'
+    },
+};
+platform.api.post(url, payload, options, function(body, response) {
+        var result = JSON.parse(body);
+        console.log(result);
+}
+</source>
+
+<pre>
+// PHP
+
+$url = 'http://example.com/my_api';
+$payload = json_decode("{\"name\":\"test\"}", true);
+$options = [];
+$options['headers'] = [];
+$options['headers']['Content-Type'] = 'application/json';
+$options['parameters'] = [];
+$options['parameters']['api_key'] = 'my_api_key';
+$api = $platform['api'];
+$post = $api->post;
+$result = $post($url, $payload, $options);
+var_dump($result);
+</pre>
+
+<source lang="python">
+// Python
+
+url = 'http://example.com/my_api'
+payload = '{\"name\":\"test\"}'
+options = {}
+options['headers'] = {}
+options['headers']['Content-Type'] = 'application/json'
+options['parameters'] = {}
+options['parameters']['api_key'] = 'my_api_key'
+result = platform.api.post(url, payload, options)
+data = result.read()
+print data
+jsonData = bunchify(json.loads(data))
+</source>
+
+For V8js and PHP scripts, which use cURL to make calls to external URLs, you can also specify any number of cURL options.  Calls to internal URLs do not use cURL, so cURL options have no effect there.
+
+<source lang="javascript">
+// V8js
+
+options = {
+    'headers': {
+        'Content-Type': 'application/json'
+    },
+    'CURLOPT_USERNAME' : 'user@example.com'
+    'CURLOPT_PASSWORD' : 'password123'
+};
+</source>
+
+<pre>
+// PHP
+
+$options = [];
+$options['headers'] = [];
+$options['headers']['Content-Type'] = 'application/json';
+$options['parameters'] = [];
+$options['parameters']['api_key'] = 'my_api_key';
+$options['CURLOPT_USERNAME'] = 'user@example.com';
+$options['CURLOPT_PASSWORD'] = 'password123';
+</pre>
+
+cURL options can include HTTP headers using '''CURLOPT_HTTPHEADER''', but it's recommended to use options.headers for V8js or $options['headers'] for PHP to send headers as shown above.
+
+==== Platform Config ====
+
+The '''config''' object contains configuration settings for the instance.
+
+{|
+! Function || Description
+|-
+| '''df''' || Configuration settings specific to DreamFactory.
+        (
+            [version] => "2.1.0"
+            [api_version] => "2.0"
+            [always_wrap_resources] => true
+            [resources_wrapper] => "resource"
+            [storage_path] => "my/install/path/storage"
+            ...
+        )
+|-
+|}
+
+==== Platform Session ====
+
+The '''session''' resource contains information and states about the current session for the event.
+
+{|
+! Function || Description
+|-
+| '''api_key''' || DreamFactory API key.
+|-
+| '''session_token''' || Session token, i.e. JWT.
+|-
+| '''user''' || User information derived from the supplied session token, i.e. JWT.
+        (
+            [id] => 6
+            [display_name] => First Last
+            [first_name] => First
+            [last_name] => Last
+            [email] => first.last@company.com
+            [is_sys_admin] => 1
+            [last_login_date] => 2016-02-19 14:05:25
+        )
+|-
+| '''app''' || App information derived from the supplied API key.
+|-
+| '''lookup''' || Available lookups for the session.
+|}
+
+== Stopping Script Execution ==
+
+Just like in normal code execution, execution of a script is stopped prematurely by two means, throwing an exception, or returning.
+
+<source lang="javascript">
+// Stop execution if verbs other than GET are used in Custom Scripting Service
+if (event.request.method !== "GET") {
+    throw "Only HTTP GET is allowed on this endpoint."; // will result in a 500 back to client with the given message.
+}
+
+// Stop execution and return a specific status code
+if (event.resource !== "test") {
+    // For pre-process scripts where event.response doesn't exist yet, just create it
+    event.response = {};
+    // For post-process scripts just update the members necessary
+    event.response.status_code = 400;
+    event.response.content = {"error": "Invalid resource requested."};
+    return;
+}
+
+// defaults to 200 status code
+event.response.content = {"test": "value"};
+</source>
+
+== Queued Scripting Setup ==
+
+DreamFactory queued scripting takes advantage of Laravel's built-in queueing feature, for more detailed information,
+see their documentation [https://laravel.com/docs/5.3/queues here]. Every DreamFactory instance comes already setup 
+with the 'database' queue setting with all necessary tables created (scripts and failed_scripts). The queue 
+configuration file is stored in <code>config/queue.php</code> and can be updated if another setup is preferred, such as
+[http://kr.github.com/beanstalkd Beanstalkd], [http://aws.amazon.com/sqs Amazon SQS], or [http://redis.io Redis].
+
+DreamFactory also fully supports the following artisan commands for configuration and runtime execution...
+  queue:failed                       List all of the failed queue scripts
+  queue:flush                        Flush all of the failed queue scripts
+  queue:forget                       Delete a failed queue script
+  queue:listen                       Listen to a given queue
+  queue:restart                      Restart queue worker daemons after their current script
+  queue:retry                        Retry a failed queue script
+  queue:work                         Process the next script on a queue
+
+==== Specifying The Queue ====
+You may also specify the queue a script should be sent to. By pushing scripts to different queues, you may 
+categorize your queued scripts, and even prioritize how many workers you assign to various queues. 
+This does not push scripts to different queue connections as defined by your queue configuration file, but 
+only to specific queues within a single connection. To specify the queue, use the <code>queue</code> configuration 
+option on the script or service. 
+
+==== Specifying The Queue Connection ====
+If you are working with multiple queue connections, you may specify which connection to push a script to. To specify 
+the connection, use the <code>connection</code> configuration option on the script or service.
+
+=== Delayed Scripts===
+Sometimes you may wish to delay the execution of a queued script for some period of time. For instance, you may wish to 
+queue a script that sends a customer a reminder e-mail 5 minutes after sign-up. You may accomplish this using the 
+<code>delay</code> configuration option on your script or service. The option values should be in seconds.
+
+=== Running The Queue Listener ===
+
+==== Starting The Queue Listener ====
+Laravel includes an Artisan command that will run new scripts as they are pushed onto the queue. You may run the 
+listener using the <code>queue:listen</code> command:
+<pre>php artisan queue:listen</pre>
+You may also specify which queue connection the listener should utilize:
+<pre>php artisan queue:listen connection-name</pre>
+Note that once this task has started, it will continue to run until it is manually stopped. You may use a process 
+monitor such as <a href="http://supervisord.org/">Supervisor</a> to ensure that the queue listener does not stop running.
+
+==== Queue Priorities ====
+You may pass a comma-delimited list of queue connections to the <code>listen</code> script to set queue priorities:
+<pre>php artisan queue:listen --queue=high,low</pre>
+In this example, scripts on the <code>high</code> queue will always be processed before moving onto scripts from the 
+<code>low</code> queue.
+
+==== Specifying The Script Timeout Parameter ====
+You may also set the length of time (in seconds) each script should be allowed to run:
+<pre>php artisan queue:listen --timeout=60</pre>
+
+==== Specifying Queue Sleep Duration ====
+In addition, you may specify the number of seconds to wait before polling for new scripts:
+<pre>php artisan queue:listen --sleep=5</pre>
+Note that the queue only sleeps if no scripts are on the queue. If more scripts are available, the queue will continue 
+to work them without sleeping.
+
+==== Processing The First Script On The Queue ====
+To process only the first script on the queue, you may use the <code>queue:work</code> command:
+<pre>php artisan queue:work</pre>
+
+=== Dealing With Failed Scripts ===
+To specify the maximum number of times a script should be attempted, you may use the <code>--tries</code> switch on the 
+<code>queue:listen</code> command:
+<pre>php artisan queue:listen connection-name --tries=3</pre>
+After a script has exceeded this amount of attempts, it will be inserted into a <code>failed_jobs</code> table.
+
+=== Retrying Failed Scripts=== 
+To view all of your failed scripts that have been inserted into your <code>failed_jobs</code> database table, you
+may use the <code>queue:failed</code> Artisan command:
+<pre>php artisan queue:failed</pre>
+The <code>queue:failed</code> command will list the script ID, connection, queue, and failure time. The script ID may
+be used to retry the failed script. For instance, to retry a failed script that has an ID of 5, the following command
+should be issued:
+<pre>php artisan queue:retry 5</pre>
+To retry all of your failed scripts, use <code>queue:retry</code> with <code>all</code> as the ID:
+<pre>php artisan queue:retry all</pre>
+If you would like to delete a failed script, you may use the <code>queue:forget</code> command:
+<pre>php artisan queue:forget 5</pre>
+To delete all of your failed scripts, you may use the <code>queue:flush</code> command:
+<pre>php artisan queue:flush</pre>
+
+== DreamFactory Scripting Library ==
+
+
+=== Obtain DreamFactory API Key Details=== 
+
+A simple PHP script to obtain additional information regarding the API Key used such as the Keys name, active status, and more.
+
+Code:
+<pre>$app_id = $platform['session']['app']['id'];
+$url = 'system/app?ids=' . $app_id;
+$api = $platform['api'];
+$get = $api->get;
+$result = $get($url);
+
+return $result; </pre>
+
+
+===Use DreamFactory's scripted service to add a Database function===
+
+A DreamFactory feature that allows the administrator to add a database function to a column so when that column is retrieved by the API, the function runs in its place.For instance, imagine if you want to change the format of the date field, you could use ORACLE’s TO_DATE() function to do that:
+
+TO_DATE({value}, 'DD-MON-YY HH.MI.SS AM')
+
+Code:
+<pre>$api = $platform['api'];
+$get = $api->get;
+$patch = $api->patch;
+$options = [];
+set_time_limit(800000);
+// Get all tables URL. Replace the databaseservicename with your API namespace
+$url = '<API_Namespace>/_table';
+
+// Call parent API
+$result = $get($url);
+$fieldCount = 0;
+$tableCount = 0;
+$tablesNumber = 0;
+
+// Check status code
+if ($result['status_code'] == 200) {
+// If parent API call returns 200, call a MySQL API
+    $tablesNumber = count($result['content']['resource']);
+
+// The next line is to limit number of tables to first 5 to see the successfull run of the script
+//$result['content']['resource'] = array_slice($result['content']['resource'], 0, 5, true);
+
+foreach ($result['content']['resource'] as $table) {
+    // Get all fields URL
+    $url = "<API_Namespace>/_schema/" . $table['name'] . "?refresh=true";
+    $result = $get($url);
+     
+    if ($result['status_code'] == 200) {
+        $tableCount++;
+        foreach ($result['content']['field'] as $field) {
+            if (strpos($field['db_type'], 'date') !== false || strpos($field['db_type'], 'Date') !== false || strpos($field['db_type'], 'DATE') !== false) {
+                // Patch field URL
+                $fieldCount++;
+                $url = "<API_Namespace>/_schema/" . $table['name'] . "/_field";
+                
+                // Skip fields that already have the function
+                if ($field['db_function'][0]['function'] === "TO_DATE({value}, 'DD-MON-YY HH.MI.SS AM')") continue;
+                // Remove broken function
+                $field['db_function'] = null;
+                $payload = ['resource' => [$field]];
+                $result = $patch($url, $payload);
+                
+                // Add correct function
+                $field['db_function'] = [['function' => "TO_DATE({value}, 'DD-MON-YY HH.MI.SS AM')", "use" => ["INSERT", "UPDATE"]]];
+                $payload = ['resource' => [$field]];
+                $result = $patch($url, $payload);
+                
+                if ($result['status_code'] == 200) {
+                    echo("Function successfully added to " . $field['label'] . " field in " . $table['name'] . " table \n");
+                    \Log::debug("Function successfully added to " . $field['label'] . " field in " . $table['name'] . " table");
+
+                } else {
+                    $event['response'] = [
+                        'status_code' => 500,
+                        'content' => [
+                            'success' => false,
+                            'message' => "Could not add function to " . $field['label'] . " in " . $table['name'] . " table;"
+                        ]
+                    ];
+
+                }
+            } 
+        }
+        \Log::debug("SCRIPT DEBUG: Total tables number " . $tablesNumber . " -> Tables  " . $tableCount . " fieldCount " . $fieldCount);
+    } else {
+        $event['response'] = [
+            'status_code' => 500,
+            'content' => [
+                'success' => false,
+                'message' => "Could not get all fields."
+            ]
+        ];
+    }
+}
+} else {
+$event['response'] = [
+    'status_code' => 500,
+    'content' => [
+        'success' => false,
+        'message' => "Could not get list of tables."
+    ]
+];
+}
+return "Script finished"; </pre>
+
+
+===Email Alert API Usages=== 
+
+If there is a suspicious amount of API usage, send an email notification to an admin. This is a custom scripted service that uses a 'TransactionHistory' table to count the number of API calls in the last 5 minutes. An email alert will be sent to the specified email address if the number of API calls exceeds a specific threshold. For this example we are monitoring the usage of the API for the past 5 minutes and setting a threshold of 1,000 API calls. To modify these values to fit your project just change the 'timelapse' and 'threshold' values.
+
+Note: This script can also be scheduled to run periodically using DreamFactory's built in Scheduling feature.
+
+Code:
+<pre>function twoDigits(d) {
+    if (0 <= d && d < 10) return "0" + d.toString();
+    if (-10 < d && d < 0) return "-0" + (-1 * d).toString();
+    return d.toString();
+}
+
+var toMysqlFormat = function (x) {
+    return x.getUTCFullYear() + "-" + twoDigits(1 + x.getUTCMonth()) + "-" + twoDigits(x.getUTCDate()) + " " + twoDigits(x.getUTCHours()) + ":" + twoDigits(x.getUTCMinutes()) + ":" + twoDigits(x.getUTCSeconds());
+};
+
+var timelapse = 5; // How many minutes to count
+
+var threshold = 1000; // How many API calls are allowed
+
+var query = "timestamp%3c" + toMysqlFormat(new Date(Date.now() - timelapse * 60000));
+
+result = platform.api.get("db/_table/TransactionHistory?filter=(" + query + ")");
+
+if (result.content.resource.length >= threshold) {
+
+    var email = {
+
+        "to": [
+            {
+                "name": "John Doe",
+                "email": "johndoe@mailinator.com"
+            }
+        ],
+        "subject": "Usage alert",
+        "body_text": "API usage has exceeded the alert threshold.",
+        "from_name": "John Doe",
+        "from_email": "johndoe@mailinator.com",
+        "reply_to_name": "John Doe",
+        "reply_to_email": "johndoe@mailinator.com"
+    };
+
+    platform.api.post("email", email);
+} </pre>
+
+===Create Custom Error Messages===
+
+You may wish to customize error messages if you are validating input parameters or simply want to guide the end user with a fleshed out response. To achieve this you can add a pre-process event handler with the code below.
+
+Code:
+<pre>// PHP
+throw new \Exception('Custom Message');
+
+// Python
+raise ValueError('Custom Message')
+
+// NodeJS
+throw "Custom Message";</pre>
+
+
+===NodeJS script to POST records to a Database===
+
+This script simply creates a new record in the database table. Each time a GET call is made on the scripted service API endpoint, this script creates a new record in the table, 'departments'. You can create/write this data into any popular database whether it be MySQL, Microsoft SQL Server, or Oracle, or any other DreamFactory Service.
+
+To create a scripted service, navigate to the 'Services' tab in your instance, hit the create button on the left, and select service type 'Scripts', and then select the desired scripting language. Don't forget that performing CRUD operations is just scratching the surface, you can also track things such as timestamps, status codes, and more!
+
+Code:
+<pre>// In the scripts tab, add this script to user -> user.session -> post -> user.session.post.post_process.
+// Make sure you've correctly configured Logstash as a service in the Services tab of the DreamFactory Admin Console.
+
+// To enable Node.js scripting, set the path to node in your DreamFactory .env file.
+// This setting is commented out by default.
+//
+// DF_NODEJS_PATH=/usr/local/bin/node
+//
+// Use npm to install any dependencies. This script requires 'lodash.'
+// Your scripts can call console.log to dump info to the log file in storage/logs.
+
+var url, result, options;
+options = {
+    'headers': {
+        'X-DreamFactory-Api-Key': platform.session.api_key,
+        'X-DreamFactory-Session-Token': platform.session.session_token,
+        'Content-Type': 'application/json'
+    }
+};
+var payload =
+    {
+         "resource" : [{'dept_no': 'd325', 'dept_name': 'Accounting'}]
+    };
+function createInternal() {
+    // create a record using internal URL
+    url = 'mysql/_table/departments';
+    platform.api.post(url, payload, null, function(body, response) {
+        result = JSON.parse(body);
+    });
+}
+createInternal();</pre>
+
+===Validating API Payloads in Python===
+
+When using the /_table/{table_name} endpoint you can insert a new record into a database backed by a DreamFactory generated database API. By default the underlying database constraints will serve as a validation backstop, meaning if a required (not nullable) field is not provided, the database will throw an error and DreamFactory will in return return a 500 status code to the client. Alternatively, you might however wish to customize both the validation logic and error response. This can be achieved by using DreamFactory's scripting engine. To do so you can add custom logic to the POST endpoint's pre-process event handler, meaning the custom code will execute before the destination data source is contacted.
+
+Code:
+<pre>payload = event.request.payload
+
+if(payload):
+    if 'first_name' not in payload:
+        raise ValueError('First name field missing')
+    if payload.first_name == '':
+        raise ValueError("First name field required")</pre>
+
+===Python API Proxy===
+
+This can be attached as a post-process script to intercept the parameters being passed to the API call. The script then takes those parameters and passes it to the second API call. The data from the second API call is then returned.
+
+Code:
+<pre># Retrieve the parameters that are being filtered from original API call
+params = event.request.parameters.filter;
+
+# Call second API and attach the same parameters to the API call
+result = platform.api.get('<service_name>/_table/customer?filter'+params);
+
+# Set the data to be returned
+data = result.read();
+event.response.content = data;</pre>
+
+===What is CORS?===
+
+APIs are bridges useful for accessing otherwise siloed data from a variety of clients such as websites and mobile apps. However one must be careful to not give up security in the quest for convenience. Imagine an Internet where any third-party domain could initiate cross-domain requests which interact with your APIs and embed images and other assets hosted on your web server into their own site. All sorts of issues would quickly arise, including data theft and the ability to masquerade as a trusted resource of your organization. In fact, the prospects of this ability are so dangerous that all modern browsers prevent script-driven cross-domain requests by implementing what's known as the "same-origin policy".
+
+At the same time, it would be incredibly convenient if this safeguard couldn't be overridden! Imagine the trouble associated with managing your APIs and all client websites on a single domain. Indeed there is a way to loosen this restriction using something known as CORS, or cross-origin resource sharing. When enabled, CORS will inform the web server to add supplemental HTTP headers which tell the browser how and in what ways the same-origin policy can be loosened. The most important such header is '''Access-Control-Allow-Origin''', which tells the browser what other domains are allowed to request resources from the destination server.
+
+The DreamFactory platform includes point-and-click support for securing your APIs with CORS. Check out chapter 8 of our Getting Started with DreamFactory guide to learn more.
+
+===Call a Stored Procedure From REST API===
+
+Although the DreamFactory platform can do many things, its ability to generate full-featured REST APIs for twenty databases (MySQL, SQL Server, and MongoDB, among others) is undoubtedly the most popular feature. Once generated, developers can review the API using companion Swagger documentation made available through the platform's administrative interface. Endpoints are available for carrying out the typical CRUD (create, retrieve, update, and delete) operations, inspecting the schema, and executing stored procedures. The URI signature looks like this:
+
+'''/_proc/{procedure_name}'''
+
+Therefore if the stored procedure name is '''getCustomers''', you can call the following URI:
+
+'''/_proc/getCustomers'''
+
+Many stored procedures accept input parameters. DreamFactory supports this functionality as well. You can pass the parameter along as a URL parameter, like this:
+
+'''/_proc/getCustomerByLastName?LastName=Moreno'''
+
+===How to Enable and Monitor PHP-FPM Status in Nginx===
+
+PHP-FPM (FastCGI Process Manager) is a popular solution for serving dynamic PHP content via the Apache and NGINX web servers. It's quite performant out of the box, however occasions do arise when you'll need to dig into the configuration to gain a deeper understanding of how the PHP processes are handling your application scripts. This is admittedly a mix of science and art, however there is one simple feature you can enable to immediately gain greater insights into metrics such as active processes, slow requests, and the number of times the allocated number of PHP processes have reached capacity. When enabled, you'll be able to go to a URL and view output which looks like this:
+
+pool:                 www
+process manager:      dynamic
+start time:           10/Aug/2020:20:33:42 +0000
+start since:          4565539
+accepted conn:        238803
+listen queue:         0
+max listen queue:     0
+listen queue len:     0
+idle processes:       9
+active processes:     1
+total processes:      10
+max active processes: 7
+max children reached: 1
+slow requests:        8
+To configure the status page, open your PHP-FPM  '''www.conf''' file and find '''pm.status_path:'''
+
+pm.status_path = /fpm-status
+
+Uncomment the line, and change the value to some suitable URI, making sure to leave the forward slash in place. Save the changes, then open '''nginx.conf''' and add this block:
+
+location = /fpm-status {
+  access_log off;
+  fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+  include fastcgi_params;
+}
+
+If PHP-FPM is configured to instead listen on a port, change the '''fastcgi_pass''' variable accordingly. Once complete, restart the NGINX and PHP-FPM daemons and navigate to the designated URI to view the status page.
+
+===De-identifying sensitive API data===
+
+APIs are often used to manage sensitive data, however in many cases the data must be partially masked or entirely anonymized before it can be presented to the client. A few such situations include:
+
+*Displaying sensitive PII (such as health-related data) to individuals lacking permission to view the entire record.
+*Sending data to machine learning models.
+*Sending customer data to third-party marketing research firms.
+*Presenting valuable intellectual property in a public forum (i.e. hiding manufacturing details pertaining to a particular composite or chemical)
+
+DreamFactory developers have several options regarding implementing de-identification of data. If the API in question is retrieving data from a database, you can attach a post-process event handler to the endpoint, and use PHP, Python (version 2 or 3), or NodeJS to intercept and manipulate the response before it's returned to the client. Let's use the following record as a representative record for the examples that follow:
+
+====Applying a Data Mask to JSON Response====
+
+Sometimes you would like to present a partial representation of a particular value, such as a phone number or employee ID. This would allow a customer representative to verify the employee's identity without having full access to a potentially sensitive piece of information. Here is an example of how that would be done using a post-process event handler:
+
+$responseBody = $event['response']['content'];
+
+foreach ($responseBody['resource'] as $n => $record) {
+    $record["employee_id"] = substr_replace($record["employee_id"], '***', 0, 3);
+    $responseBody['resource'][$n] = $record;
+}
+
+$event['response']['content'] = $responseBody;
+Once enabled, the records returned from this endpoint would look like this:
+
+{
+  "emp_id": "111AD8***",
+  "birth_date": "1953-09-02",
+  "first_name": "Steve",
+  "last_name": "Smith",
+  "hire_date": "1986-06-26"
+}
+
+====Removing Data from a JSON Response====
+
+Sometimes data masking won't be enough to properly de-identify a sensitive record; you might have to remove the data altogether. This is easily accomplished using PHP's unset() function in conjunction with a DreamFactory post-process event handler:
+
+Code:
+<pre>$responseBody = $event['response']['content'];
+
+foreach ($responseBody['resource'] as $n => $record) {
+    unset($record["employee_id"]);
+    unset($record["birth_date"]);
+    $responseBody['resource'][$n] = $record;
+}
+
+$event['response']['content'] = $responseBody;</pre>
+
+
+===Increasing the PHP memory_limit Setting===
+
+
+If you've built PHP applications for even a short period of time, chances are you've encountered this dreaded error:
+
+'''PHP Fatal error: Allowed memory size of X bytes exhausted (tried to allocate Y bytes)'''
+
+This error occurs when the executing PHP script consumes more memory than what has been allocated using PHP's '''memory_limit''' setting. Keep in mind this setting imposes a cap on each PHP process, meaning if the '''memory_limit''' setting was 128MB and there were four simultaneously executing PHP scripts with each requiring 100MB, then none would produce the above PHP fatal error because each was under the 128MB maximum memory allocation.
+
+The '''memory_limit''' value is often set quite low, for instance to 128MB:
+
+'''memory_limit = 128M'''
+
+Because many web application servers are configured with much higher amounts of RAM than in years past, you can almost certainly increase the setting to 512 MB or even higher. This is typically done by changing the '''memory_limit''' setting found in your server's '''php.ini''' file.
+
+====Finding Your php.ini File====
+It would seem trivial to find your server's '''php.ini''' configuration file, however there is a catch. Modern PHP installations come with two '''php.ini''' files: one for use in conjunction with CLI-based PHP applications, and another for web-based PHP applications. If you SSH into the server and run the following command you'll be presented with the location of the '''php.ini''' file used for the former:
+
+<pre>$ php --ini | grep Configuration
+Configuration File (php.ini) Path: /etc/php/7.3/cli
+Loaded Configuration File:         /etc/php/7.3/cli/php.ini</pre>
+
+However if you instead use the '''find''' command you'll locate two '''php.ini''' files:
+
+<pre>$ find . -name php.ini
+./etc/php/7.3/fpm/php.ini
+./etc/php/7.3/cli/php.ini</pre>
+
+The '''php.ini''' file found in the '''fpm''' directory is used by PHP-FPM, so that's the version you'll want to modify. After making the change, restart your PHP-FPM daemon:
+
+'''$ sudo service php7.3-fpm restart'''
+
+===Creating a Twitter API===
+
+DreamFactory does not (yet) offer a native Twitter connector, however it's really easy to create your own using a DreamFactory scripted service and a popular PHP package. DreamFactory will recognize any PHP Composer package added to the platform's Composer file, so head over to https://github.com/abraham/twitteroauth and familiarize yourself with the twitteroauth package. 
+Next, enter your DreamFactory root directory and install the package:
+
+'''$ composer require abraham/twitteroauth'''
+
+Next, head over to https://developer.twitter.com/en/docs/apps/overview and create a new Twitter developer app. In doing so you'll be provided with four credentials used for acting on behalf of a Twitter account:
+
+*'''oauth_consumer_key''' and '''oauth_consumer_secret''': The consumer key and secret represent the registered Twitter developer app.
+*'''oauth_token''' and '''oauth_token_secret''': The OAuth token and secret represent the user on whose behalf your API will be communicating with Twitter.
+
+Next, create four environment variables in your '''.env''' file: '''TWITTER_CONSUMER_KEY''', '''TWITTER_CONSUMER_SECRET''', '''TWITTER_OAUTH_TOKEN''', and '''TWITTER_OAUTH_SECRET''' and assign the respective credentials to these variables.
+
+With these pieces in place, login to your DreamFactory administration console and create a new PHP scripted service. Add the code found below to your service and save the changes. Create a role-based access control and associated API key, and then send a tweet to the designated account by issuing a request to '''POST /api/v2/twitter''' (replace '''twitter''' with the namespace you used when creating the service), and pass in a payload that looks like this:
+
+'''{
+    "resource": [
+        {
+            "message": "Sending a tweet from DreamFactory"
+        }
+    ]
+}'''
+
+<pre>$consumerKey    = env('TWITTER_CONSUMER_KEY'); 
+$consumerSecret = env('TWITTER_CONSUMER_SECRET');
+$oauthToken    = env('TWITTER_OAUTH_TOKEN');  
+$oauthSecret = env('TWITTER_OAUTH_SECRET');
+
+$connection = new \Abraham\TwitterOAuth\TwitterOAuth($consumerKey, $consumerSecret, $oauthToken, $oauthSecret);
+
+if ($event['request']['method'] == "GET") {
+
+   $response = $connection->get("statuses/home_timeline", ["count" => 10, "exclude_replies" => true]);
+
+} elseif ($event['request']['method'] == "POST") {
+
+   $message = $event['request']['payload']['resource'][0]['message'];
+   $response = $connection->post("statuses/update", ["status" => $message]);
+
+}
+
+return json_encode(["response" => $response]);</pre>
+
+===Reset DreamFactory Admin Password===
+
+Whether you forgot your password or just need to change it and have not configured email-based password recovery yet, you can do so by accessing your server via SSH. Utilizing Laravel's lesser-known feature, php artisan tinker, to make changes at the system database level we are able to do this very efficiently.
+
+To make these changes you must have SSH access into your DreamFactory server.
+
+<pre>Navigate to the DreamFactory root directory. For those who used an automated DreamFactory installer, the root directory will be /opt/dreamfactory. The path will vary in accordance to other installers.
+
+Enter the terminal console:
+$ php artisan tinker
+Psy Shell v0.9.12 (PHP 7.2.28 — cli) by Justin Hileman
+
+This command will retrieve the desired administrator account. Be sure to swap out the placeholder email address with the actual administrator address:
+>>> $u = \DreamFactory\Core\Models\User::where('email', 'known@admin-email.com')->first();
+
+Change the password to the desired value and save the results:
+>>> $u->password = 'secret';
+=> "secret"
+>>> $u->save();
+=> true
+
+Confirm the password has been encrypted (hashed) by referencing the $u object's password attribute:
+>>> $u->password
+=> "$2y$10$jtlt8D8fHWzgoosAV/P6m.w459QE6ntNfbXo.1x6V9GPXGVT7IFfm"
+
+Exit the console, and return to the browser to login using the new password:
+>>> exit</pre>
+
+===Enabling the MySQL Slow Query Log===
+
+When troubleshooting API performance issues, it's important to consider all contributors to the API request and response cycle. For instance, the issue may be related to poor code execution performance, but it's also worth considering the data source. If the API data source is a relational database, you should confirm that the respective tables have been correctly indexed, and that the database itself has been allocated appropriate system resources (CPU, RAM, etc).
+
+MySQL users can quickly determine whether queries are performant by enabling the slow query log. When enabled, the slow query log will log any query which takes longer than a predetermined number of seconds to execute.
+
+To enable the MySQL slow query log, you'll need root-level access to the database server.
+
+<pre>Step 1. Log into the MySQL database server
+$ mysql -u root -p
+Enter password:
+
+Step 2. Enable the slow query log
+mysql> set global slow_query_log = 'ON';
+
+Step 3. Define the execution time limit (in seconds)
+mysql>  set global long_query_time = 2;
+
+Step 4. Define the log location
+mysql> set global slow_query_log_file = '/var/log/mysql/slow_query_log';
+
+Step 5. Monitor the log
+$ tail -f /var/log/mysql/slow_query_log
+/usr/sbin/mysqld, Version: 5.7.31-0ubuntu0.16.04.1 ((Ubuntu)). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+# Time: 2020-09-14T17:49:56.033857Z
+# User@Host: dreamfactory[dreamfactory] @ ec2-12.34.56.78.compute-1.amazonaws.com [12.34.56.78]  Id:  7060
+# Query_time: 0.304755  Lock_time: 0.000046 Rows_sent: 1  Rows_examined: 300030
+use dreamfactory;
+SET timestamp=1600105796;
+select count(1) as aggregate from `jason`.`employees`;</pre>
+
+===Combining Relational SQL and NoSQL===
+
+Do you utilize both NoSQL and SQL databases but wish there was a way to interact with both databases in a single API call? Well this is the script for you! Whether you are connecting MySQL to MongoDB or SQL Server to Couchbase it is easily achievable in a few lines of code.
+
+This script runs after a GET on the service db at db/_table/contact. For each record in the response, it queries MongoDB to get another field, specifically the Twitter handle for the contact. It adds that to the response as a field named 'from_mongo_twitter'. For this change to take effect, you have to enable modification of response in the Admin Console script editor. Check the box 'Allow script to modify request (pre-process) or response (post-process)'.
+
+<pre>$content = $event['response']['content'];
+$api = $platform['api'];
+$get = $api->get;
+
+if (isset($content['resource']) && !empty($content['resource'])) {
+
+    foreach($content['resource'] as $k => $record){
+        // filter by email
+        $params = [
+               'filter' => 'email=' . $record['email']
+        ];
+
+        // get matching record from MongoDB service
+        $result = $get('mongodb/_table/contact', $params);
+
+        // from_mongo_twitter can be a field in MySQL schema, but it doesn't have to be
+        $record['from_mongo_twitter'] = $result['content']['resource'][0]['twitter'];
+        $event['response']['content']['resource'][$k] = $record;
+    }
+}</pre>
+
+===Restructuring an API response===
+
+Sometimes an API client expects data to be returned using a rigid data structure, and updating the client to suit new requirements is either difficult or even impossible. Using DreamFactory's event-driven scripting engine you can easily reformat API responses so suit any expectation.
+
+The script presented in this example would be attached to an API endpoint as a post-process event handler. It will intercept the response body, and iterate over the records contained therein, placing the '''first_name''' and '''last_name''' fields under a new '''name''' field before returning the modified response to the client. For instance, here's an example original record returned from a table containing employee information:
+
+{
+  "emp_id": "111AD87BY",
+  "birth_date": "1953-09-02",
+  "first_name": "Steve",
+  "last_name": "Smith",
+  "gender": "M",
+  "hire_date": "1986-06-26"
+}
+
+After applying the post-process event handler script, the record will look like this:
+
+{
+  "emp_id": "111AD87BY",
+  "birth_date": "1953-09-02",
+  "name": {
+    "first_name": "Steve",
+    "last_name": "Smith",
+  }.
+  "gender": "M",
+  "hire_date": "1986-06-26"
+Code:
+
+<pre>$responseBody = $event['response']['content'];
+
+foreach ($responseBody['resource'] as $n => $record) {
+    $record["name"] = $record["first_name"] . " " . $record["last_name"];
+    unset($record["first_name"]);
+    unset($record["last_name"]);
+    $responseBody['resource'][$n] = $record;
+}
+
+$event['response']['content'] = $responseBody;<pre>
+
+===Create Data Masks for an API===
+
+
+When interacting with a database-backed API, DreamFactory will by default return all fields associated with each record. You'll often want to restrict access to certain data due to for instance internal compliance or regulatory needs.
+
+The script presented in this example would be attached to an API endpoint as a post-process event handler. It will intercept the response body, and iterate over the records contained therein, removing the '''employee_id''' and '''birth_date fields''' before returning the modified response to the client. For instance, here's an example original record returned from a table containing employee information:
+
+{
+  "emp_id": "111AD87BY",
+  "birth_date": "1953-09-02",
+  "first_name": "Steve",
+  "last_name": "Smith",
+  "gender": "M",
+  "hire_date": "1986-06-26"
+}
+
+Some information might however be sensitive and therefore subject to restrictions. Modifying the query would ensure that the '''emp_id''' and '''birth_date''' fields were removed from the query:
+
+/api/v2/mysql/_table/employees?fields=first_name,last_name,gender,hire_date
+
+However, the organization might desire to completely restrict the possibility of such fields being returned. One easy way to implement this restriction is through data masking. Once implemented, the record will look like this, regardless of what API query is used:
+
+{
+  "first_name": "Steve",
+  "last_name": "Smith",
+  "gender": "M",
+  "hire_date": "1986-06-26"
+}
+
+Code:
+<pre>$responseBody = $event['response']['content'];
+
+foreach ($responseBody['resource'] as $n => $record) {
+    unset($record["employee_id"]);
+    unset($record["birth_date"]);
+    $responseBody['resource'][$n] = $record;
+}
+
+$event['response']['content'] = $responseBody;</pre>
+
+===Chaining APIs Using DreamFactory===
+
+It's often useful to break APIs down into discrete, highly focused tasks which can then be chained together to perform a more complicated task. This is easily accomplished using DreamFactory thanks to the scripted service feature.
+
+The example presents two separate scripted PHP APIs. The parent API is configured to randomly return either a 200 or 400 status code, simulating the fact that sometimes APIs fail. The second API calls the parent API, and if the status code is 200 it proceeds to call yet another API (in this case a MySQL API which returns records from a table). If anything but a 200 status code is returned, the second API will return a 500 status code.
+
+Code:
+<pre>/*
+  * Parent API
+  */ 
+
+$outcome = array_rand([1,2]);
+
+if ($outcome == 1) {
+    
+    $event['response'] = [
+        'status_code' => 400, 
+        'content' => [
+            'success' => false,
+            'message' => "Required parameter not found in request."
+        ]
+    ];
+
+} else {
+    
+    $event['response'] = [
+        'status_code' => 200, 
+        'content' => [
+            'success' => true,
+            'entity_id' => 99,
+            'message' => "Value found."
+        ]
+    ];
+    
+}
+
+return;
+
+/*
+  * Dependent API
+  */ 
+$api = $platform['api'];
+$get = $api->get;
+$options = [];
+
+// Define the parent API
+$url = "parent/";
+
+// Call parent API
+$result = $get($url);
+
+// Check status code
+if ($result['status_code'] == 200) {
+    
+    // If parent API call returns 200, call a MySQL API
+    $url = "mysql/_table/employees";
+    $event['response'] = $get($url, $payload, $options);
+
+// Something went wrong with parent API call, so throw 500 status code
+} else {
+    
+    $event['response'] = [
+        'status_code' => 500, 
+        'content' => [
+            'success' => false,
+            'message' => "Could not complete call."
+        ]
+    ];
+    
+}
+
+return;</pre>
+
+===Redirect HTTP to HTTPs in Nginx===
+
+DreamFactory can run atop any modern web server, however Nginx is the most popular of the bunch. Naturally you'll want to keep communications between the client and server secure, and the easiest way to do so is by ensuring all traffic is transmitted over HTTPS. With just a few lines of code added to the Nginx configuration file you can redirect all HTTP traffic to the correct HTTPS URL.
+
+Your Nginx web server will refer to a configuration file to determine where log files are stored, what port will be used for traffic (typically 80 and 443), and what to do should non-2XX status codes occur. This file is typically named '''default.conf''' however when the server is hosting multiple sites it might be named something like '''api.example.com.conf'''. Generally (but not always), these configuration files are found in the '''/etc/nginx/conf.d''' directory.
+
+To redirect HTTP traffic to HTTPS, you'll add a separate server block to the file which listens on port 80, and then returns a 301 redirect status code along with the requested host and request URI, but using the HTTPS protocol.
+
+Code:
+<pre>server {
+    listen 80;
+    server_name api.example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl
+   ...
+}</pre>
+
+===Monitor API calls in Node.JS===
+
+Adding an event script into every HTTP request your API makes will allow you to automatically log requests, handle problems with failure remediations, and more. This script allows us to capture usernames and what API key was used for the call as well as a timestamp to track exactly when this call occurred. Once we capture that information we are able to push that data into any popular database whether it be MySQL, Microsoft SQL Server, or Oracle.
+
+To install this script, open the Scripts tab and drill down to the table (or view) endpoint associated with the API you would like to monitor. Don't forget that tracking the username, API key, and timestamp is just scratching the surface, you can also track things such as status codes and more!
+
+Code:
+<pre>// To enable Node.js scripting, set the path to node in your DreamFactory .env file.
+// This setting is commented out by default.
+//
+// DF_NODEJS_PATH=/usr/local/bin/node
+//
+// Use npm to install any dependencies. This script requires 'lodash.'
+// Your scripts can call console.log to dump info to the log file in storage/logs.
+
+var payload = {
+    user_name: platform.session.user.email,
+    api_key: platform.session.api_key,
+    timestamp: (new Date()).toString()
+};
+
+platform.api.post("db/_table/TransactionHistory", {"resource": [payload]}, '', function(body, response){
+
+    console.log(response.statusCode + " " + response.statusMessage);
+    event.setResponse(JSON.parse(body), response.statusCode, 'applicaton/json');
+});</pre>
+
+===Get the client IP address in PHP===
+
+It's often useful to record the API client's IP address. PHP has long supported an easy way to retrieve the IP address using the '''$_SERVER['REMOTE_ADDR']''' variable. Keep in mind however that the client is sometimes operating behind a proxy, and that proxy might therefore assign the IP address to the '''HTTP_X_FORWARDED_FOR''' header. PHP will additionally make this value available using the '''$_SERVER['HTTP_X_FORWARDED_FOR']''' variable.
+
+There is no additional configuration required to access PHP's global '''$_SERVER''' variable array.
+
+Code:
+<pre>$ip = $_SERVER['REMOTE_ADDR'];
+$proxiedIP = $_SERVER['HTTP_X_FORWARDED_FOR'];</pre>
+
+===Validating Existence of API Payload Parameters===
+
+Using the '''/_table/{table_name}''' endpoint it's easy to insert a new record into a database backed by a DreamFactory generated database API. By default the underlying database constraints will serve as a validation backstop, meaning if a required (not nullable) field is not provided, the database will throw an error and DreamFactory will in return return a 500 status code to the client.
+
+You might however wish to customize both the validation logic and error response. This is accomplished using DreamFactory's scripting engine. Specifically, you can add custom logic to the POST endpoint's pre-process event handler, meaning the custom code will execute before the destination data source is contacted.
+
+Code:
+<pre>$payload = $event['request']['payload'];
+
+if(!empty($payload['resource'])){
+    foreach($payload['resource'] as $record){
+        if(!array_key_exists('first_name', $record)){
+            throw new \Exception('First name field missing.');
+        }
+    }
+}</pre>
+
+===Transform DreamFactory MySQL API Response===
+
+When retrieving records from a database-backed API, DreamFactory will return an array of one or more JSON objects containing the column and value mappings. However, the client initiating the API call might require the response to be formatted differently than this default. Using a post-process event handler, you can intercept the response prior to returning it to the client and modify it to suit the custom requirements.
+
+To install this script, open the Scripts tab and drill down to the table (or view) endpoint associated with the database API. Each endpoint offers a pre-process, post-process, and queued event handler. Because we need to manipulate the data after it has been returned from the data source, you'll choose the post-process handler. For instance, if the API namespace is mysql, and the target table is employees, then the leaf will be '''mysql._table.employees.get.post_process.'''
+
+Before saving the script, be sure to enable the event handler by selecting the Active checkbox, and additionally enable the "Allow script to modify response payload" checkbox.
+
+Code:
+<pre>$responseBody = $event['response']['content'];
+
+foreach ($responseBody['resource'] as $n => $record) {
+	$record["name"] = [
+	    "first" => $record["first_name"],
+	    "last" =>  $record["last_name"]
+	];
+	unset($record["first_name"]);
+	unset($record["last_name"]);
+    unset($record["hire_date"]);
+	$responseBody['resource'][$n] = $record;
+}
+
+$event['response']['content'] = $responseBody;</pre>

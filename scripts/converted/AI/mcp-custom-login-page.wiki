@@ -1,0 +1,517 @@
+= Custom Login Page for MCP =
+<span id="custom-login-page-for-mcp-oauth"></span>
+= Custom Login Page for MCP OAuth =
+
+This guide explains how to create a custom login page layer for DreamFactory's MCP (Model Context Protocol) OAuth authentication flow. By following this guide, you can build a branded, self-hosted login experience while maintaining full OAuth 2.0 security.
+
+<span id="overview"></span>
+== Overview ==
+
+<span id="what-this-achieves"></span>
+=== What This Achieves ===
+
+A custom login page layer allows you to:
+
+* '''Brand the login experience''' with your company's look and feel
+* '''Host authentication UI on your domain''' (e.g., <code>login.yourcompany.com</code>)
+* '''Maintain OAuth 2.0 + PKCE security''' through DreamFactory
+* '''Support both credential-based and social login''' flows
+
+<span id="how-it-works"></span>
+=== How It Works ===
+
+<pre>┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Your Client    │────&gt;│  DreamFactory    │────&gt;│ Custom Login    │
+│  Application    │     │  MCP Service     │     │ Page (this)     │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+        │                       │                        │
+        │  1. OAuth Request     │                        │
+        │──────────────────────&gt;│                        │
+        │                       │  2. Redirect to        │
+        │                       │     custom login       │
+        │                       │───────────────────────&gt;│
+        │                       │                        │
+        │                       │  3. User submits       │
+        │                       │     credentials        │
+        │                       │&lt;───────────────────────│
+        │                       │                        │
+        │  4. Authorization     │                        │
+        │     code returned     │                        │
+        │&lt;──────────────────────│                        │
+        │                       │                        │
+        │  5. Exchange code     │                        │
+        │     for tokens        │                        │
+        │──────────────────────&gt;│                        │
+        │                       │                        │
+        │  6. Access granted    │                        │
+        │&lt;──────────────────────│                        │</pre>
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+* '''DreamFactory instance''' with MCP services configured
+* '''Web server''' capable of serving static HTML (any will work)
+* '''HTTPS certificate''' (required for production)
+
+<span id="step-by-step-implementation"></span>
+== Step-by-Step Implementation ==
+
+<span id="step-1-create-the-html-structure"></span>
+=== Step 1: Create the HTML Structure ===
+
+Your login page needs:
+
+<syntaxhighlight lang="html"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <!-- Login Form -->
+    <form id="loginForm" method="POST">
+        <!-- Hidden OAuth fields (populated by JavaScript) -->
+        <input type="hidden" name="client_id" id="client_id">
+        <input type="hidden" name="redirect_uri" id="redirect_uri">
+        <input type="hidden" name="state" id="state">
+        <input type="hidden" name="code_challenge" id="code_challenge">
+        <input type="hidden" name="code_challenge_method" id="code_challenge_method">
+        <input type="hidden" name="service" id="service">
+        <input type="hidden" name="original_state" id="original_state">
+
+        <!-- User input fields -->
+        <input type="email" name="email" required>
+        <input type="password" name="password" required>
+        <button type="submit">Sign In</button>
+    </form>
+
+    <!-- Optional: OAuth service buttons container -->
+
+    <script>
+        // JavaScript implementation here
+    </script>
+</body>
+</html></syntaxhighlight>
+<span id="step-2-extract-oauth-parameters-from-url"></span>
+=== Step 2: Extract OAuth Parameters from URL ===
+
+DreamFactory passes OAuth parameters via query string. Extract them:
+
+<syntaxhighlight lang="javascript">// Parse URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+
+const oauthParams = {
+    client_id: urlParams.get('client_id'),
+    redirect_uri: urlParams.get('redirect_uri'),
+    state: urlParams.get('state'),
+    code_challenge: urlParams.get('code_challenge'),
+    code_challenge_method: urlParams.get('code_challenge_method'),
+    original_state: urlParams.get('original_state'),
+    login_url: urlParams.get('login_url'),        // CRITICAL: form submission endpoint
+    service: urlParams.get('service'),
+    oauth_services: urlParams.get('oauth_services'),
+    oauth_callback_base: urlParams.get('oauth_callback_base')
+};</syntaxhighlight>
+<span id="step-3-configure-the-form"></span>
+=== Step 3: Configure the Form ===
+
+Set the form action and populate hidden fields:
+
+<syntaxhighlight lang="javascript">document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+
+    // CRITICAL: Set form action to DreamFactory's login endpoint
+    if (oauthParams.login_url) {
+        form.action = oauthParams.login_url;
+    } else {
+        // Handle error - login_url is required
+        console.error('Missing login_url parameter');
+        return;
+    }
+
+    // Populate hidden fields with OAuth parameters
+    const fields = [
+        'client_id', 'redirect_uri', 'state',
+        'code_challenge', 'code_challenge_method',
+        'service', 'original_state'
+    ];
+
+    fields.forEach(field => {
+        const input = document.getElementById(field);
+        if (input && oauthParams[field]) {
+            input.value = oauthParams[field];
+        }
+    });
+});</syntaxhighlight>
+<span id="step-4-handle-form-submission"></span>
+=== Step 4: Handle Form Submission ===
+
+Add validation before submission:
+
+<syntaxhighlight lang="javascript">form.addEventListener('submit', function(e) {
+    const email = form.querySelector('input[name="email"]').value;
+    const password = form.querySelector('input[name="password"]').value;
+
+    // Basic validation
+    if (!email || !password) {
+        e.preventDefault();
+        showError('Please enter both email and password');
+        return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        e.preventDefault();
+        showError('Please enter a valid email address');
+        return;
+    }
+
+    // Form submits naturally to login_url via POST
+});</syntaxhighlight>
+<span id="step-5-handle-error-responses-optional"></span>
+=== Step 5: Handle Error Responses (Optional) ===
+
+DreamFactory may redirect back with errors:
+
+<syntaxhighlight lang="javascript">// Check for error in URL (returned from DreamFactory)
+const error = urlParams.get('error');
+const errorDescription = urlParams.get('error_description');
+
+if (error) {
+    showError(errorDescription || error);
+}</syntaxhighlight>
+<span id="oauth-flow-explained"></span>
+== OAuth Flow Explained ==
+
+<span id="client-initiates-oauth"></span>
+=== 1. Client Initiates OAuth ===
+
+Your application redirects to DreamFactory:
+
+<pre>GET https://your-dreamfactory.com/mcp/{service}/authorize
+    ?client_id=your_client_id
+    &amp;redirect_uri=https://your-app.com/callback
+    &amp;response_type=code
+    &amp;state=random_state_value
+    &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+    &amp;code_challenge_method=S256</pre>
+<span id="dreamfactory-redirects-to-custom-login"></span>
+=== 2. DreamFactory Redirects to Custom Login ===
+
+If <code>custom_login_url</code> is configured, DreamFactory redirects:
+
+<pre>GET https://login.yourcompany.com/
+    ?client_id=your_client_id
+    &amp;redirect_uri=https://your-app.com/callback
+    &amp;state=internal_state
+    &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+    &amp;code_challenge_method=S256
+    &amp;original_state=random_state_value
+    &amp;login_url=https://your-dreamfactory.com/mcp/{service}/login
+    &amp;service={service}</pre>
+<span id="custom-login-submits-credentials"></span>
+=== 3. Custom Login Submits Credentials ===
+
+Your form POSTs to <code>login_url</code>:
+
+<pre>POST https://your-dreamfactory.com/mcp/{service}/login
+Content-Type: application/x-www-form-urlencoded
+
+email=user@example.com
+&amp;password=userpassword
+&amp;client_id=your_client_id
+&amp;redirect_uri=https://your-app.com/callback
+&amp;state=internal_state
+&amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+&amp;code_challenge_method=S256
+&amp;service={service}
+&amp;original_state=random_state_value</pre>
+<span id="dreamfactory-returns-authorization-code"></span>
+=== 4. DreamFactory Returns Authorization Code ===
+
+On successful authentication:
+
+<pre>GET https://your-app.com/callback
+    ?code=authorization_code_here
+    &amp;state=random_state_value</pre>
+<span id="client-exchanges-code-for-tokens"></span>
+=== 5. Client Exchanges Code for Tokens ===
+
+Your application exchanges the code:
+
+<pre>POST https://your-dreamfactory.com/mcp/{service}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code
+&amp;code=authorization_code_here
+&amp;redirect_uri=https://your-app.com/callback
+&amp;client_id=your_client_id
+&amp;code_verifier=original_code_verifier</pre>
+<span id="required-query-parameters"></span>
+== Required Query Parameters ==
+
+Your custom login page '''must''' handle these parameters from the URL:
+
+{| class="wikitable"
+|-
+! Parameter
+! Required
+! Description
+|-
+| <code>login_url</code>
+| '''Yes'''
+| DreamFactory endpoint for credential submission
+|-
+| <code>client_id</code>
+| '''Yes'''
+| OAuth client identifier
+|-
+| <code>redirect_uri</code>
+| '''Yes'''
+| Where to redirect after authentication
+|-
+| <code>state</code>
+| '''Yes'''
+| Internal state for CSRF protection
+|-
+| <code>code_challenge</code>
+| '''Yes'''
+| PKCE challenge value
+|-
+| <code>code_challenge_method</code>
+| '''Yes'''
+| PKCE method (usually <code>S256</code>)
+|-
+| <code>service</code>
+| No
+| MCP service name
+|-
+| <code>original_state</code>
+| No
+| Client's original state value
+|-
+| <code>oauth_services</code>
+| No
+| Base64-encoded available OAuth providers
+|-
+| <code>oauth_callback_base</code>
+| No
+| Base URL for OAuth callbacks
+|}
+
+<span id="form-submission-requirements"></span>
+== Form Submission Requirements ==
+
+Your form '''must''' POST these fields to <code>login_url</code>:
+
+<syntaxhighlight lang="html"><!-- User credentials -->
+<input type="email" name="email" required>
+<input type="password" name="password" required>
+
+<!-- OAuth parameters (hidden, populated via JavaScript) -->
+<input type="hidden" name="client_id">
+<input type="hidden" name="redirect_uri">
+<input type="hidden" name="state">
+<input type="hidden" name="code_challenge">
+<input type="hidden" name="code_challenge_method">
+<input type="hidden" name="service">
+<input type="hidden" name="original_state"></syntaxhighlight>
+<span id="supporting-social-login-optional"></span>
+== Supporting Social Login (Optional) ==
+
+To support OAuth providers (Google, GitHub, etc.):
+
+<span id="parse-oauth-services"></span>
+=== 1. Parse OAuth Services ===
+
+<syntaxhighlight lang="javascript">if (oauthParams.oauth_services) {
+    try {
+        const services = JSON.parse(atob(oauthParams.oauth_services));
+        // services is an array of {name: string, label: string}
+        renderOAuthButtons(services);
+    } catch (e) {
+        console.error('Failed to parse oauth_services');
+    }
+}</syntaxhighlight>
+<span id="create-oauth-buttons"></span>
+=== 2. Create OAuth Buttons ===
+
+<syntaxhighlight lang="javascript">function renderOAuthButtons(services) {
+    const container = document.getElementById('oauthServices');
+
+    services.forEach(service => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = `Sign in with ${service.label}`;
+        button.onclick = () => initiateOAuth(service.name);
+        container.appendChild(button);
+    });
+}</syntaxhighlight>
+<span id="initiate-oauth-flow"></span>
+=== 3. Initiate OAuth Flow ===
+
+<syntaxhighlight lang="javascript">function initiateOAuth(serviceName) {
+    // Build callback URL that returns to this page
+    const callbackUrl = encodeURIComponent(
+        oauthParams.oauth_callback_base +
+        '?client_id=' + oauthParams.client_id +
+        '&redirect_uri=' + encodeURIComponent(oauthParams.redirect_uri) +
+        '&state=' + oauthParams.state +
+        '&code_challenge=' + oauthParams.code_challenge +
+        '&code_challenge_method=' + oauthParams.code_challenge_method
+    );
+
+    // Extract DreamFactory base URL from login_url
+    const dfBaseUrl = new URL(oauthParams.login_url).origin;
+
+    // Redirect to DreamFactory OAuth initiation
+    window.location.href = `${dfBaseUrl}/api/v2/user/session?service=${serviceName}&redirect=${callbackUrl}`;
+}</syntaxhighlight>
+<span id="dreamfactory-configuration"></span>
+== DreamFactory Configuration ==
+
+To use your custom login page, configure DreamFactory:
+
+# Navigate to '''AI''' &gt; '''Your MCP Service'''
+# Find the '''Custom Login URL''' setting
+# Enter your login page URL: <code>https://login.yourcompany.com/</code>
+# Save changes
+
+<span id="complete-minimal-example"></span>
+== Complete Minimal Example ==
+
+Here's a minimal working implementation:
+
+<syntaxhighlight lang="html"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f5f5f5; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h1 { margin: 0 0 1.5rem; text-align: center; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        button { width: 100%; padding: 0.75rem; background: #4f46e5; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+        button:hover { background: #4338ca; }
+        .error { background: #fee2e2; color: #dc2626; padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem; display: none; }
+    </style>
+</head>
+<body>
+    <h1>Sign In</h1>
+
+        <form id="loginForm" method="POST">
+            <!-- Hidden OAuth fields -->
+            <input type="hidden" name="client_id" id="client_id">
+            <input type="hidden" name="redirect_uri" id="redirect_uri">
+            <input type="hidden" name="state" id="state">
+            <input type="hidden" name="code_challenge" id="code_challenge">
+            <input type="hidden" name="code_challenge_method" id="code_challenge_method">
+            <input type="hidden" name="service" id="service">
+            <input type="hidden" name="original_state" id="original_state">
+
+            <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+
+            <button type="submit">Sign In</button>
+        </form>
+
+    <script>
+        (function() {
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const oauthParams = {
+                client_id: urlParams.get('client_id'),
+                redirect_uri: urlParams.get('redirect_uri'),
+                state: urlParams.get('state'),
+                code_challenge: urlParams.get('code_challenge'),
+                code_challenge_method: urlParams.get('code_challenge_method'),
+                original_state: urlParams.get('original_state'),
+                login_url: urlParams.get('login_url'),
+                service: urlParams.get('service')
+            };
+
+            const form = document.getElementById('loginForm');
+            const errorAlert = document.getElementById('errorAlert');
+
+            function showError(message) {
+                errorAlert.textContent = message;
+                errorAlert.style.display = 'block';
+            }
+
+            // Check for errors from DreamFactory
+            const error = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+            if (error) {
+                showError(errorDescription || error);
+            }
+
+            // Validate required parameters
+            if (!oauthParams.login_url || !oauthParams.client_id) {
+                showError('Invalid authentication request. Missing required parameters.');
+                form.querySelector('button').disabled = true;
+                return;
+            }
+
+            // Configure form
+            form.action = oauthParams.login_url;
+
+            // Populate hidden fields
+            ['client_id', 'redirect_uri', 'state', 'code_challenge',
+             'code_challenge_method', 'service', 'original_state'].forEach(field => {
+                const input = document.getElementById(field);
+                if (input && oauthParams[field]) {
+                    input.value = oauthParams[field];
+                }
+            });
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!email || !password) {
+                    e.preventDefault();
+                    showError('Please enter both email and password.');
+                    return;
+                }
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    e.preventDefault();
+                    showError('Please enter a valid email address.');
+                    return;
+                }
+            });
+        })();
+    </script>
+</body>
+</html></syntaxhighlight>
+<span id="summary"></span>
+== Summary ==
+
+To create a custom login page for DreamFactory MCP:
+
+# '''Create a single HTML page''' with a login form
+# '''Extract OAuth parameters''' from the URL query string
+# '''Set form action''' to <code>login_url</code> parameter value
+# '''Include hidden fields''' for all OAuth parameters
+# '''Submit credentials''' via POST to DreamFactory
+# '''Configure DreamFactory''' to use your custom login URL
+
+The implementation requires no backend logic—it's a stateless pass-through that maintains OAuth security while providing a branded experience.
+
+== See also ==
+* [[AI_Services/Mcp_Service_Creation|Creating an MCP Server Service]]
+* [[AI_Services/Mcp_Service|MCP Server]]
+
+[[Category:Custom]]
+[[Category:Login]]

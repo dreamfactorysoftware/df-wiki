@@ -1,0 +1,139 @@
+= Appendix A: Configuration Parameter Reference =
+* <code>APP_CIPHER</code>: Database encryption cipher, options are AES-128-CBC or AES-256-CBC (default). Only change this if you are starting from a clean database
+* <code>APP_DEBUG</code>: When your application is in debug mode, detailed error messages with stack traces will be shown on every error that occurs within your application. If disabled, a simple generic error page is shown
+* <code>APP_ENV</code>: This may determine how various services behave in your application
+* <code>APP_KEY</code>: This key is used by the application for encryption and should be set to a random, 32 character string, otherwise these encrypted strings will not be safe. Use 'php artisan key:generate' to generate a new key. Please do this before deploying an application!
+* <code>APP_LOCALE</code>: The application locale determines the default locale that will be used by the translation service provider. Currently only 'en' (English) is supported
+* <code>APP_LOG</code>: This setting controls the placement and rotation of the log file used by the application
+* <code>APP_LOG_LEVEL</code>: The setting controls the amount and severity of the information logged by the application. This is hierarchical and goes in the following order: DEBUG -&gt; INFO -&gt; NOTICE -&gt; WARNING -&gt; ERROR -&gt; CRITICAL -&gt; ALERT -&gt; EMERGENCY. If you set log level to WARNING then all WARNING, ERROR, CRITICAL, ALERT, and EMERGENCY will be logged. Setting log level to DEBUG will log everything. Default is WARNING ['APP_NAME']="This value is used when the framework needs to place the application's name in a notification or any other location as required by the application or its packages
+* <code>APP_TIMEZONE</code>: Here you may specify the default timezone for your application, which will be used by the PHP date and date-time functions
+* <code>APP_URL</code>: This URL is used by the console to properly generate URLs when using the Artisan command line tool. You should set this to the root of your application so that it is used when running Artisan tasks
+* <code>DF_LANDING_PAGE</code>: This is the starting point (page, application, etc.) when a browser points to the server root URL
+
+<span id="database-settings"></span>
+== Database settings ==
+
+* <code>DB_CONNECTION</code>: This corresponds to the driver that will be supporting connections to the system database server
+* <code>DB_HOST</code>: The hostname or IP address of the system database server
+* <code>DB_PORT</code>: The connection port for the host given, or blank if the provider default is used
+* <code>DB_DATABASE</code>: The database name to connect to and where to place the system tables
+* <code>DB_USERNAME</code>: Credentials for the system database connection if required
+* <code>DB_PASSWORD</code>: Credentials for the system database connection if required
+* <code>DB_CHARSET</code>: The character set override if required. Defaults use utf8, except utf8mb4 for MySQL-based databases - may cause problems for pre-5.7.7 (MySQL) or pre-10.2.2 (MariaDB), if so, use utf8
+* <code>DB_COLLATION</code>: The character set collation override if required. Defaults use utf8_unicode_ci, except utf8mb4_unicode_ci for MySQL-based database - may cause problems for pre-5.7.7 (MySQL) or pre-10.2.2 (MariaDB), if so, use utf8_unicode_ci
+* <code>DB_MAX_RECORDS_RETURNED</code>: This is the default number of records to return at once for database queries
+* <code>DF_SQLITE_STORAGE</code>: This is the default location to store SQLite3 database files
+
+<span id="freetds-configuration-linux-and-os-x-only"></span>
+== FreeTDS configuration (Linux and OS X only) ==
+
+* <code>DF_FREETDS_DUMP</code>: Enabling and location of dump file, defaults to disabled or default freetds.conf setting
+* <code>DF_FREETDS_DUMPCONFIG</code>: Location of connection dump file, defaults to disabled
+
+<span id="cache"></span>
+== Cache ==
+
+* <code>CACHE_DRIVER</code>: What type of driver or connection to use for cache storage
+* <code>CACHE_DEFAULT_TTL</code>: Default cache time-to-live, defaults to 300
+* <code>CACHE_PREFIX</code>: A prefix used for all cache written out from this installation
+* <code>CACHE_PATH</code>: The path to a folder where the system cache information will be stored
+* <code>CACHE_TABLE</code>: The database table name where cached information will be stored
+* <code>REDIS_CLIENT</code>: What type of php extension to use for Redis cache storage
+* <code>CACHE_HOST</code>: The hostname or IP address of the memcached or redis server
+* <code>CACHE_PORT</code>: The connection port for the host given, or blank if the provider default is used
+* <code>CACHE_USERNAME</code>: Credentials for the service if required
+* <code>CACHE_PASSWORD</code>: Credentials for the service if required
+* <code>CACHE_PERSISTENT_ID</code>: Memcached persistent ID setting
+* <code>CACHE_WEIGHT</code>: Memcached weight setting
+* <code>CACHE_DATABASE</code>: The desired Redis database number between 0 and 16 (or the limit set in your redis.conf file
+
+<span id="limits"></span>
+== Limits ==
+
+* <code>LIMIT_CACHE_DRIVER</code>: What type of driver or connection to use for limit cache storage
+* <code>LIMIT_CACHE_PREFIX</code>: A prefix used for all cache written out from this installation
+* <code>LIMIT_CACHE_PATH</code>: Path to a folder where limit tracking information will be stored
+* <code>LIMIT_CACHE_TABLE</code>: The database table name where limit tracking information will be stored
+* <code>LIMIT_CACHE_HOST</code>: The hostname or IP address of the redis server
+* <code>LIMIT_CACHE_PORT</code>: The connection port for the host given, or blank if the provider default is used
+* <code>LIMIT_CACHE_USERNAME</code>: Credentials for the service if required
+* <code>LIMIT_CACHE_PASSWORD</code>: Credentials for the service if required
+* <code>LIMIT_CACHE_PERSISTENT_ID</code>: Memcached persistent ID setting
+* <code>LIMIT_CACHE_WEIGHT</code>: Memcached weight setting
+* <code>LIMIT_CACHE_DATABASE</code>: The desired Redis database number between 0 and 16 (or the limit set in your redis.conf file
+
+<span id="queuing"></span>
+== Queuing ==
+
+* <code>QUEUE_DRIVER</code>: What type of driver or connection to use for queuing jobs on the server
+* <code>QUEUE_NAME</code>: Name of the queue to use, defaults to 'default'
+* <code>QUEUE_RETRY_AFTER</code>: Number of seconds after to retry a failed job, defaults to 90
+* <code>QUEUE_TABLE</code>: The database table used to store the queued jobs
+* <code>QUEUE_HOST</code>: The hostname or IP address of the beanstalkd or redis server
+* <code>QUEUE_PORT</code>: The connection port for the host given, or blank if the provider default is used
+* <code>QUEUE_DATABASE</code>: The desired Redis database number between 0 and 16 (or the limit set in your redis.conf file
+* <code>QUEUE_PASSWORD</code>: Credentials for the service if required
+* <code>SQS_KEY</code>: AWS credentials
+* <code>SQS_SECRET</code>: AWS credentials
+* <code>SQS_REGION</code>: AWS storage region
+* <code>SQS_PREFIX</code>: AWS SQS specific prefix for queued jobs
+
+<span id="event-broadcasting"></span>
+== Event Broadcasting ==
+
+* <code>BROADCAST_DRIVER</code>: What type of driver or connection to use for broadcasting events from the server
+* <code>PUSHER_APP_ID</code>:
+* <code>PUSHER_APP_KEY</code>:
+* <code>PUSHER_APP_SECRET</code>:
+* <code>BROADCAST_HOST</code>: The hostname or IP address of the redis server
+* <code>BROADCAST_PORT</code>: The connection port for the host given, or blank if the provider default is used
+* <code>BROADCAST_DATABASE</code>: The desired Redis database number between 0 and 16 (or the limit set in your redis.conf file
+* <code>BROADCAST_PASSWORD</code>: Credentials for the service if required
+
+<span id="user-management"></span>
+== User Management ==
+
+* <code>DF_LOGIN_ATTRIBUTE</code>: By default DreamFactory uses an email address for user authentication. You can change this to use username instead by setting this to 'username'
+* <code>DF_CONFIRM_CODE_LENGTH</code>: New user confirmation code length. Max/Default is 32. Minimum is 5
+* <code>DF_CONFIRM_CODE_TTL</code>: Confirmation code expiration. Default is 1440 minutes (24 hours)
+* <code>DF_ALLOW_FOREVER_SESSIONS</code>: false
+* <code>JWT_SECRET</code>: If a separate encryption salt is required for JSON Web Tokens, place it here. Defaults to the APP_KEY setting
+* <code>DF_JWT_TTL</code>: The time-to-live for JSON Web Tokens, i.e. how long each token will remain valid to use
+* <code>DF_JWT_REFRESH_TTL</code>: The time allowed in which a JSON Web Token can be refreshed from its origination
+* <code>DF_CONFIRM_RESET_URL</code>: Application path to where password resets are to be handled
+* <code>DF_CONFIRM_INVITE_URL</code>: Application path to where invited users are to be handled
+* <code>DF_CONFIRM_REGISTER_URL</code>: Application path to where user registrations are to be handled
+
+<span id="server-side-scripting"></span>
+== Server-side Scripting ==
+
+* <code>DF_SCRIPTING_DISABLE</code>: To disable all server-side scripting set this to 'all', or comma-delimited list of v8js, nodejs, python, and/or php to disable individually
+* <code>DF_NODEJS_PATH</code>: The system will try to detect the executable path, but in some environments it is best to set the path to the installed Node.js executable
+* <code>DF_PYTHON_PATH</code>: The system will try to detect the executable path, but in some environments it is best to set the path to the installed Python executable
+
+<span id="api"></span>
+== API ==
+
+* <code>DF_API_ROUTE_PREFIX</code>: By default, API calls take the form of http://<server_name>/<api_route_prefix>/v<version_number>
+* <code>DF_STATUS_ROUTE_PREFIX</code>: By default, API calls take the form of http://<server_name>/[<status_route_prefix>/]status
+* <code>DF_STORAGE_ROUTE_PREFIX</code>: By default, API calls take the form of http://<server_name>/[<storage_route_prefix>/]<storage_service_name>/<file_path>
+* <code>DF_XML_ROOT</code>: XML root tag for HTTP responses
+* <code>DF_ALWAYS_WRAP_RESOURCES</code>: Most API calls return a resource array or a single resource, if array, do we wrap it?
+* <code>DF_RESOURCE_WRAPPER</code>: Most API calls return a resource array or a single resource, if array, what do we wrap it with?
+* <code>DF_CONTENT_TYPE</code>: Default content-type of response when accepts header is missing or empty
+
+<span id="storage"></span>
+== Storage ==
+
+* <code>DF_FILE_CHUNK_SIZE</code>: File chunk size for downloadable files in bytes. Default is 10MB
+
+<span id="other-settings"></span>
+== Other settings ==
+
+* <code>DF_PACKAGE_PATH</code>: Path to a package file, folder, or URL to import during instance launch
+* <code>DF_LOOKUP_MODIFIERS</code>: Lookup management, comma-delimited list of allowed lookup modifying functions like urlencode, trim, etc. Note: Setting this will disable a large list of modifiers already internally configured
+* <code>DF_INSTALL</code>: This designates from where or how this instance of the application was installed, i.e. Bitnami, GitHub, DockerHub, etc.
+
+[[Category:Legacy_Guide]]
+[[Category:Appendix]]
+[[Category:Configuration]]

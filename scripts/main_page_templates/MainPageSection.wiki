@@ -1,0 +1,16 @@
+<noinclude>
+Section wrapper with heading and ID for the Main Page.
+
+== Parameters ==
+* '''id''' — HTML id attribute for the section
+* '''heading''' — section heading text
+* '''content''' — section body content
+
+== Usage ==
+<pre>
+{{MainPageSection|id=quick-start|heading=Quick Start|content=...}}
+</pre>
+</noinclude><includeonly><div class="mp-section" id="{{{id}}}">
+<h2 class="mp-section-heading">{{{heading}}}</h2>
+{{{content}}}
+</div></includeonly>

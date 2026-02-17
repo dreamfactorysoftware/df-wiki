@@ -1,0 +1,6 @@
+<noinclude>
+Banner template for current DreamFactory 7.x documentation.
+== Usage ==
+<pre>{{CurrentDoc}}</pre>
+[[Category:Templates]][[Category:Version Templates]]
+</noinclude><includeonly>{{VersionBanner|version=7.x|current=yes|color=#e8f5e9|border=#4caf50}}</includeonly>

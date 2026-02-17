@@ -1,0 +1,189 @@
+= Basic Configuration =
+<span id="basic-configuration"></span>
+= Basic Configuration =
+
+This page outlines the basic configuration settings for DreamFactory. For the most part, this entails adding or updating parameters in the .env file located in the <code>dreamfactory</code> directory. Common tasks and procedures are outlined below, and each parameter is individually documented in the '''Configuration Parameters''' section of this page.
+
+For web server configurations, check the child pages of this section for your specific web server.
+<span id="common-configuration-tasks-and-faqs"></span>
+== Common configuration tasks and FAQs ==
+
+<span id="changing-configuration"></span>
+=== Changing configuration ===
+
+Any time configurations are changed in the .env file, at a minimum, the confguration cache must be cleared. This is done by running <code>php artisan config:clear</code> in the <code>dreamfactory</code> directory.
+
+<span id="enable-debugging"></span>
+=== Enable debugging ===
+
+Two parameters are used for this process:
+
+* <code>APP_LOG_LEVEL</code> : Set to <code>debug</code> for debug mode. Other levels are described in the parameter listing below.
+* <code>APP_DEBUG</code> : Set to <code>true</code> to turn on application debug messages. This triggers DreamFactory to return a payload with a trace for error(s).
+
+<span id="changing-the-system-database"></span>
+=== Changing the system database ===
+
+This requires updating the connection to your database type (mysql, sqlsrv, pgsql, sqlite) and providing the necessary connection details.
+
+* <code>DB_CONNECTION</code>: Type of database connection.
+* <code>DB_HOST</code>: Database host address.
+* <code>DB_PORT</code>: Database port number.
+* <code>DB_DATABASE</code>: Database name.
+* <code>DB_USERNAME</code>: Database username.
+* <code>DB_PASSWORD</code>: Database password.
+
+<span id="caching-settings"></span>
+=== Caching settings ===
+
+To update the default cache (file) to an external cache (Memcache or Redis), or to a local alternative (apc, array, database, file) you can update the following values.
+
+* <code>CACHE_DRIVER</code>: Cache driver type.
+* <code>CACHE_DEFAULT_TTL</code>: Default cache TTL in seconds.
+* <code>CACHE_PREFIX</code>: Prefix for cache keys.
+* <code>CACHE_PATH</code>: Cache path for 'file' driver.
+* <code>CACHE_TABLE</code>: Cache table for 'database' driver.
+* <code>CACHE_HOST</code>, <code>CACHE_PORT</code>, <code>CACHE_PASSWORD</code>, <code>CACHE_WEIGHT</code>, <code>CACHE_PERSISTENT_ID</code>, <code>CACHE_USERNAME</code>, <code>CACHE_DATABASE</code>: Cache settings for 'memcached' or 'redis'.
+
+<span id="configuration-parameters"></span>
+== Configuration parameters ==
+
+Below, the .env in its entirety is outlined and every parameter described. These parameters are listed in the order/section they would normally exist on a DreamFactory instance.
+
+<span id="application-settings"></span>
+=== Application settings ===
+
+* <code>ASSET_URL</code>: Configures the asset URL host.
+* <code>VIEW_COMPILED_PATH</code>: Location for compiled Blade templates.
+* <code>BCRYPT_ROUNDS</code>: Options for Bcrypt password hashing.
+* <code>APP_NAME</code>: Name of the application.
+* <code>APP_CIPHER</code>: Encryption cipher options.
+* <code>APP_DEBUG</code>: Debugging trace toggle in exceptions.
+* <code>APP_ENV</code>: Environment type (local, production).
+* <code>APP_KEY</code>: Application encryption key.
+* <code>APP_LOCALE</code>: Default application locale.
+* <code>LOG_CHANNEL</code>: Configuration for log channels.
+* <code>APP_LOG_LEVEL</code>: Log level setting.
+* <code>APP_LOG_MAX_FILES</code>: Max log files for 'daily' logging.
+* <code>APP_TIMEZONE</code>: Timezone setting for PHP functions.
+* <code>APP_URL</code>: External URL for the installation.
+* <code>DF_LANDING_PAGE</code>: Default landing page URL.
+
+<span id="database-settings"></span>
+=== Database settings ===
+
+* <code>DB_CONNECTION</code>: Type of database connection.
+* <code>DB_HOST</code>: Database host address.
+* <code>DB_PORT</code>: Database port number.
+* <code>DB_DATABASE</code>: Database name.
+* <code>DB_USERNAME</code>: Database username.
+* <code>DB_PASSWORD</code>: Database password.
+* <code>DB_CHARSET</code>: Database character set.
+* <code>DB_COLLATION</code>: Database collation setting.
+* <code>DB_QUERY_LOG_ENABLED</code>: Toggle for database query logging.
+* <code>DB_MAX_RECORDS_RETURNED</code>: Max records returned in queries.
+* <code>DF_SQLITE_STORAGE</code>: Location for SQLite3 database files.
+* <code>DF_FREETDS_SQLSRV</code>, <code>DF_FREETDS_SQLANYWHERE</code>, <code>DF_FREETDS_SYBASE</code>, <code>DF_FREETDS_DUMP</code>, <code>DF_FREETDS_DUMPCONFIG</code>: FreeTDS configuration settings.
+
+<span id="cache-settings"></span>
+=== Cache settings ===
+
+* <code>CACHE_DRIVER</code>: Cache driver type.
+* <code>CACHE_DEFAULT_TTL</code>: Default cache TTL in seconds.
+* <code>CACHE_PREFIX</code>: Prefix for cache keys.
+* <code>CACHE_PATH</code>: Cache path for 'file' driver.
+* <code>CACHE_TABLE</code>: Cache table for 'database' driver.
+* <code>CACHE_HOST</code>, <code>CACHE_PORT</code>, <code>CACHE_PASSWORD</code>, <code>CACHE_WEIGHT</code>, <code>CACHE_PERSISTENT_ID</code>, <code>CACHE_USERNAME</code>, <code>CACHE_DATABASE</code>: Cache settings for 'memcached' or 'redis'.
+
+<span id="limit-cache-settings"></span>
+=== Limit cache settings ===
+
+* <code>LIMIT_CACHE_DRIVER</code>: Limit cache driver type.
+* <code>LIMIT_CACHE_PREFIX</code>: Prefix for limit cache keys.
+* <code>LIMIT_CACHE_PATH</code>: Path for 'file' limit cache.
+* <code>LIMIT_CACHE_TABLE</code>: Table for 'database' limit cache.
+* <code>LIMIT_CACHE_HOST</code>, <code>LIMIT_CACHE_PORT</code>, <code>LIMIT_CACHE_PASSWORD</code>, <code>LIMIT_CACHE_WEIGHT</code>, <code>LIMIT_CACHE_PERSISTENT_ID</code>, <code>LIMIT_CACHE_USERNAME</code>, <code>LIMIT_CACHE_DATABASE</code>: Limit cache settings for 'memcached' or 'redis'.
+
+<span id="queuing-settings"></span>
+=== Queuing settings ===
+
+* <code>QUEUE_CONNECTION</code>: Queue connection type.
+* <code>QUEUE_NAME</code>: Name of the queue.
+* <code>QUEUE_RETRY_AFTER</code>: Retry time for failed jobs.
+* <code>QUEUE_TABLE</code>: Queue table for 'database' driver.
+* <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, <code>AWS_DEFAULT_REGION</code>, <code>SQS_PREFIX</code>: AWS SQS settings.
+* <code>QUEUE_HOST</code>, <code>QUEUE_PORT</code>, <code>QUEUE_DATABASE</code>, <code>QUEUE_PASSWORD</code>: Queue settings for 'beanstalkd' or 'redis'.
+
+<span id="event-broadcasting-settings"></span>
+=== Event broadcasting settings ===
+
+* <code>BROADCAST_DRIVER</code>: Broadcasting driver type.
+* <code>PUSHER_APP_ID</code>, <code>PUSHER_APP_KEY</code>, <code>PUSHER_APP_SECRET</code>: Pusher settings.
+* <code>BROADCAST_HOST</code>, <code>BROADCAST_PORT</code>, <code>BROADCAST_DATABASE</code>, <code>BROADCAST_PASSWORD</code>: Broadcast settings for 'redis'.
+
+<span id="dreamfactory-settings"></span>
+=== DreamFactory settings ===
+
+* <code>DF_LOGIN_ATTRIBUTE</code>: User authentication attribute.
+* <code>DF_ENABLE_ALTERNATE_AUTH</code>: Toggle for alternate authentication.
+* <code>DF_ENABLE_WINDOWS_AUTH</code>: Windows authentication for AD SSO.
+* <code>DF_CONFIRM_CODE_LENGTH</code>: Length of user confirmation code.
+* <code>DF_CONFIRM_CODE_TTL</code>: TTL for confirmation code.
+* <code>JWT_SECRET</code>: JWT encryption secret.
+* <code>DF_JWT_TTL</code>, <code>DF_JWT_REFRESH_TTL</code>, <code>DF_ALLOW_FOREVER_SESSIONS</code>: JWT session settings.
+* <code>DF_JWT_USER_CLAIM</code>: Custom JWT claim fields.
+* <code>DF_CONFIRM_RESET_URL</code>, <code>DF_CONFIRM_INVITE_URL</code>, <code>DF_CONFIRM_REGISTER_URL</code>: URLs for user actions.
+
+<span id="storage-settings"></span>
+=== Storage settings ===
+
+* <code>DF_FILE_CHUNK_SIZE</code>: Chunk size for downloadable files.
+
+<span id="scripting-settings"></span>
+=== Scripting settings ===
+
+* <code>DF_SCRIPTING_DISABLE</code>: Disables specific scripting languages.
+* <code>DF_NODEJS_PATH</code>: Path to Node.js executable.
+* <code>DF_PYTHON_PATH</code>: Path to Python executable.
+* <code>DF_PYTHON3_PATH</code>: Path to Python3 executable.
+* <code>DF_SCRIPTING_DEFAULT_PROTOCOL</code>: Default protocol for scripting calls.
+* <code>DF_SCRIPT_INLINE_CHAR_LIMIT</code>: Inline script character limit.
+
+<span id="api-settings"></span>
+=== API settings ===
+
+* <code>DF_API_ROUTE_PREFIX</code>: Prefix for API routes.
+* <code>DF_STATUS_ROUTE_PREFIX</code>: Prefix for status routes.
+* <code>DF_STORAGE_ROUTE_PREFIX</code>: Prefix for storage routes.
+* <code>DF_XML_ROOT</code>: Root tag for XML responses.
+* <code>DF_ALWAYS_WRAP_RESOURCES</code>, <code>DF_RESOURCE_WRAPPER</code>: Resource wrapping settings.
+* <code>DF_CONTENT_TYPE</code>: Default response content-type.
+* <code>DF_LOOKUP_MODIFIERS</code>: Allowed lookup modifiers.
+* <code>DF_PACKAGE_PATH</code>: Path for package import at launch.
+* <code>DF_INSTALL</code>: Installation source.
+
+<span id="managed-settings"></span>
+=== Managed settings ===
+
+* <code>DF_MANAGED</code>: Managed environment toggle.
+* <code>DF_MANAGED_LOG_PATH</code>, <code>DF_MANAGED_CACHE_PATH</code>, <code>DF_MANAGED_LOG_ROTATE_COUNT</code>, <code>DF_MANAGED_LOG_FILE_NAME</code>, <code>DF_LIMITS_CACHE_STORE</code>, <code>DF_LIMITS_CACHE_PATH</code>: Managed environment settings.
+* <code>SENDMAIL_DEFAULT_COMMAND</code>: Default sendmail command.
+* <code>DF_REGISTER_CONTACT</code>: Registration contact information.
+
+<span id="logsdb-settings"></span>
+=== LogsDB settings ===
+
+* <code>LOGSDB_ENABLED</code>: LogsDB enabled toggle.
+* <code>LOGSDB_HOST</code>, <code>LOGSDB_PORT</code>, <code>LOGSDB_DATABASE</code>, <code>LOGSDB_USERNAME</code>, <code>LOGSDB_PASSWORD</code>: LogsDB settings.
+
+<span id="license-key"></span>
+=== License key ===
+
+* <code>DF_LICENSE_KEY</code>: DreamFactory license key.
+
+== See also ==
+* [[Getting_Started/Date_Time|Date and Time Configuration]]
+
+[[Category:Getting_Started]]
+[[Category:Basic]]
+[[Category:Configuration]]

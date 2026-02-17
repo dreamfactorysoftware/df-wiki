@@ -1,0 +1,427 @@
+= Windows Installation =
+<span id="windows-installation"></span>
+= Windows Installation =
+
+This page contains installation instructions for Windows.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+These instructions apply only to a fresh 64-bit Windows 2019 or 2022 Server. The server must not have any other IIS/web applications running on it in order to work with DreamFactory. You must be able to access the GUI of the server using something like RDP, have the ability to transfer files from your client machine to the server, and it is recommended to turn IE enhanced security '''off''' to make downloading some of the necessary installation files easier. Other applications might be able to run on the same IIS instance as DreamFactory, however this is not typically supported.
+
+A local Administrator account is also required at minimum for testing permissions, and possibly in perpetuity for IIS permissions.
+
+<span id="server-role-setup"></span>
+== Server role setup ==
+
+To start, set up the IIS Web server roles.
+
+To enable the Web Server Roles:
+
+# Open the '''Server Manager Application'''.
+# Click on Option 2 '''Add roles and features'''.
+# Click '''Next'''.
+# Ensure that '''Role based or feature based''' is selected, and click '''Next'''.
+# Ensure the server you're working on is selected, click '''Next'''.
+# On server roles, check the '''Web Server (IIS)''' box, install any admin tools if asked, and click '''Next'''.
+# Your Web Server Role should look something like this (also outlined below): [[File:select-server-roles.png|thumb|Web Server Role selection]]
+# Click '''Next''' and then select '''Install'''. Let the installer run in the background, reup on coffee and start the download section below.
+
+<span id="web-server-roles"></span>
+=== Web server roles ===
+
+These are the web server roles DreamFactory recommends selecting:
+
+* Web Server (IIS)
+** Common HTTP Features
+*** Default Document
+*** Directory Browsing
+*** HTTP Errors
+*** Static Content
+*** HTTP Redirection
+** Health and Diagnostics
+*** HTTP Logging
+** Performance
+*** Static Content Compression
+** Security
+*** Request Filtering
+** Application Development
+*** CGI
+
+<span id="downloads"></span>
+== Downloads ==
+
+There are a few installation files to download and, in some cases, installed. This section covers the downloads needed before starting the actual installation and configuration of the server. Getting all of these files on the server ahead of time ensures that the rest of the installation runs smoothly.
+
+<span id="dreamfactory-specific-files"></span>
+=== DreamFactory specific files ===
+
+Before starting, locate the following files on the server so they are ready to add to the installation when needed.
+
+* Composer (license) files:
+** composer.json
+** composer.json-dist
+** composer.lock
+* DreamFactory license key
+
+The composer files are typically grabbed from the DreamFactory SFTP server. Contact DreamFactory support if you need help accessing them.
+<span id="git"></span>
+=== Git ===
+
+The <code>git</code> command must be available to get the DreamFactory code later in the installation process.
+
+Git can be downloaded from [https://git-scm.com/download/win here]. Select the '''64-bit Git for Windows Setup''' version.
+
+To install git, simply run the installer you downloaded and click '''yes'''/'''next''' on all default options.
+
+<span id="visual-c-2015-2019"></span>
+=== Visual C++ 2015-2019 ===
+
+Download [https://aka.ms/vs/16/release/VC_redist.x64.exe here]
+
+Simply run the installer to install.
+
+<span id="url-rewrite-module"></span>
+=== URL rewrite module ===
+
+Download [https://download.microsoft.com/download/1/2/8/128E2E22-C1B9-44A4-BE2A-5859ED1D4592/rewrite_amd64_en-US.msi here]
+
+Simply run the installer to install.
+
+<span id="php"></span>
+=== PHP ===
+
+PHP for Windows can be downloaded [https://windows.php.net/download#php-8.3 here]. Be sure to get a 64-bit, '''non-thread-safe (NTS)''' version. Download the .zip file.
+
+At the time of writing, the latest supported PHP version is 8.3.16. The 64-bit NTS version can be directly downloaded [https://windows.php.net/downloads/releases/php-8.3.16-nts-Win32-vs16-x64.zip here].
+
+Just get the .zip downloaded. It is installed later in the process.
+
+<span id="composer"></span>
+=== Composer ===
+
+Composer is a package manager for PHP. The installer can be directly downloaded [https://getcomposer.org/Composer-Setup.exe here].
+
+Just get the installer downloaded. It is run later in the process.
+
+<span id="php-manager"></span>
+=== PHP Manager ===
+
+PHP Manager is an IIS utility to make managing PHP and extensions much easier.
+
+Go to the link [https://www.iis.net/downloads/community/2018/05/php-manager-150-for-iis-10 here] and click '''Download this extension'''.
+
+Simply run the downloaded installer while IIS is closed to complete the install.
+
+<span id="sql-server-drivers"></span>
+=== SQL Server drivers ===
+
+If you plan to use DreamFactory to connect to a SQL Server, you must have the driver packages.
+
+Start with downloading the v17 and v18 drivers:
+
+* [https://go.microsoft.com/fwlink/?linkid=2249004 Version 17]
+* [https://go.microsoft.com/fwlink/?linkid=2249006 Version 18]
+
+Run '''both''' downloaded installers.
+
+For the drivers to be used, you also need the sqlsrv PHP extensions. Start by going to the releases page [https://github.com/microsoft/msphpsql/releases here].
+
+Find the latest release and look in the assets section. Windows packages are at the end of the list. Download the Windows_5.12.0RTW.zip for PHP v8.3.
+
+As of this writing, the latest release of the extension package can be directly downloaded [https://github.com/microsoft/msphpsql/releases/download/v5.12.0/Windows_5.12.0RTW.zip here].
+
+<span id="getting-dreamfactory-running"></span>
+== Getting DreamFactory running ==
+
+The rest of the procedure involves two primary objectives: getting DreamFactory installed and running with the PHP development server, and then configuring IIS to serve DreamFactory. This section cover the installation and PHP development server set up.
+
+<span id="installing-php"></span>
+=== Installing PHP ===
+
+# Create a new folder: <code>C:\php\</code>, grab the PHP installation .zip you gathered earlier, and extract the entire contents to the <code>C:\php\</code> folder.
+# Duplicate (copy/paste) the <code>php.ini-development</code> file, and rename the duplicate <code>php.ini</code>.
+
+You might need to enable file name extentions in the '''View''' tab of the file explorer.
+<ol start="3" style="list-style-type: decimal;">
+<li>Open the newly created php.ini and copy/paste the following at the bottom of the file:</li></ol>
+
+<syntaxhighlight lang="text">
+extension=ldap
+extension=curl
+extension=ffi
+extension=ftp
+extension=fileinfo
+extension=gd
+extension=intl
+extension=mbstring
+extension=exif
+extension=mysqli
+extension=odbc
+extension=openssl
+extension=pdo_mysql
+extension=pdo_odbc
+extension=pdo_pgsql
+extension=pdo_sqlite
+extension=pgsql
+extension=shmop
+extension=soap
+extension=sockets
+extension=sodium
+extension=sqlite3
+extension=tidy
+extension=xsl
+extension=php_pdo_sqlsrv.dll
+extension=php_sqlsrv.dll
+
+zend_extension=opcache
+
+opcache.enable=1
+</syntaxhighlight>
+<ol start="4" style="list-style-type: decimal;">
+<li>Save and close php.ini.</li></ol>
+
+You can manually add PHP to your enviornment variable path, however this is done automatically during the Composer installation.
+<span id="installing-composer"></span>
+=== Installing Composer ===
+
+To start, run the composer installer you downloaded earlier.
+
+You can select '''Next''' through most of the installation. When asked to browse to your command line/CLI PHP, navigate to: <code>C:\php\php.exe</code>. Then check the '''Add to path''' option. Click '''Next''' and wait.
+
+This is a great time to test both the PHP and Composer installations, open a new commmand prompt and run:
+
+<code>php -v</code>
+
+<code>composer --version</code>
+
+If both of those commands are successful, you are safe to keep moving forward.
+<span id="installing-sql-server-drivers-optional"></span>
+=== Installing SQL Server drivers (optional) ===
+
+This is an optional step dependent on if you intend to use DreamFactory with SQL Server.
+
+The v17 and v18 drivers should have been installed during the previous steps, if not, install them now.
+
+Open the Windows_5.12.0RTW.zip downloaded earlier, in the x64 folder there should be 4 .dll files. Copy/paste the '''two''' nts (Non Thread Safe) .dll into your php ext folder (<code>C:\php\ext\</code>)
+
+Then, rename both files removing the "_83_nts" at the end of the filename. The files are named:
+
+* php_pdo_sqlsrv.dll
+* php_sqlsrv.dll
+
+<span id="get-git-dreamfactory-code"></span>
+=== Get (git) DreamFactory code ===
+
+Next, get the DreamFactory code by opening a command prompt, and running:
+
+<code>cd C:\inetpub\wwwroot\</code>
+
+<code>git clone https://github.com/dreamfactorysoftware/dreamfactory</code>
+
+This creates a <code>C:\inetpub\wwwroot\dreamfactory</code> folder on the server, refered to as the '''DreamFactory installation folder''' in this and other documentation.
+
+<span id="install-dreamfactory-dependencies"></span>
+=== Install DreamFactory dependencies ===
+
+DreamFactory uses Composer to handle all PHP dependencies, if you haven't installed Composer from the installation section above, do so now.
+
+First, take your 3 composer/license files (<code>composer.json</code>, <code>composer.json-dist</code>, <code>composer.lock</code>) and add them to the DreamFactory installation directory, overwriting the existing composer files in that directory. Then, open a command prompt, cd into the dreamfactory installation directory and run:
+
+<code>composer install --no-dev --ignore-platform-reqs --verbose</code>
+
+Sometimes this command takes a while to run, if it feels hung, hit enter a couple times in the command prompt.
+
+<span id="build-dreamfactory-system-database-and-root-admin"></span>
+=== Build DreamFactory system database and root admin ===
+
+Once the composer install finishes, we can finalize the DreamFactory setup. In your command prompt, cd into the dreamfactory installation directory. Start by running: <code>php artisan df:env --df_install=Windows</code>.
+
+This command defines the system database for the DreamFactory environment. For initial installation, it is recommended to start with option [0], Sqlite. If you run into problems during the installation, starting with sqlite eliminates database/networking issues from the troubleshooting process. This database can be changed at a later date, and any configurations you build in sqlite can be exported and imported into another instance later.
+
+When selecting a database name and user, it is recommended to stick with the default "dreamfactory" and "dfadmin" respectively.
+
+Once the df:env command finishes, run: <code>php artisan df:setup</code> This command prompts you to create your first admin user. This email and password are used to log in to the UI later. The root admin account details can be changed later.
+
+Finally, add your license key to the end of the .env file located in the dreamfactory installation directory. You can add it to the bottom of the file like: <code>DF_LICENSE_KEY={YOUR LICENSE KEY}</code>
+
+:::note Ensure that you remove curly brackets seen in the example above.:::
+
+<span id="test-dreamfactory"></span>
+=== Test DreamFactory ===
+
+In order to run a test/development Laravel server, from the dreamfactory installation directory run: <code>php artisan serve</code>
+
+This starts a web server at http://127.0.0.1:8000. If you can navigate to this url, login to the UI with the root admin created earlier. If you '''don't''' have a red banner at the top of the UI, you have done everything correctly. If the red banner is still visible, go back and check for any steps you may have missed before moving forward.
+
+From here, DreamFactory is installed, the next section focuses on getting IIS to serve DreamFactory on port 80.
+
+<span id="serving-dreamfactory-with-iis"></span>
+== Serving DreamFactory with IIS ==
+
+This section highlights the IIS configuration needed to serve DreamFactory.
+
+We at DreamFactory are not Windows experts. The guidance provided here outlines a basic, default IIS configuration that has been tested and is known to work with DreamFactory on Windows environments. This setup is intended as a foundation for your DreamFactory installation. It's important to understand that while this configuration works for us and is supported by our team, Windows and IIS are versatile platforms. As such, there may be alternative configurations that also work well, depending on your specific needs and environment. We encourage you to use this as a guide, but feel free to explore and implement what works best for your situation.
+To begin, open the IIS manager, most of the steps here take place in the IIS manager.
+
+<span id="create-dreamfactory-site"></span>
+=== Create DreamFactory site ===
+
+In the left panel of the IIS manager UI, open '''sites''', right click, and select '''remove the default site'''.
+
+Next, right click on the '''sites''' folder and select '''Add Website'''. Then fill in the dialog:
+
+* Site name: typically set to "dreamfactory" but can be whatever you'd like
+* Physical Path: <code>{dreamfactory install dir}/public</code> if you've been following along this should be: <code>C:\inetpub\wwwroot\dreamfactory\public\</code>
+* Connect as…
+** For the default DreamFactory configuration, the "Connect As" should be set to a '''local server Administrator account''' set under the '''Specific User''' option. Other options such as domain users can be used, however you might run into permission issues that will need to be solved. DreamFactory support is able to support the local Administrator account, but is unable to help with setting domain/non-local admin account permissions.
+** Use the "Test Settings" button, and ensure you have two green check marks.
+
+Due to the vast diversity in Windows environments, initial testing of DreamFactory necessitates the use of the local Administrator account. If DreamFactory is accessible with the local Administrator account but encounters issues with domain or non-admin user accounts, the problem often stems from permissions issues. We strongly recommend and support the use of the local Administrator account. Troubleshooting permission issues is often required for non-admin accounts to resolve access discrepancies.
+<span id="handler-mappings"></span>
+=== Handler mappings ===
+
+Handler mappings tell IIS how/where to use the php executables in serving DreamFactory. Select the server on the left side of the IIS manager and click on the '''Handler Mappings''' icon. To create a new mapping, on the right side of the page, click '''Add Module Mapping'''.
+
+Fill in the '''Add Module Mapping''' dialog:
+
+* Request Path: <code>*.php</code>
+* Module: <code>FastCgiModule</code>
+* Executable: <code>C:\php\php-cgi.exe</code>
+* Name: <code>PHP_via_FastCGI</code>
+
+Next, click on request restricions, and ensure the following are set:
+
+* Mapping: file or folder
+* Verbs: all
+* Access: script
+
+Click '''OK''' to save the handler mapping.
+
+<span id="php-manager-config"></span>
+=== PHP manager config ===
+
+Again, from the server view on the left, click on the '''PHP Manager''' icon.
+
+Generally a yellow notice that your PHP configuration is non optimal is displayed. Click on '''View Recommendations''', check the boxes and apply every available recommendation.
+
+Test that PHP is working, click the '''Check phpinfo()''' link and then test using the DreamFactory site. Ensure that you see a purple and white PHP info output in this screen. If not, go back and resolve any PHP installation issues.
+
+If your php.ini is built correctly you should be able to access '''Enable or disable an extension''' and see them enabled. You can also enable extensions manually in the PHP Manager which applies the appropriate edits to the <code>php.ini</code> file.
+
+<span id="fastcgi-settings"></span>
+=== FastCGI settings ===
+
+There is one setting change to be made to the default IIS error handling.
+
+From the server view, select '''FastCGI Settings''', then select the handler you made earlier and click '''Edit…'''.
+
+Change '''Standard Error Mode''' to '''IgnoreAndReturn200''' and click '''OK'''.
+
+<span id="request-filtering"></span>
+=== Request filtering ===
+
+From the server view, select the '''Request Filtering''' icon. Then Navigate to the '''HTTP Verbs''' tab. On the right side, click '''Allow Verb''' and add the following verbs one at a time:
+
+* GET
+* HEAD
+* POST
+* DELETE
+* PUT
+* PATCH
+
+<span id="url-rewrite-rules"></span>
+=== URL rewrite rules ===
+
+On the left side of the IIS management window, open the DreamFactory site, and select the '''URL Rewrite''' module. To import the URL rewrite rules:
+
+# on the right side of the page, click '''Import Rules'''.
+# Browse to the dreamfactory/public dir and open '''.htaccess'''.
+# Click '''Import'''.
+# If any of the imported rules have red '''X'''s on them, select them and remove that specific rule until everything shows a green checkmark.
+# Click '''Apply''' to complete the process.
+
+<span id="directory-permissions"></span>
+=== Directory permissions ===
+
+IIS needs control over certian folders within the DreamFactory installation directory in order to function properly. Right click and select '''Properties''' on the following folders and give IIS_IUSRS full control over them. Additionally, be sure to unckeck the '''read only''' option, and apply all changes recursively if asked:
+
+* <code>storage</code>
+* <code>bootstrap/cache</code>
+* <code>public</code>
+
+Sometimes these permisions don't set correctly with the properties window. If you are having permissions issues, we have seen good results by running these two commands from the DreamFactory install directory:
+
+<code>icacls &quot;bootstrap\cache&quot; /grant &quot;IIS_IUSRS:(OI)(CI)F&quot;</code>
+
+<code>icacls &quot;storage&quot; /grant &quot;IIS_IUSRS:(OI)(CI)F&quot;</code>
+<span id="accessing-dreamfactory"></span>
+=== Accessing DreamFactory ===
+
+After completing the setup, you can navigate to the server's IP address or hostname to view the DreamFactory login screen on port 80. At this stage, DreamFactory is operational. However, implementing SSL and creating a DNS entry for the server are some of the many additional configuration options at your disposal. Due to the extensive variety of configurations possible beyond this point, this guide does not cover them in detail. For more advanced IIS configuration, consult Microsoft's documentation as needed.
+
+<span id="adding-ssl"></span>
+== Adding SSL ==
+
+For details on adding SSL, DreamFactory recommends using [https://certbot.eff.org/instructions?ws=other&os=windows certbot]. Follow the instructions from the provided link to help you through the process.
+
+<span id="installing-oracle-driver"></span>
+== Installing Oracle Driver ==
+
+The process of installing Oracle drivers is a more manual process than with our Linux installers. To begin you will need to download 3 things: - The Oracle "Basic" Instant Client package from [https://www.oracle.com/database/technologies/instant-client/winx64-64-downloads.html Oracle's Website] (Example file instantclient-basic-windows.x64-23.7.0.25.01.zip) - The Oracle "SDK" Instant Client Package from [https://www.oracle.com/database/technologies/instant-client/winx64-64-downloads.html Oracle's Website] (Example file instantclient-sdk-windows.x64-23.7.0.25.01.zip) - The PHP oci8 extension (DLL) available at [https://pecl.php.net/package/oci8 Pecl PHP Site] By default, DreamFactory runs on PHP 8.3 so you will want the x64 package of that (version 3.2.1). If you are running DreamFactory using IIS as your webserver you must be using the non thread safe version of PHP.
+
+[[File:PeclDLLPage.png|thumb|Web Server Role selection]] - <code>Note you will want to click on the DLL button under downloads on the Pecl site for windows .dll files</code> - <code>Unless you have good reason, choose the appropriate DLLs with the NTS tag</code>
+
+* Next you will create a folder where the Oracle drivers will be kept, for example <code>C:\oracledrivers</code> and extract the Oracle "Basic" Instant Client there. The files will be extracted into a subdirectory called <code>instantclient_&lt;version&gt;.</code> Example:
+
+<code>C:\oracledrivers\instantclient23_7</code>
+
+* Next we will extract the "SDK" Instant Client to the same folder i.e. <code>C:\oracledrivers</code>. We want the SDK package to extract into the same subdirectory as in the previous step, not a new folder. Your driver folder should look like this:
+
+[[File:instant-client-folder.png|thumb|Instant Client folder]]
+* and the subdirectory should look like:
+
+[[File:instant-client-subdirectory.png|thumb|Instant Client subdirectory]]
+* Note that there is now an <code>SDK</code> folder inside.
+
+Next, we need to add the full path of the Instant Client to the environment variables OCI_LIB64 and PATH. The quickest way to get to Environment Variables is to use the windows search bar and search for "environment" click on Environment Variables and then:
+
+# Under System Variables, create OCI_LIB64 if it does not already exist. Set the value of OCI_LIB64 to the full path of the location of Instant Client.
+
+[[File:env-variable-path.png|thumb|Environment variable path]] [[File:oci-env-path.png|thumb|OCI_LIB64 path]]
+
+2.Under System Variables, edit PATH to include the same (C:_23_7)
+
+<code>When utilizing the IIS web server, it is essential to include a new variable PATH in your FastCGI environment.</code>
+
+<code>For example, a new variable could be: %PATH%;C:\oracledrivers\instantclient_23_7.</code>
+
+The fastCGI path is located in the IIS Manager &gt; Your Server &gt; fastCGI Settings &gt; Full Path &gt; Edit &gt; 3 dots next to collections
+
+[[File:fastcgi-path.png|thumb|FastCGI path]]
+Almost there! Now, the last thing to do is to extract our PHP OCI8 extension package (It will be named along the lines of php_oci8-3.2.1-8.3-nts-vc15-x64) and move the php_oci8.dll file to the ext directory where PHP is located on your system (e.g PHP.3). Once that is done add extension=php_oci8.dll to your php.ini file and then restart the IIS server (use php -m to make sure that the oci8 extension is installed). Congratulations!
+
+<span id="mcp-daemon"></span>
+== MCP Daemon ==
+
+If you plan to use the MCP Service, you must also run the background daemon server. This can be done using the provided PowerShell script:
+
+<syntaxhighlight lang="bash">
+cd {dreamfactory path}\vendor\dreamfactory\df-mcp-server\scripts
+.\start-daemon-win.ps1
+</syntaxhighlight>
+The script will automatically: - Install all required npm dependencies. - Start the daemon in the background using npx tsx. - Use default host 127.0.0.1 and port 8006, unless overridden via environment variables: - MCP_DAEMON_HOST — host to bind the daemon (default: 127.0.0.1) - MCP_DAEMON_PORT — port to bind the daemon (default: 8006) - NODE_ENV — Node environment (default: production)
+
+After starting, you can verify the daemon is running by checking its health endpoint:
+
+<pre>Invoke-WebRequest -Uri http://127.0.0.1:8006/health -UseBasicParsing</pre>
+
+== See also ==
+* [[Getting_Started/Docker_Installation|Docker Installation]]
+* [[Getting_Started/Installing_Dreamfactory|Installing DreamFactory]]
+* [[Getting_Started/Helm_Installation|helm-installation]]
+* [[Getting_Started/Installing_Additional_Drivers|Installing Additional Drivers]]
+
+[[Category:Installation]]
+[[Category:Getting_Started]]
+[[Category:Windows]]

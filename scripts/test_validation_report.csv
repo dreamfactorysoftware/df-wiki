@@ -1,0 +1,95 @@
+file,type,severity,description
+/root/wikimigration/documentation-consolidation/scripts/test_converted/docker-installation.wiki,Broken Link,Major,Internal link target not found: Img/Docker_Install/Docker_Compose_Up_Terminal_Output.png
+/root/wikimigration/documentation-consolidation/scripts/test_converted/docker-installation.wiki,Broken Link,Major,Internal link target not found: Img/Docker_Install/Docker_Compose_Splash_Page.png
+/root/wikimigration/documentation-consolidation/scripts/test_converted/docker-installation.wiki,Broken Link,Major,Internal link target not found: Img/Docker_Install/Initial_Login_Create_Admin_Page.png
+/root/wikimigration/documentation-consolidation/scripts/test_converted/docker-installation.wiki,Broken Link,Major,Internal link target not found: installing-additional-drivers.md#enabling-oracle-in-docker
+/root/wikimigration/documentation-consolidation/scripts/test_converted/docker-installation.wiki,Broken Link,Major,Internal link target not found: Img/Docker_Install/Docker_Artisan_Migrate_Status.png
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Content Variance,Minor,"Word count variance: source=667, wiki=343 (48.6%)"
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: introduction/introducing-rest-and-dreamfactory
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: getting-started/installing-dreamfactory/docker-installation
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: getting-started/installing-dreamfactory/helm-installation
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: getting-started/installing-dreamfactory/linux-installation
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: getting-started/installing-dreamfactory/windows-installation
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: getting-started/dreamfactory-configuration/basic-configuration
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: api-generation-and-connections/api-types/database/generating-a-database-backed-api
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: api-generation-and-connections/api-types/database/querying-and-filtering
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: api-generation-and-connections/api-types/database/sql-server
+/root/wikimigration/documentation-consolidation/scripts/test_converted/introduction.wiki,Broken Link,Major,Internal link target not found: api-generation-and-connections/api-types/file/creating-an-aws-s3-rest-api
+/root/wikimigration/documentation-consolidation/scripts/test_converted/generating-database-backed-api.wiki,Broken Link,Major,Internal link target not found: security/rate-limiting
+/root/wikimigration/documentation-consolidation/scripts/test_converted/integrating-salesforce-data.wiki,Missing Metadata,Minor,No categories assigned
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Missing Metadata,Minor,No categories assigned
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Tutorials/Server_Side_Scripting
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/V8Js_Scripting
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/NodeJs
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/PHP
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/Python_Scripting
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/Event Scripting
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/Script Services
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/Event Scripting
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Features/Scripting/Script Services
+/root/wikimigration/documentation-consolidation/scripts/test_converted/legacy/DreamFactory_Features_Scripting.wiki,Broken Link,Major,Internal link target not found: DreamFactory/Tutorials/Server_Side_Scripting
+df-docs/df-docs/docs/introduction/introduction.md,Not Migrated,Major,Source file not migrated: Introduction
+df-docs/df-docs/docs/introduction/introducing-rest-dreamfactory.md,Not Migrated,Major,Source file not migrated: Introducing REST and DreamFactory
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/docker-installation.md,Not Migrated,Major,Source file not migrated: Docker Installation
+df-docs/df-docs/docs/Security/security-authentication.md,Not Migrated,Major,Source file not migrated: Security and Authentication
+df-docs/df-docs/docs/Security/sql-server-configuration.md,Not Migrated,Major,Source file not migrated: Configuring Windows Authentication for SQL Server
+df-docs/df-docs/docs/Security/authentication-apis.md,Not Migrated,Major,Source file not migrated: Authenticating your APIs
+df-docs/df-docs/docs/Security/security-faq.md,Not Migrated,Major,Source file not migrated: Security FAQ
+df-docs/df-docs/docs/Security/role-based-access.md,Not Migrated,Major,Source file not migrated: Role Based Access Control (RBAC)
+df-docs/df-docs/docs/Security/rate-limiting.md,Not Migrated,Major,Source file not migrated: Rate Limiting
+df-docs/df-docs/docs/Security/creating-your-auth-service/okta-setup.md,Not Migrated,Major,Source file not migrated: okta-setup
+df-docs/df-docs/docs/Security/creating-your-auth-service/azure-ad-oauth.md,Not Migrated,Major,Source file not migrated: azure-ad-oauth
+df-docs/df-docs/docs/Security/creating-your-auth-service/github-oauth.md,Not Migrated,Major,Source file not migrated: github-oauth
+df-docs/df-docs/docs/getting-started/dreamfactory-configuration/basic-configuration.md,Not Migrated,Major,Source file not migrated: Basic Configuration
+df-docs/df-docs/docs/getting-started/dreamfactory-configuration/date-time.md,Not Migrated,Major,Source file not migrated: Date and Time Configuration
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/windows-installation.md,Not Migrated,Major,Source file not migrated: Windows Installation
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/installing-dreamfactory.md,Not Migrated,Major,Source file not migrated: Installing DreamFactory
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/helm-installation.md,Not Migrated,Major,Source file not migrated: helm-installation
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/installing-additional-drivers.md,Not Migrated,Major,Source file not migrated: Installing Additional Drivers
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/raspberrypi-install.md,Not Migrated,Major,Source file not migrated: raspberrypi-install
+df-docs/df-docs/docs/getting-started/installing-dreamfactory/linux-installation.md,Not Migrated,Major,Source file not migrated: Linux Installation
+df-docs/df-docs/docs/getting-started/optimizing-dreamfactory/webserver.md,Not Migrated,Major,Source file not migrated: Web Server
+df-docs/df-docs/docs/getting-started/optimizing-dreamfactory/php-laravel.md,Not Migrated,Major,Source file not migrated: PHP and Laravel
+df-docs/df-docs/docs/getting-started/optimizing-dreamfactory/database.md,Not Migrated,Major,Source file not migrated: Database APIs
+df-docs/df-docs/docs/system-settings/reporting.md,Not Migrated,Major,Source file not migrated: Reporting
+df-docs/df-docs/docs/system-settings/dreamfactory-platform-apis.md,Not Migrated,Major,Source file not migrated: DreamFactory Platform APIs
+df-docs/df-docs/docs/system-settings/scheduler.md,Not Migrated,Major,Source file not migrated: Scheduler
+df-docs/df-docs/docs/system-settings/logstash.md,Not Migrated,Major,Source file not migrated: Logstash
+df-docs/df-docs/docs/api-generation-and-connections/event-scripts.md,Not Migrated,Major,Source file not migrated: Event Scripts
+df-docs/df-docs/docs/api-generation-and-connections/api-keys.md,Not Migrated,Major,Source file not migrated: API Keys
+df-docs/df-docs/docs/api-generation-and-connections/interacting-with-api.md,Not Migrated,Major,Source file not migrated: Interacting With the API
+df-docs/df-docs/docs/api-generation-and-connections/advanced-database-api-features.md,Not Migrated,Major,Source file not migrated: Advanced Database API Features
+df-docs/df-docs/docs/api-generation-and-connections/api-creation-management.md,Not Migrated,Major,Source file not migrated: api-creation-management
+df-docs/df-docs/docs/system-settings/the-system-api/05-api-key-management.md,Not Migrated,Major,Source file not migrated: API Key Management
+df-docs/df-docs/docs/system-settings/the-system-api/02-user-management.md,Not Migrated,Major,Source file not migrated: User Management
+df-docs/df-docs/docs/system-settings/the-system-api/01-system-api-brief.md,Not Migrated,Major,Source file not migrated: Using the System APIs
+df-docs/df-docs/docs/system-settings/the-system-api/04-role-management.md,Not Migrated,Major,Source file not migrated: Role Management
+df-docs/df-docs/docs/system-settings/the-system-api/03-service-management.md,Not Migrated,Major,Source file not migrated: Service Management
+df-docs/df-docs/docs/system-settings/config/cache.md,Not Migrated,Major,Source file not migrated: Cache
+df-docs/df-docs/docs/system-settings/config/system-info.md,Not Migrated,Major,Source file not migrated: System Info
+df-docs/df-docs/docs/system-settings/config/email-templates.md,Not Migrated,Major,Source file not migrated: Email Templates
+df-docs/df-docs/docs/system-settings/config/cors-ssl.md,Not Migrated,Major,Source file not migrated: CORS and SSL
+df-docs/df-docs/docs/system-settings/config/global-lookup-keys.md,Not Migrated,Major,Source file not migrated: Global Lookup Keys
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/converting-excel-to-json.md,Not Migrated,Major,Source file not migrated: Converting Excel to a JSON Response
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/creating-aws-s3-rest-api.md,Not Migrated,Major,Source file not migrated: Creating an AWS S3 REST API
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/creating-sftp-rest-api.md,Not Migrated,Major,Source file not migrated: Creating an SFTP REST API
+df-docs/df-docs/docs/api-generation-and-connections/api-types/file/index.md,Not Migrated,Major,Source file not migrated: File System APIs
+df-docs/df-docs/docs/api-generation-and-connections/api-types/database/generating-database-backed-api.md,Not Migrated,Major,Source file not migrated: Generating a Database-backed API
+df-docs/df-docs/docs/api-generation-and-connections/api-types/database/sql-server.md,Not Migrated,Major,Source file not migrated: Microsoft SQL Server
+df-docs/df-docs/docs/api-generation-and-connections/api-types/database/querying-filtering.md,Not Migrated,Major,Source file not migrated: Querying and Filtering Records
+df-docs/df-docs/docs/api-generation-and-connections/api-types/network/placeholder.md,Not Migrated,Major,Source file not migrated: Network APIs (Coming Soon)
+df-docs/df-docs/docs/api-generation-and-connections/api-types/scripting/scripted-services-and-endpoints.md,Not Migrated,Major,Source file not migrated: Creating Scripted Services and Endpoints
+df-docs/df-docs/docs/api-generation-and-connections/api-types/scripting/scripting-resources.md,Not Migrated,Major,Source file not migrated: Scripting Resources
+df-docs/df-docs/docs/api-generation-and-connections/api-types/utility/placeholder.md,Not Migrated,Major,Source file not migrated: Utility APIs (Coming Soon)
+df-docs/df-docs/docs/admin-settings/users.md,Not Migrated,Major,Source file not migrated: Users
+df-docs/df-docs/docs/admin-settings/logs.md,Not Migrated,Major,Source file not migrated: Logs
+df-docs/df-docs/docs/admin-settings/schema.md,Not Migrated,Major,Source file not migrated: Schema
+df-docs/df-docs/docs/admin-settings/files.md,Not Migrated,Major,Source file not migrated: Files
+df-docs/df-docs/docs/admin-settings/admins.md,Not Migrated,Major,Source file not migrated: Admins
+df-docs/df-docs/docs/AI/mcp-service-creation.md,Not Migrated,Major,Source file not migrated: Creating an MCP Server Service
+df-docs/df-docs/docs/AI/mcp-service.md,Not Migrated,Major,Source file not migrated: MCP Server
+df-docs/df-docs/docs/AI/mcp-custom-login-page.md,Not Migrated,Major,Source file not migrated: Custom Login Page for MCP
+df-docs/df-docs/docs/upgrades-and-migrations/upgrades.md,Not Migrated,Major,Source file not migrated: upgrades
+df-docs/df-docs/docs/upgrades-and-migrations/upgrading-php-windows.md,Not Migrated,Major,Source file not migrated: Upgrading PHP On Windows
+df-docs/df-docs/docs/upgrades-and-migrations/upgrading-migrating-dreamfactory.md,Not Migrated,Major,Source file not migrated: Upgrading and Migrating DreamFactory
+df-docs/df-docs/docs/upgrades-and-migrations/upgrading-to-php-8_1.md,Not Migrated,Major,Source file not migrated: Upgrading to PHP 8.1

@@ -1,0 +1,143 @@
+= Rate Limiting =
+<span id="rate-limiting"></span>
+= Rate Limiting =
+
+DreamFactory provides a comprehensive rate limiting system that allows administrators to control API usage at multiple levels. Rate limits can be applied per instance, per user, per role, per service, or per endpoint, giving you fine-grained control over how your APIs are consumed. This is essential for preventing abuse, ensuring fair resource allocation, and maintaining platform stability.
+
+<span id="why-rate-limiting-matters"></span>
+== Why Rate Limiting Matters ==
+
+Without rate limiting, a single client or user can monopolize server resources by making an excessive number of API requests. This can degrade performance for all users, increase infrastructure costs, and potentially lead to service outages. DreamFactory's rate limiting feature helps you:
+
+* Protect backend services from being overwhelmed by too many requests
+* Enforce usage tiers and quotas for different user groups
+* Prevent API abuse and denial-of-service scenarios
+* Monitor and plan capacity based on actual usage patterns
+
+<span id="limit-types-and-hierarchy"></span>
+== Limit Types and Hierarchy ==
+
+DreamFactory supports a hierarchy of limit types. When multiple limits are combined, broader limits can override more granular ones. For example, if an instance-wide limit is set to 500 requests per minute, a service-specific limit of 1,000 requests per minute would never be reached because the instance limit triggers first.
+
+{| class="wikitable"
+|-
+! Limit Type
+! Description
+|-
+| Instance
+| Rate limits across the entire DreamFactory instance, cumulative for all users and services
+|-
+| User
+| Limits applied to a specific user across all services
+|-
+| Each User
+| Every user receives an independent counter with the same rate limit
+|-
+| Role
+| Rate limits applied based on a user's assigned role
+|-
+| Service
+| Limits targeting a specific API service
+|-
+| Service by User
+| Limits for a specific user on a specific service
+|-
+| Service by Each User
+| Independent per-user counters on a specific service
+|-
+| Endpoint
+| Limits targeting a specific API endpoint
+|-
+| Endpoint by User
+| Limits for a specific user on a specific endpoint
+|-
+| Endpoint by Each User
+| Independent per-user counters on a specific endpoint
+|}
+
+<span id="limit-periods"></span>
+=== Limit Periods ===
+
+Each limit is configured with a reset period that determines when the counter resets automatically. Available periods include:
+
+* '''Minute''' — resets every 60 seconds
+* '''Hour''' — resets every 60 minutes
+* '''Day''' — resets every 24 hours
+* '''7-day''' — resets weekly
+* '''30-day''' — resets monthly
+
+<span id="configuring-rate-limits"></span>
+== Configuring Rate Limits ==
+
+<span id="via-the-admin-console"></span>
+=== Via the Admin Console ===
+
+To create a rate limit in the DreamFactory Admin Console:
+
+# Navigate to '''Config &gt; Limits''' in the left sidebar
+# Click '''Create''' to add a new limit
+# Select the '''Limit Type''' from the dropdown (Instance, User, Service, etc.)
+# Set the '''Rate''' (maximum number of requests allowed)
+# Choose the '''Period''' (minute, hour, day, 7-day, or 30-day)
+# Optionally restrict to a specific '''HTTP Verb''' (GET, POST, PUT, PATCH, DELETE)
+# Provide a descriptive '''Name''' for the limit
+# Click '''Save'''
+
+<span id="via-the-api"></span>
+=== Via the API ===
+
+Limits can also be managed programmatically through the DreamFactory REST API:
+
+<syntaxhighlight lang="bash"># Create an instance-wide limit of 1000 requests per hour
+curl -X POST "https://your-instance.com/api/v2/system/limit" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY" \
+  -H "X-DreamFactory-Session-Token: YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource": [{
+      "type": "instance",
+      "name": "Global Hourly Limit",
+      "rate": 1000,
+      "period": "hour",
+      "is_active": true
+    }]
+  }'</syntaxhighlight>
+Key API endpoints for limit management:
+
+* <code>GET /api/v2/system/limit</code> — List all configured limits
+* <code>POST /api/v2/system/limit</code> — Create a new limit
+* <code>PUT /api/v2/system/limit/{id}</code> — Update an existing limit
+* <code>DELETE /api/v2/system/limit/{id}</code> — Remove a limit
+* <code>GET /api/v2/system/limit_cache</code> — View current counter values
+* <code>DELETE /api/v2/system/limit_cache/{id}</code> — Reset a specific limit counter
+
+<span id="what-happens-when-limits-are-exceeded"></span>
+== What Happens When Limits Are Exceeded ==
+
+When a client exceeds a configured rate limit, DreamFactory responds with an '''HTTP 429 Too Many Requests''' status code. The response includes information about the limit that was reached. Clients should implement backoff logic and retry after the limit period resets.
+
+<span id="monitoring-usage"></span>
+== Monitoring Usage ==
+
+The '''Limits''' section of the Admin Console displays current usage statistics for all active limits, including the current hit count and remaining requests in the current period. You can also programmatically query limit usage via the <code>system/limit_cache</code> endpoint.
+
+<span id="endpoint-limits-and-wildcards"></span>
+== Endpoint Limits and Wildcards ==
+
+Endpoint limits allow granular control over specific API paths. For example, you can limit requests to <code>_table/contacts</code> on a database service without affecting other tables. Adding a wildcard <code>*</code> character creates a limit that matches the endpoint and all sub-paths (e.g., <code>_table/contacts*</code> would also match <code>_table/contacts/5</code>).
+
+<span id="limit-cache-and-storage"></span>
+== Limit Cache and Storage ==
+
+By default, DreamFactory uses a file-based cache for rate limit counters, separate from the main application cache. This ensures that clearing the DreamFactory cache does not reset rate limit counters. For high-traffic environments, Redis can be configured as the limit cache backend. See the <code>.env-dist</code> file for limit cache configuration options.
+
+== See also ==
+* [[Security/Sql_Server_Configuration|Configuring Windows Authentication for SQL Server]]
+* [[Security/Authentication_Apis|Authenticating your APIs]]
+* [[Security/Security_Faq|Security FAQ]]
+* [[Security/Role_Based_Access|Role Based Access Control (RBAC)]]
+
+[[Category:Rate_Limiting]]
+[[Category:Api_Limits]]
+[[Category:Throttling]]
+[[Category:Security]]

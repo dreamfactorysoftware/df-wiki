@@ -1,0 +1,468 @@
+= Interacting With the API =
+'''Learn to interact with DreamFactory APIs using HTTP clients for CRUD operations, filtering, joins, and stored procedures'''
+
+<span id="interacting-with-the-api"></span>
+= Interacting with the API =
+
+The following topic contains examples to help you become familiar with the many ways you can interact with a database-backed API. For these examples we're using the Insomnia HTTP client, however you can use any similar client or even cURL to achieve the same results.
+
+<span id="retrieving-all-records"></span>
+=== Retrieving all records ===
+
+Let's begin by retrieving all of a particular table's records just as was done within the API Docs example. Open your client and in the address bar set the URL to <code>/api/v2/{service_name}/{table_name}</code>, replacing <code>{service_name}</code> with the name of your API and <code>{table_name}</code> with the name of a table found within the database (and to which your API key's associated role has access). For the remainder of this example we use <code>mysql</code> as the service name, and in this particular example the table we're querying is called <code>employees</code> so the URL looks like this:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees</syntaxhighlight>
+Also, because we're retrieving records the method is set to <code>GET</code>.
+
+Next, you must set the header which defines the API key. This header should be named <code>X-DreamFactory-Api-Key</code>. You might have to hunt around for a moment within your HTTP client to figure out where this is placed, but we promise it is definitely there. In the case of Insomnia select the '''Header''' tab found directly below the address bar:
+
+[[File:insomnia-api-key.png|thumb|Setting DreamFactory API Key Header]]
+
+With the URL and header in place, request the URL and you should see the table records returned in JSON format:
+
+[[File:insomnia-all-records.png|thumb|JSON response of GET Request for All Records]]
+
+The equivalent SQL query would look like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees;</syntaxhighlight>
+<span id="limiting-results"></span>
+=== Limiting results ===
+
+The previous example returns all records found in the <code>employees</code> table. But what if you only wanted to return five or ten records? You can use the <code>limit</code> parameter to do so. Modify your URL to look like this:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?limit=10</syntaxhighlight>
+The equivalent SQL query would look like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees LIMIT 10;</syntaxhighlight>
+<span id="offsetting-results"></span>
+=== Offsetting results ===
+
+The above example limits your results found in the <code>employees</code> table to 10, but what if you want to select records 11 - 20? You would use the <code>offset</code> parameter like this:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?limit=10&offset=10</syntaxhighlight>
+The equivalent SQL query would look like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees LIMIT 10 OFFSET 10;</syntaxhighlight>
+<span id="ordering-results"></span>
+=== Ordering results ===
+
+You can order results by any column using the <code>order</code> parameter. For instance to order the <code>employees</code> tab by the <code>emp_no</code> field, modify your URL to look like this:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?order=emp_no</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees ORDER BY emp_no;</syntaxhighlight>
+To order in descending fashion, just append <code>desc</code> to the <code>order</code> string:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?order=emp_no%20desc</syntaxhighlight>
+{{Note|title=Note The space separating <code>emp_no</code> and <code>desc</code> has been HTML encoded. Most programming languages offer HTML encoding capabilities either natively or through a third-party library so there's no need for you to do this manually within your applications. The equivalent SQL query looks like this: :::|<syntaxhighlight lang="sql">SELECT * FROM employees ORDER BY emp_no DESC;</syntaxhighlight>
+<span id="selecting-specific-fields"></span>
+=== Selecting specific fields ===
+
+Often you only require a few of the fields found in a table. To limit the fields returned, use the <code>fields</code> parameter:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?fields=emp_no%2Clast_name</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT emp_no, last_name FROM employees;</syntaxhighlight>
+<span id="filtering-records-by-condition"></span>
+=== Filtering records by condition ===
+
+You can filter records by a particular condition using the <code>filter</code> parameter. For instance to return only those records having a <code>gender</code> equal to <code>M</code>, set the <code>filter</code> parameter like so:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?filter=(gender=M)</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees where gender='M';</syntaxhighlight>
+You're free to use any of the typical comparison operators, such as <code>LIKE</code>:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?filter=(last_name%20like%20G%25)</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees where last_name LIKE 'G%';</syntaxhighlight>
+<span id="combining-parameters"></span>
+=== Combining parameters ===
+
+The REST API's capabilities really begin to shine when combining multiple parameters together. For example, let's query the <code>employees</code> table to retrieve only those records having a <code>last_name</code> beginning with <code>G</code>, ordering the results by <code>emp_no</code>:
+
+<syntaxhighlight lang="text">http://localhost/api/v2/_table/employees?filter=(last_name%20like%20G%25)&order=emp_no</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees where last_name LIKE 'G%' ORDER BY emp_no;</syntaxhighlight>
+<span id="querying-by-primary-key"></span>
+=== Querying by primary key ===
+
+You may want to select a specific record using a column that uniquely defines it. Often (but not always) this unique value is the ''primary key''. You can retrieve a record using its primary key by appending the value to the URL like so:
+
+<syntaxhighlight lang="text">/api/v2/_table/supplies/45</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM supplies where id = 5;</syntaxhighlight>
+If you'd like to use this URL format to search for another unique value not defined as a primary key, you must also pass along the <code>id_field</code> and <code>id_type</code> fields like so:
+
+<syntaxhighlight lang="text">/api/v2/_table/employees/45abchdkd?id_field=guid&id_type=string</syntaxhighlight>
+<span id="joining-tables"></span>
+=== Joining tables ===
+
+One of DreamFactory's most interesting database-related features is the automatic support for table joins. When DreamFactory creates a database-backed API, it parses all of the database tables, learning everything it can about the tables, including the column names, attributes, and relationships. The relationships are assigned aliases, and presented for referential purposes within DreamFactory's <code>Schema</code> tab. For instance, the following screenshot contains the list of relationship aliases associated with the <code>employees</code> table:
+
+[[File:mysql-relationships.png|thumb|Joining Tables with DreamFactory]]
+
+Using these aliases along with the <code>related</code> parameter we can easily return sets of joined records via the API. For instance, the following URI would be used to join the <code>employees</code> and <code>departments</code> tables together:
+
+<syntaxhighlight lang="text">/api/v2/mysql/_table/employees?related=dept_emp_by_emp_no</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">SELECT * FROM employees
+    LEFT JOIN departments on employees.emp_no = departments.emp_no;</syntaxhighlight>
+The joined results are presented within a JSON array having a name matching that of the alias:
+
+<syntaxhighlight lang="json">    {
+        "emp_no": 10001,
+        "birth_date": "1953-09-02",
+        "first_name": "Georgi",
+        "last_name": "Facello",
+        "gender": "M",
+        "hire_date": "1986-06-26",
+        "birth_year": "1953",
+        "dept_emp_by_emp_no": [
+            {
+                "emp_no": 10001,
+                "dept_no": "d005",
+                "from_date": "1986-06-26",
+                "to_date": "9999-01-01"
+            }
+        ]
+    }</syntaxhighlight>
+<span id="inserting-records"></span>
+=== Inserting records ===
+
+To insert a record, send a <code>POST</code> request to the API, passing along a JSON-formatted payload. For instance, to add a new record to the <code>supplies</code> table, send a <code>POST</code> request to the following URI:
+
+<syntaxhighlight lang="text">/api/v2/mysql/_table/supplies</syntaxhighlight>
+The body payload would look like this:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+            {
+                "name": "Stapler"
+            }
+        ]
+    }</syntaxhighlight>
+If the request is successful, DreamFactory returns a <code>200</code> status code and a response containing the record's primary key:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+          {
+            "id": 9
+          }
+        ]
+    }</syntaxhighlight>
+<span id="adding-records-to-multiple-tables"></span>
+==== Adding records to multiple tables ====
+
+If you want to create a new record and associate it with another table, you can use a single HTTP request. Consider the following two tables. The first, <code>supplies</code>, manages a list of company supplies (staplers, brooms, etc). The company requires that all supply are closely tracked in the corporate database, and so another table, <code>locations</code>, exists for this purpose. Each record in the <code>locations</code> table includes a location name and foreign key reference to a record found in the <code>supplies</code> table.}}note Note In the real world the location names would likely be managed in a separate table and then a join table would relate locations and supplies together. We're just trying to keep things simple for the purposes of this demonstration. :::
+
+The table schemas look like this:
+
+<syntaxhighlight lang="sql">
+CREATE TABLE `supplies` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `locations` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `supply_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `supply_id` (`supply_id`),
+  CONSTRAINT `locations_ibfk_1` FOREIGN KEY (`supply_id`) REFERENCES `supplies` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+</syntaxhighlight>
+Remember from the last example that DreamFactory creates convenient join aliases which can be used in conjunction with the <code>related</code> parameter. In this case, that alias is <code>locations_by_supply_id</code>. To create the relationship alongside the new <code>supplies</code> record, use that alias to nest the location name within the payload, as demonstrated here:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+            {
+                "name": "Broom",
+                "locations_by_supply_id": [
+                    {
+                        "name": "Broom Closet"
+                    }
+                ]
+            }
+        ]
+    }</syntaxhighlight>
+With the payload sorted out, all that remains is to make a request to the <code>supplies</code> table endpoint:
+
+<syntaxhighlight lang="text">/api/v2/mysql/_table/supplies</syntaxhighlight>
+If the nested insert is successful, a <code>200</code> status code is returned along with the primary key ID of the newly inserted <code>supplies</code> record:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+            {
+                "id": 15
+            }
+        ]
+    }</syntaxhighlight>
+<span id="updating-records"></span>
+=== Updating records ===
+
+Updating database records is a straightforward matter in DreamFactory. However to do so you first need to determine which type of REST update you wany to perform. Two options are supported:
+
+* '''PUT''': The <code>PUT</code> request replaces an existing resource in its entirety. This means you need to pass along ''all'' of the resource attributes regardless of whether the attribute value is actually being modified.
+* '''PATCH''': The <code>PATCH</code> request updates only part of the existing resource, meaning you only need to supply the resource primary key and the attributes you'd like to update. This is typically a much more convenient update approach than <code>PUT</code>, although both have their uses.
+
+Let's work through update examples involving each method.
+
+<span id="updating-records-with-put"></span>
+==== Updating records with PUT ====
+
+When updating records with <code>PUT</code> you must send along ''all'' of the record attributes within the request payload:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+            {
+                "emp_no": 500015,
+                "birth_date": "1900-12-15",
+                "first_name": "Johnny",
+                "last_name": "Football",
+                "gender": "m",
+                "hire_date": "2007-01-01"
+            }
+        ]
+    }</syntaxhighlight>
+With the payload in place, send a <code>PUT</code> request to the <code>employees</code> table endpoint:
+
+<syntaxhighlight lang="text">/api/v2/mysql/_table/employees</syntaxhighlight>
+If successful, DreamFactory returns a <code>200</code> status code and a response body containing the primary key of the updated record:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+            {
+                "emp_no": 500015
+            }
+        ]
+    }</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">    UPDATE supplies SET first_name = 'Johnny', last_name = 'Football',
+    birthdate = '1900-12-15', gender = 'm', hire_date = '2007-01-01' WHERE emp_no = 500015;</syntaxhighlight>
+<span id="updating-records-with-patch"></span>
+==== Updating records with PATCH ====
+
+To update one or more (but not all) attributes associated with a particular record found in the <code>supplies</code> table, send a <code>PATCH</code> request to the <code>supplies</code> table endpoint, accompanied by the primary key:
+
+<syntaxhighlight lang="text">/api/v2/mysql/_table/supplies/8</syntaxhighlight>
+Suppose the <code>supplies</code> table includes attributes such as <code>name</code>, <code>description</code>, and <code>purchase_date</code>, but we only want to modify the <code>name</code> value. The JSON request body would look like this:
+
+<syntaxhighlight lang="json">    {
+      "name": "Silver Stapler"
+    }</syntaxhighlight>
+If successful, DreamFactory returns a <code>200</code> status code and a response body containing the primary key of the updated record:
+
+<syntaxhighlight lang="json">    {
+      "id": 8
+    }</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<code>UPDATE supplies SET name = 'Silver Stapler' WHERE id = 8;</code>
+
+<span id="deleting-records"></span>
+=== Deleting records ===
+
+To delete a record, send a <code>DELETE</code> request to the table endpoint associated with the record you'd like to delete. For instance, to delete a record from the <code>employees</code> table, reference this URL:
+
+<syntaxhighlight lang="text">/api/v2/mysql/_table/employees/500016</syntaxhighlight>
+If deletion is successful, DreamFactory returns a 200 status code with a response body containing the deleted record's primary key:
+
+<syntaxhighlight lang="json">    {
+        "resource": [
+            {
+                "emp_no": 500016
+            }
+        ]
+    }</syntaxhighlight>
+The equivalent SQL query looks like this:
+
+<syntaxhighlight lang="sql">DELETE FROM employees WHERE emp_no = 500016;</syntaxhighlight>
+<span id="working-with-stored-procedures"></span>
+== Working with stored procedures ==
+
+Stored procedure support via the REST API is just for discovery and calling what you have already created on your database, it is not for managing the stored procedures themselves. They can be accessed on each database service by the <code>_proc</code> resource.
+
+As with most database features, there are a lot of common things about stored procedures across the various database vendors, with some notable exceptions. DreamFactory's blended API defines the difference between stored procedures and how they are used in the API as follows.
+
+Procedures can use input parameters ('IN') and output parameters ('OUT'), as well as parameters that serve both as input and output ('INOUT'). They can, except in the Oracle case, also return data directly.
+
+:::warning Database Vendor Exceptions * SQLite does not support procedures (or indeed functions). * PostgreSQL calls procedures and functions the same thing (a function) in PostgreSQL. DreamFactory calls them procedures if they have OUT or INOUT parameters or don't have a designated return type, otherwise they are referred to as functions. * SQL Server treats OUT parameters like INOUT parameters, and therefore require some value to be passed in. :::
+
+<span id="listing-available-stored-procedures"></span>
+=== Listing available stored procedures ===
+
+The following call lists the available stored procedures, based on role access allowed:
+
+<syntaxhighlight lang="text">GET http(s)://<dfServer>/api/v2/<serviceName>/_proc</syntaxhighlight>
+<span id="getting-stored-procedure-details"></span>
+=== Getting stored procedure details ===
+
+We can use the <code>ids</code> url parameter and pass a comma delimited list of resource names to retrieve details about each of the stored procedures. For example if you have a stored procedure named <code>getCustomerByLastName</code> a GET call to <code>http(s)://&lt;dfServer&gt;/api/v2/&lt;serviceName&gt;?ids=getCustomerByLastName</code> returns the following:
+
+<syntaxhighlight lang="json">{
+  "resource": [
+    {
+      "alias": null,
+      "name": "getCustomerByLastName",
+      "label": "GetCustomerByLastName",
+      "description": null,
+      "native": [],
+      "return_type": null,
+      "return_schema": [],
+      "params": [
+        {
+          "name": "LastName",
+          "position": 1,
+          "param_type": "IN",
+          "type": "string",
+          "db_type": "nvarchar",
+          "length": 25,
+          "precision": null,
+          "scale": null,
+          "default": null
+        }
+      ],
+      "access": 31
+    }
+  ]
+}</syntaxhighlight>
+<span id="calling-a-stored-procedure"></span>
+=== Calling a stored procedure ===
+
+<span id="using-get"></span>
+==== Using GET ====
+
+When passing no payload is required, any IN or INOUT parameters can be sent by passing the values in the order required inside parentheses:
+
+<syntaxhighlight lang="text">/api/v2/<serviceName>/_proc/myproc(val1, val2, val3)</syntaxhighlight>
+Or as URL parameters by parameter name:
+
+<syntaxhighlight lang="text">/api/v2/<serviceName>/_proc/myproc?param1=val1&param2=val2&param3=val3</syntaxhighlight>
+In the below example, there is a stored procedure <code>getUsernameByDepartment</code> which takes two input parameters, a department code, and a userID. Making the following call:
+
+<syntaxhighlight lang="text">/api/v2/<serviceName>/_proc/getUserNameByDepartment(AB,1234)</syntaxhighlight>
+In the above example, AB is the department code and 1234 is the userID, which returns:
+
+<syntaxhighlight lang="json">{
+  "userID": "1234",
+  "username": "Tomo"
+}</syntaxhighlight>
+<span id="using-post"></span>
+==== Using POST ====
+
+If a payload is required, i.e. passing values that are not url compliant, or passing schema formatting data, include the parameters directly in order. The same call as above can be made with a POST request with the following in the body:
+
+<syntaxhighlight lang="json">{
+  "params": ["AB", 1234]
+}</syntaxhighlight>
+<span id="formatting-results"></span>
+=== Formatting results ===
+
+For procedures that do not have INOUT or OUT parameters, the results can be returned as is, or formatted using the returns URL parameter if the value is a single scalar value, or the schema payload attribute for result sets.
+
+If INOUT or OUT parameters are involved, any procedure response is wrapped using the configured (a URL parameter wrapper) or default wrapper name (typically "resource"), and then added to the output parameter listing. The output parameter values are formatted based on the procedure configuration data types.
+
+Note that without formatting, all data is returned as strings, unless the driver (i.e. mysqlnd) supports otherwise. If the stored procedure returns multiple data sets, typically via multiple "SELECT" statements, then an array of datasets (i.e. array of records) is returned, otherwise a single array of records is returned.
+
+''schema'' - When a result set of records is returned from the call, the server uses any name-value pairs, consisting of <code>&quot;&lt;field_name&gt;&quot;: &quot;&lt;desired_type&gt;&quot;</code>, to format the data to the desired type before returning.
+
+''wrapper'' - Just like the URL parameter, the wrapper designation can be passed in the posted data.
+
+Request with formatting configuration:
+
+<syntaxhighlight lang="json">{
+  "schema": {
+    "id": "integer",
+    "complete": "boolean"
+  },
+  "wrapper": "data"
+}</syntaxhighlight>
+Response without formatting:
+
+<syntaxhighlight lang="json">{
+  "resource": [
+    {
+      "id": "3",
+      "name": "Write an app that calls the stored procedure.",
+      "complete": 1
+    },
+    {
+      "id": "4",
+      "name": "Test the application.",
+      "complete": 0
+    }
+  ],
+  "inc": 6,
+  "count": 2,
+  "total": 5
+}</syntaxhighlight>
+Response with formatting applied:
+
+<syntaxhighlight lang="json">{
+  "data": [
+    {
+      "id": 3,
+      "name": "Write an app that calls the stored procedure.",
+      "complete": true
+    },
+    {
+      "id": 4,
+      "name": "Test the application.",
+      "complete": false
+    }
+  ],
+  "inc": 6,
+  "count": 2,
+  "total": 5
+}</syntaxhighlight>
+<span id="using-symmetric-keys-to-decrypt-data-in-a-stored-procedure-sql-server"></span>
+=== Using symmetric keys to decrypt data in a stored procedure (SQL Server) ===
+
+SQL Server has the ability to perform column level encryption using symmetric keys which can be particularly useful for storing sensitive information such as passwords. A good example of how to do so can be found [https://www.sqlshack.com/an-overview-of-the-column-level-sql-server-encryption/ here]
+
+Typically, you would then decrypt this column (assuming the user has access to the certificate) with a statement in your sql server workbench such as:
+
+<syntaxhighlight lang="sql">OPEN SYMMETRIC KEY SymKey
+DECRYPTION BY CERTIFICATE <CertificateName>;
+
+SELECT <encryptedColumn> AS 'Encrypted data',
+CONVERT(varchar, DecryptByKey(<encryptedColumn>)) AS 'decryptedColumn'
+FROM SalesLT.Address;</syntaxhighlight>
+Now, we cannot call our table endpoint (e.g <code>/api/v2/&lt;serviceName&gt;/_table/&lt;tableWithEncryptedField&gt;</code>) and add this logic with DreamFactory, however we could put the same logic in a stored procedure, and have DreamFactory call that to return our decrypted result. As long as the SQLServer user has permissions to the certificate used for encryption, they are able to decrypt the field. You could then use [[System_Settings/Dreamfactory_Platform_Apis|roles]] to make sure only certain users have access to this stored procedure.
+
+The stored procedure looks something like this:
+
+<syntaxhighlight lang="sql">CREATE PROCEDURE dbo.<procedureName>
+AS
+BEGIN
+  SET NOCOUNT on;
+  OPEN SYMMETRIC KEY SymKey
+  DECRYPTION BY CERTIFICATE <CertificateName>;
+
+  SELECT <oneField>, CONVERT(nvarchar, DecryptByKey(<encryptedField>)) AS 'decrypted'
+  FROM <table>;
+END
+return;</syntaxhighlight>
+It can be called by DreamFactory with <code>/_proc/&lt;procedureName&gt;</code>.
+
+== See also ==
+* [[Event_Scripts|Event Scripts]]
+* [[Api_Keys|API Keys]]
+* [[Advanced_Database_Api_Features|Advanced Database API Features]]
+
+[[Category:Rest_Api]]
+[[Category:Crud_Operations]]
+[[Category:Database_Api]]
+[[Category:API]]
+[[Category:Difficulty_Beginner]]

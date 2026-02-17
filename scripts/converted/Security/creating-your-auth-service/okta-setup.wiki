@@ -1,0 +1,122 @@
+<span id="okta-sso-setup-guide"></span>
+= Okta SSO Setup Guide =
+
+This guide will walk you through setting up Okta Single Sign-On (SSO) authentication with DreamFactory.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+* An Okta account (create one at https://www.okta.com if needed)
+* Access to your DreamFactory admin application
+
+<span id="step-1-okta-initial-configuration"></span>
+== Step 1: Okta Initial Configuration ==
+
+<span id="create-account-and-access-admin-panel"></span>
+=== 1.1 Create Account and Access Admin Panel ===
+
+# Create an account on https://www.okta.com (if you do not have one yet) and sign in
+# Open the admin tab, the button for this should be located in the top right of the Dashboard
+
+<span id="add-new-application"></span>
+=== 1.2 Add New Application ===
+
+# Navigate to Applications and click "Create App Integration"
+# Select "SAML 2.0" as the application type
+
+[[File:okta-saml-2.png|thumb|okta new app integration screen]]
+<span id="configure-application"></span>
+=== 1.3 Configure Application ===
+
+# Fill in the General Settings page as you see fit, at a minimum a unique name for your new App
+# When configuring SAML the first time the Single sign-on URL and Audience URI will be placeholders (until you create the service in DreamFactory) you can put just the base URL for your DreamFactory Instance for now. You will also need to change Name ID format to EmailAddress, Application username to Email, and Response to Unsigned. When complete the page should look like this:
+
+[[File:okta-saml-config-full-1.png|thumb|okta SAML configuration screen]]
+<ol start="3" style="list-style-type: decimal;">
+<li><p>Hit next and on the Feedback page select the radio button for "This is an internal app that we have created" and hit finish</p></li>
+<li><p>On the right hand side of your new applications Sign On page you should have a button that says "View SAML setup instructions" select this and keep the tab open, you will need this information to setup the DreamFactory service for Okta SAML 2.0</p></li></ol>
+
+[[File:okta-saml-setup-link.png|thumb|okta SAML setup instructions link]]
+<span id="step-2-dreamfactory-configuration"></span>
+== Step 2: DreamFactory Configuration ==
+
+<span id="access-dreamfactory-admin"></span>
+=== 2.1 Access DreamFactory Admin ===
+
+# Open your DreamFactory admin WEB Interface in a new tab and sign in
+
+<span id="create-user-role"></span>
+=== 2.2 Create User Role ===
+
+# Create a role for users who will sign in via Okta SSO
+#* If you already have appropriate roles, you can use them
+#* For full access, create a role with the below permissions
+
+[[File:okta-allaccess-role.png|thumb|okta SAML role configuration]]
+<span id="create-api-key"></span>
+=== 2.3 Create API Key ===
+
+# Go to API Generation &amp; connections &gt; API Keys
+# Create a new API key and assign the previously created role to this key
+
+[[File:okta-api-key-creation.png|thumb|okta SAML API Key Creation]]
+<span id="create-saml-2.0-service"></span>
+=== 2.4 Create SAML 2.0 Service ===
+
+# Navigate to Security &gt; Authentication and create a new SAML 2.0 service
+
+[[File:okta-saml-blank-service-page.png|thumb|okta SAML Service Creation Blank Page]]
+<ol start="2" style="list-style-type: decimal;">
+<li><p>You will need to fill in the Namespace field, this will become part of the URI structure for the service</p></li>
+<li><p>The Label of the service will become the text in the button to login with Okta at the main login page for your DreamFactory instance</p></li>
+<li><p>You will need to use the SAML setup instructions page from the Okta admin tab to populate the new service</p></li>
+<li><p>"Identity Provider Single Sign-On URL" will need to be entered into the IdP SSO service URL field</p></li>
+<li><p>"Identity Provider Issuer" will need to be entered into the "IdP EntityId" field</p></li>
+<li><p>"X.509 Certificate" including the BEGIN and END lines will need to be entered into the "IdP x509cert" field</p></li>
+<li><p>Finally the relay state needs to be filled in with the URL the service should return the JWT token to, typically this is https://your.instance.url/dreamfactory/dist/#/auth/login?jwt=''token''</p></li>
+<li><p>Once configured your service should look like:</p></li></ol>
+
+[[File:okta-saml-2-service-creation.png|thumb|okta SAML Service Creation]]
+<span id="step-3-okta-second-configuration"></span>
+== Step 3: Okta Second Configuration ==
+
+<span id="assign-application-to-users"></span>
+=== 3.1 Assign Application to Users ===
+
+# In your Okta admin app, go to the Application page
+# Select your DreamFactory application from the list
+# Assign this application to the People/Group who will use it
+
+[[File:okta-users.png|thumb|okta SAML users configuration]]
+<span id="update-application-settings"></span>
+=== 3.2 Update Application Settings ===
+
+# Go to the General tab and click the Edit button next to SAML settings
+# Update the following fields with your DreamFactory endpoints:
+#* Single sign on URL this should look like: https://your.domain.url/api/v2/YourServicenameHere/acs
+#* Audience URI (SP Entity ID) this should look like: https://your.domain.url/api/v2/YourServicenameHere/metadata
+# Save your changes
+
+<span id="step-4-application-configuration"></span>
+== Step 4: Application Configuration ==
+
+<span id="configure-sso-endpoint"></span>
+=== 4.1 Configure SSO Endpoint ===
+
+You can now sign in by going to the <code>/sso</code> endpoint (see DreamFactory configuration &gt; Step 2.5). Since we used the SAML 2.0 you should now see on the login landing page for your DreamFactory instance a new button below the normal login credentials fields, clicking this should redirect you to the Okta SSO page and proceed with requesting users to authenticate.
+
+<span id="configure-cors"></span>
+=== 4.2 Configure CORS ===
+
+'''Important''': Don't forget to add your application and Okta domains to DreamFactory &gt; Config &gt; CORS. For detailed instructions on configuring CORS settings, see our [[System_Settings/Cors_Ssl|CORS and SSL documentation]].
+
+<span id="next-steps"></span>
+== Next Steps ==
+
+Your Okta SSO integration is now complete! Users can sign in through Okta and access DreamFactory with the appropriate permissions based on their assigned roles.
+
+== See also ==
+* [[Security/Azure_Ad_Oauth|azure-ad-oauth]]
+* [[Security/Github_Oauth|github-oauth]]
+
+[[Category:Security]]

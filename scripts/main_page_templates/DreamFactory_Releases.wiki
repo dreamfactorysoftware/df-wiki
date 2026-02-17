@@ -1,0 +1,3 @@
+<noinclude>
+Container for DreamFactory GitHub release entries. This page is automatically updated by the update_releases.py script.
+</noinclude><includeonly><div class="mp-releases-note" style="color:#666; font-style:italic;">Release data will be populated automatically. Run update_releases.py to fetch the latest releases from GitHub.</div></includeonly>

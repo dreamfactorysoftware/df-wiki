@@ -1,0 +1,482 @@
+/* ═══════════════════════════════════════════════════════
+   DreamFactory Main Page Styles
+   Appended to MediaWiki:Common.css by upload_main_page.py
+   ═══════════════════════════════════════════════════════ */
+
+/* --- Hide default heading and subtitle on Main Page --- */
+body.page-Main_Page .mw-page-title-main,
+body.page-Main_Page #firstHeading,
+body.page-Main_Page #siteSub,
+body.page-Main_Page .mw-indicators {
+    display: none !important;
+}
+
+/* --- Root container --- */
+.mp-root {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* --- Hero Banner --- */
+.mp-hero {
+    background: linear-gradient(135deg, #fff8f5 0%, #ffe8dc 100%);
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #f5d0c0;
+}
+.mp-hero-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+.mp-hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 0.25rem 0;
+    border-bottom: none;
+}
+.mp-hero-tagline {
+    font-size: 1.15rem;
+    color: #e8651a;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+}
+.mp-hero-desc {
+    color: #444;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+    max-width: 700px;
+}
+.mp-hero-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.mp-badge {
+    background: #fff;
+    border: 1px solid #e0d0c8;
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* --- Section Headings --- */
+.mp-section {
+    margin-bottom: 2rem;
+}
+.mp-section-heading {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    border-bottom: 2px solid #e8651a;
+    padding-bottom: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+/* --- Navigation Card Grid (Quick Start) --- */
+.mp-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+.mp-nav-card {
+    position: relative;
+    display: flex;
+    gap: 0.75rem;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.mp-nav-card:hover {
+    border-color: #e8651a;
+    box-shadow: 0 2px 8px rgba(232, 101, 26, 0.12);
+}
+.mp-nav-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 2rem;
+    text-align: center;
+}
+.mp-nav-body {
+    min-width: 0;
+}
+.mp-nav-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+.mp-nav-title a {
+    color: #1a1a2e;
+    text-decoration: none;
+}
+.mp-nav-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+}
+.mp-nav-card:hover .mp-nav-title a {
+    color: #e8651a;
+}
+.mp-nav-desc {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* --- Connector Grid --- */
+.mp-connector-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+.mp-connector-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-left: 4px solid #e8651a;
+    border-radius: 4px 8px 8px 4px;
+    padding: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.mp-connector-card:hover {
+    border-color: #e8651a;
+    box-shadow: 0 2px 8px rgba(232, 101, 26, 0.12);
+}
+.mp-connector-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.mp-connector-icon {
+    font-size: 1.2rem;
+}
+.mp-connector-type {
+    font-weight: 600;
+}
+.mp-connector-type a {
+    color: #1a1a2e;
+    text-decoration: none;
+}
+.mp-connector-type a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 4px 8px 8px 4px;
+}
+.mp-connector-card:hover .mp-connector-type a {
+    color: #e8651a;
+}
+.mp-connector-items {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* --- Releases --- */
+.mp-releases-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.mp-release-entry {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.mp-release-entry:hover {
+    border-color: #e8651a;
+    box-shadow: 0 2px 8px rgba(232, 101, 26, 0.12);
+}
+.mp-release-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+}
+.mp-release-version {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.mp-release-version a {
+    color: #e8651a;
+    text-decoration: none;
+}
+.mp-release-version a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+}
+.mp-release-entry:hover .mp-release-version a {
+    text-decoration: underline;
+}
+.mp-release-date {
+    font-size: 0.85rem;
+    color: #888;
+}
+.mp-release-notes {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+}
+.mp-releases-link {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* --- Popular Pages Grid --- */
+.mp-popular-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+.mp-popular-col h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 0.5rem 0;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px dotted #ccc;
+}
+.mp-popular-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.mp-popular-col li {
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px dotted #eee;
+}
+.mp-popular-col li:last-child {
+    border-bottom: none;
+}
+.mp-popular-col a {
+    text-decoration: none;
+    color: #0645ad;
+}
+.mp-popular-col a:hover {
+    text-decoration: underline;
+    color: #e8651a;
+}
+
+/* --- External Links Grid --- */
+.mp-ext-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+.mp-ext-col h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 0.5rem 0;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px dotted #ccc;
+}
+.mp-ext-link {
+    margin-bottom: 0.4rem;
+}
+.mp-ext-link a {
+    display: inline-block;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.mp-ext-link a:hover {
+    border-color: #e8651a;
+    background: #fff8f5;
+    color: #e8651a;
+}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+
+@media (max-width: 900px) {
+    .mp-nav-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .mp-connector-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .mp-popular-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .mp-ext-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .mp-hero {
+        padding: 1.5rem 1rem;
+    }
+    .mp-hero-title {
+        font-size: 1.5rem;
+    }
+    .mp-hero-content {
+        flex-direction: column;
+    }
+    .mp-nav-grid,
+    .mp-connector-grid,
+    .mp-popular-grid,
+    .mp-ext-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════════════ DARK MODE ═══════════════════ */
+/* Uses .dark-mode class (toggle) and @media with html:not(.light-mode) guard
+   to match the existing site-wide dark mode system in Common.css */
+
+.dark-mode .mp-hero {
+    background: linear-gradient(135deg, #1e1e2e 0%, #2a1f1a 100%);
+    border-color: #444;
+}
+.dark-mode .mp-hero-title,
+.dark-mode .mp-section-heading,
+.dark-mode .mp-popular-col h3,
+.dark-mode .mp-ext-col h3 {
+    color: #f0f0f0;
+}
+.dark-mode .mp-nav-title a,
+.dark-mode .mp-connector-type a {
+    color: #e0e0e0;
+}
+.dark-mode .mp-hero-tagline {
+    color: #f0944e;
+}
+.dark-mode .mp-hero-desc,
+.dark-mode .mp-nav-desc,
+.dark-mode .mp-connector-items,
+.dark-mode .mp-release-notes {
+    color: #bbb;
+}
+.dark-mode .mp-nav-card,
+.dark-mode .mp-connector-card,
+.dark-mode .mp-release-entry {
+    background: #1e1e2e;
+    border-color: #444;
+}
+.dark-mode .mp-connector-card {
+    border-left-color: #e8651a;
+}
+.dark-mode .mp-nav-card:hover {
+    border-color: #e8651a;
+}
+.dark-mode .mp-badge {
+    background: #2a2a3e;
+    border-color: #555;
+    color: #bbb;
+}
+.dark-mode .mp-release-date {
+    color: #999;
+}
+.dark-mode .mp-popular-col li {
+    border-bottom-color: #333;
+}
+.dark-mode .mp-popular-col h3,
+.dark-mode .mp-ext-col h3 {
+    border-bottom-color: #555;
+}
+.dark-mode .mp-popular-col a {
+    color: #6b9fde;
+}
+.dark-mode .mp-ext-link a {
+    background: #1e1e2e;
+    border-color: #444;
+    color: #ccc;
+}
+.dark-mode .mp-ext-link a:hover {
+    background: #2a1f1a;
+    border-color: #e8651a;
+    color: #e8651a;
+}
+
+/* OS-level dark mode — only when user hasn't forced light mode */
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) .mp-hero {
+        background: linear-gradient(135deg, #1e1e2e 0%, #2a1f1a 100%);
+        border-color: #444;
+    }
+    html:not(.light-mode) .mp-hero-title,
+    html:not(.light-mode) .mp-section-heading,
+    html:not(.light-mode) .mp-popular-col h3,
+    html:not(.light-mode) .mp-ext-col h3 {
+        color: #f0f0f0;
+    }
+    html:not(.light-mode) .mp-nav-title a,
+    html:not(.light-mode) .mp-connector-type a {
+        color: #e0e0e0;
+    }
+    html:not(.light-mode) .mp-hero-tagline {
+        color: #f0944e;
+    }
+    html:not(.light-mode) .mp-hero-desc,
+    html:not(.light-mode) .mp-nav-desc,
+    html:not(.light-mode) .mp-connector-items,
+    html:not(.light-mode) .mp-release-notes {
+        color: #bbb;
+    }
+    html:not(.light-mode) .mp-nav-card,
+    html:not(.light-mode) .mp-connector-card,
+    html:not(.light-mode) .mp-release-entry {
+        background: #1e1e2e;
+        border-color: #444;
+    }
+    html:not(.light-mode) .mp-connector-card {
+        border-left-color: #e8651a;
+    }
+    html:not(.light-mode) .mp-nav-card:hover {
+        border-color: #e8651a;
+    }
+    html:not(.light-mode) .mp-badge {
+        background: #2a2a3e;
+        border-color: #555;
+        color: #bbb;
+    }
+    html:not(.light-mode) .mp-release-date {
+        color: #999;
+    }
+    html:not(.light-mode) .mp-popular-col li {
+        border-bottom-color: #333;
+    }
+    html:not(.light-mode) .mp-popular-col h3,
+    html:not(.light-mode) .mp-ext-col h3 {
+        border-bottom-color: #555;
+    }
+    html:not(.light-mode) .mp-popular-col a {
+        color: #6b9fde;
+    }
+    html:not(.light-mode) .mp-ext-link a {
+        background: #1e1e2e;
+        border-color: #444;
+        color: #ccc;
+    }
+    html:not(.light-mode) .mp-ext-link a:hover {
+        background: #2a1f1a;
+        border-color: #e8651a;
+        color: #e8651a;
+    }
+}
+/* END DreamFactory Main Page Styles */

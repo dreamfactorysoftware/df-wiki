@@ -1,0 +1,422 @@
+= Upgrading to PHP 8.1 =
+<span id="upgrading-to-php-8.1"></span>
+= Upgrading to PHP 8.1 =
+
+Estimated Upgrade Time: 1.5 Hours
+DreamFactory is committed to making the shift from PHP 7.2 to PHP 8.1 as simple as possible. Some services have undergone significant changes as a result of third-party API providers. We have compiled a list of all services that have experienced noticeable changes, which you can find below. While it's not necessary to update all of these services, if you are using any of them, we recommend that you review the relevant section to expedite the development of your dream API.
+
+This article assumes that you are not using our automatic installers. However, if you have a different operating system or prefer not to handle the installation process manually, you can refer to the relevant guide [[Getting_Started/Installing_Dreamfactory|here]]. Note that these steps are intended for those using the [https://wiki.ubuntu.com/Releases ''Supported Ubuntu Release''].
+<span id="switch-to-php-8.1"></span>
+== Switch to PHP 8.1 ==
+
+This section demonstrates how to migrate from PHP 7.4 to PHP 8.1 on Ubuntu 20.04.
+
+# Add PPA:
+
+<syntaxhighlight lang="bash">sudo add-apt-repository ppa:ondrej/php -y</syntaxhighlight>
+<ol start="2" style="list-style-type: decimal;">
+<li>Install PHP 8.1 and the required dependencies:</li></ol>
+
+<syntaxhighlight lang="bash">sudo apt-get install -y php8.1-common \
+php8.1-xml \
+php8.1-cli \
+php8.1-fpm \
+php8.1-curl \
+php8.1-mysqlnd \
+php8.1-sqlite \
+php8.1-soap \
+php8.1-mbstring \
+php8.1-zip \
+php8.1-bcmath \
+php8.1-dev \
+php8.1-ldap \
+php8.1-pgsql \
+php8.1-interbase \
+php8.1-gd \
+php8.1-sybase</syntaxhighlight>
+<ol start="3" style="list-style-type: decimal;">
+<li>After successful installation, manually switch to PHP 8.1:</li></ol>
+
+<syntaxhighlight lang="bash">sudo update-alternatives --set php /usr/bin/php8.1 \
+sudo update-alternatives --set phar /usr/bin/phar8.1 \
+sudo update-alternatives --set phar.phar /usr/bin/phar.phar8.1 \</syntaxhighlight>
+<ol start="4" style="list-style-type: decimal;">
+<li>Select the version of PHP you need by using:</li></ol>
+
+<syntaxhighlight lang="bash">sudo update-alternatives --config php</syntaxhighlight>
+If you would like to know how to install the dependencies for the DreamFactory packages that you are interested in, you can refer to the table of contents below for guidance.
+
+Command <code>pecl install</code> may fail with a message like:
+
+<code>pecl/sqlsrv is already installed and is the same as the released version 5.10.1 install failed</code>
+
+In this case use force install: <code>pecl install -f &lt;extension_name&gt;</code>
+<span id="configure-nginx"></span>
+=== Configure NGINX ===
+
+If you are using FastCGI Process Manager (FPM) with NGINX or Apache, you must update your DreamFactory installation's host configuration. To update the configuration for NGINX, modify the version of PHP specified in the Nginx server configuration file, which is located at <code>/etc/nginx/sites-available/default</code>.
+
+<syntaxhighlight lang="diff">-fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
++fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;</syntaxhighlight>
+Now you can update your DreamFactory instance to the latest version.
+
+# Use the <code>git pull</code> command from the DreamFactory root directory.
+# Next, run the <code>composer install</code> command.
+# To complete the process, restart <code>fpm</code> and <code>nginx</code>:
+
+<syntaxhighlight lang="bash">sudo service php8.1-fpm restart && service nginx restart</syntaxhighlight>
+<span id="table-of-contents"></span>
+== Table of contents ==
+
+<span id="free-plan"></span>
+==== Free Plan ====
+
+* [[#cassandra|Cassandra]]
+* [[#couchbase|Couchbase]]
+* [[#email|Email]]
+* [[#firebird|Firebird]]
+* [[#github|GitHub]]
+* [[#mongo-logs|Mongo logs]]
+
+<span id="paid-plan"></span>
+==== Paid Plan ====
+
+* [[#apache-hive|Apache Hive]]
+* [[#azure-active-directory|Azure Active Directory]]
+* [[#ibm-db2|IBM Db2]]
+* [[#ibm-informix|IBM Informix]]
+* [[#ldap--active-directory|LDAP &amp; Active Directory]]
+* [[#mqtt|MQTT]]
+* [[#oracle|Oracle]]
+* [[#sap-sql-anywhere|SAP SQL Anywhere]]
+* [[#snowflake|Snowflake]]
+* [[#microsoft-sql-server|SQL Server]]
+
+<span id="cassandra"></span>
+=== Cassandra ===
+
+'''Likelihood Of Impact: High'''
+
+To use the Cassandra service, you must recompile the driver and install the client library if you haven't already.
+
+[https://github.com/datastax/cpp-driver/releases/tag/2.16.2 Download] and extract the client library for Apache Cassandra. From the downloaded repository, run the following commands:
+
+<syntaxhighlight lang="bash">sudo apt install -y --no-install-recommends libgmp-dev libpcre3-dev libssl-dev libuv1-dev cmake</syntaxhighlight>
+<syntaxhighlight lang="bash">mkdir build       &&\
+pushd build       &&\
+cmake ..          &&\
+make              &&\
+sudo make install &&\
+popd</syntaxhighlight>
+[https://github.com/nano-interactive/ext-cassandra/tree/v1.3.x Download] the DataStax PHP Driver for Apache Cassandra. '''Make sure that you are on the 1.3.x branch.''' From the downloaded repository, run the following command:
+
+<syntaxhighlight lang="bash"># Currently, we are using a specific version of the repository that is still functional, 
+# as the recent efforts to enhance the installation process do not work properly.
+git checkout 1cf12c5ce49ed43a2c449bee4b7b23ce02a37bf0 &&\
+pushd ext         &&\
+phpize            &&\
+popd              &&\
+mkdir build       &&\
+pushd build       &&\
+../ext/configure  &&\
+make              &&\
+sudo make install &&\
+popd</syntaxhighlight>
+Make sure <code>cassandra.so</code> is built.
+
+<pre>find /usr/lib/php/20210902/cassandra.so</pre>
+If <code>cassandra.so</code> exists, connect it to PHP's modules.
+
+<syntaxhighlight lang="text">
+echo 'extension=cassandra.so' | sudo tee /etc/php/8.1/mods-available/cassandra.ini
+sudo phpenmod -v 8.1 -s ALL cassandra
+</syntaxhighlight>
+<span id="couchbase"></span>
+=== Couchbase ===
+
+'''Likelihood Of Impact: High'''
+
+With the new release of DreamFactory, we removed Couchbase from the list of supported services. There is a possibility that support for Couchbase may be reinstated in a future release.
+
+<span id="email"></span>
+=== Email ===
+
+'''Likelihood Of Impact: Low'''
+
+The Mandrill &amp; SparkPost mail drivers have been [https://laravel.com/docs/6.x/upgrade removed from Laravel 6]. These services have technically not been supported by DreamFactory since its migration to Laravel 6. For this reasone these services are no longer displayed in the '''Services''' tab.
+
+<span id="firebird"></span>
+=== Firebird ===
+
+'''Likelihood Of Impact: High'''
+
+If you are using Firebird with major version 3, then it must be at least version 3.0.4. This is due to usage of the [https://firebirdsql.org/file/documentation/chunk/en/refdocs/fblangref40/fblangref40-contextvars-localtimestamp.html LOCALTIMESTAMP parameter].
+
+To use the Firebird service, you need to install/recompile a driver compatible with PHP 8.1. Use [https://www.php.net/manual/en/ref.pdo-firebird.php <code>--with-pdo-firebird</code>] to install the PDO Firebird extension or install <code>php81-interbase</code> package from [[#installing-the-php-extension|ppa:ondrej/php]].
+
+<span id="github"></span>
+=== GitHub ===
+
+'''Likelihood Of Impact: Medium'''
+
+DreamFactory provided the ability to authenticate through the REST API using an account password or personal access token to perform authenticated API operations on GitHub.com. Beginning November 13th, 2020, GitHub announced that they no longer accept account passwords when authenticating via the REST API and require the use of token-based authentication. If you have a registered DreamFactory GitHub service, ensure to specify a personal access token. For more information, follow the Deprecating password authentication information found [https://developer.github.com/changes/2020-02-14-deprecating-password-auth/ here].
+
+<span id="mongo-logs"></span>
+=== Mongo logs ===
+
+'''Likelihood Of Impact: Low'''
+
+DreamFactory supports a very simple solution for logging all requests. All records requested in the API are written to the database. The implication is that DreamFactory relies on [https://www.mongodb.com/docs/drivers/php/ MongoDB PHP driver]. You can easily install the required dependency with [https://pecl.php.net/package/mongodb pecl]. After that, run these two commands:
+
+<syntaxhighlight lang="bash">echo 'extension=mongodb.so' | sudo tee /etc/php/8.1/mods-available/mongodb.ini
+sudo phpenmod -s ALL mongodb</syntaxhighlight>
+<span id="apache-hive"></span>
+=== Apache Hive ===
+
+'''Likelihood Of Impact: High'''
+
+In order to use the service, you must have both the [https://www.php.net/manual/en/pdo.installation.php PDO] and [https://www.php.net/manual/en/odbc.installation.php ODBC] PHP extensions installed, which are available for download from [[#installing-the-php-extension|this PPA]] with the names <code>php8.1-pdo</code> and <code>php8.1-odbc</code>, respectively. Additionally, the MapR ODBC Driver must be installed, which you can obtain by downloading from this [https://docs.datafabric.hpe.com/70/Hive/install-hive_odbc_connector_linux.html link] or through the Amazon cloud, as we do. To install MapR ODBC Driver run:
+
+<syntaxhighlight lang="bash">cd /opt \
+&& sudo curl --fail -O https://odbc-drivers.s3.amazonaws.com/apache-hive/maprhiveodbc_2.6.1.1001-2_amd64.deb \
+&& sudo dpkg -i maprhiveodbc_2.6.1.1001-2_amd64.deb \
+&& test -f /opt/mapr/hiveodbc/lib/64/libmaprhiveodbc64.so \
+&& rm maprhiveodbc_2.6.1.1001-2_amd64.deb</syntaxhighlight>
+Note that it's crucial to install the extension using a specific path. So the full path to the driver must be - <code>/opt/mapr/hiveodbc/lib/64/libmaprhiveodbc64.so</code>
+
+<span id="azure-active-directory"></span>
+=== Azure Active Directory ===
+
+'''Likelihood Of Impact: Low'''
+
+Microsoft announced that Azure AD Graph has been deprecated as of June 30, 2023. For this reason, DreamFactory migrated towards Microsoft Graph. For more information, follow the details available [https://techcommunity.microsoft.com/t5/microsoft-entra-azure-ad-blog/microsoft-entra-change-announcements-september-2022-train/ba-p/2967454 here].
+
+<span id="ibm-db2"></span>
+=== IBM Db2 ===
+
+'''Likelihood Of Impact: High'''
+
+DreamFactory services that work with IBM databases use software that can be loaded from [https://www.ibm.com/us-en/ ibm.com]. This section is appointed for a self-hosted environment. To make DreamFactory work with the IBM Db2, you need to complete the following steps:
+
+Sign in to your [https://www.ibm.com/us-en/ IBM] account, or create a new one. Download the client driver package:
+
+https://epwt-www.mybluemix.net/software/support/trial/cst/programwebsite.wss?siteId=853&amp;h=null&amp;p=null
+
+Extract the downloaded file. From the "dsdriver" subdirectory, generate "''db2profile''" and "''db2cshrc''" script files:
+
+<syntaxhighlight lang="bash">sudo -s \
+&& tar -xvf ibm_data_server_driver_package_linuxx64_v11.5.tar.gz -C /opt/ \
+&& cd /opt/dsdriver \
+&& apt install -y ksh \
+&& ./installDSDriver</syntaxhighlight>
+Set the environment variables using:
+
+<syntaxhighlight lang="text">
+source db2profile (for the Bash or Korn shell)
+source db2cshrc (for the C shell)
+</syntaxhighlight>
+Clone the PDO_IBM [https://github.com/php/pecl-database-pdo_ibm source code from GitHub]. '''Note that this must be done from the same terminal since db2profile | db2cshrc sets the environment variables in the current terminal session.'''
+
+<syntaxhighlight lang="bash">git clone https://github.com/php/pecl-database-pdo_ibm /opt/PDO_IBM && \
+cd /opt/PDO_IBM</syntaxhighlight>
+From the cloned repository run:
+
+<syntaxhighlight lang="bash">export CPATH=/opt/dsdriver/include</syntaxhighlight>
+<syntaxhighlight lang="bash">phpize \
+&& ./configure --with-pdo-ibm=/opt/dsdriver \
+&& make \
+&& make install \
+&& exit</syntaxhighlight>
+Check for the presence of <code>pdo_ibm.so</code>:
+
+<syntaxhighlight lang="bash">find "/usr/lib/php/20210902/pdo_ibm.so"</syntaxhighlight>
+If <code>pdo_ibm.so</code> exists, connect it to PHP's modules:
+
+<syntaxhighlight lang="bash">echo 'extension=pdo_ibm.so' | sudo tee /etc/php/8.1/mods-available/pdo_ibm.ini && \
+sudo phpenmod -v 8.1 -s ALL pdo_ibm</syntaxhighlight>
+<span id="ibm-informix"></span>
+=== IBM Informix ===
+
+'''Likelihood Of Impact: High'''
+
+DreamFactory services that work with IBM databases use software that can be loaded from [https://www.ibm.com/us-en/ ibm.com]. This section is appointed for a self-hosted environment. To make DreamFactory work with the IBM Informix, you need to take the following steps:
+
+Sign in to your [https://www.ibm.com/us-en/ IBM] account or create a new one. Download the [https://www.ibm.com/support/pages/informix-client-software-development-kit-client-sdk-and-informix-connect-system-requirements Informix Client SDK].
+
+<u>Download Informix Client SDK</u> ➜ <u>IBM Informix Client SDK downloads</u> ➜ ''Fill out the form'' ➜ ''Select appropriate version'' ➜ ''Download tar file''
+
+SDK may require you to install <code>libncurses.so.5</code>:
+
+<syntaxhighlight lang="bash">
+sudo add-apt-repository universe
+sudo apt update
+sudo apt install libncurses5 libncurses5:i386
+</syntaxhighlight>
+Extract and install the SDK:
+
+<syntaxhighlight lang="bash">
+sudo -s
+tar -xvf your_archive
+./installclientsdk
+</syntaxhighlight>
+Now we have two options to install <code>pdo_informix.so</code>: using <code>pecl</code> or by building it manually. We prefer the second method since we have had limited success with the <code>pecl</code> method.
+
+Download the [https://pecl.php.net/package/pdo_informix PDO_INFORMIX] archive and extract it. From the extracted ''PDO_INFORMIX-1.3.x'' folder run:
+
+<syntaxhighlight lang="bash">phpize \
+&& ./configure --with-pdo-informix=/opt/IBM/Informix_Client-SDK \
+&& make \
+&& make install \
+&& exit</syntaxhighlight>
+If you decide to test your luck, and install [https://pecl.php.net/package/pdo_informix PDO_INFORMIX] using <code>pecl</code>, run:
+
+<syntaxhighlight lang="bash">sudo pecl install PDO_INFORMIX</syntaxhighlight>
+Set the environment variables in <code>.profile</code>, and open the file for editing with:
+
+<syntaxhighlight lang="bash">sudo nano ~/.profile</syntaxhighlight>
+Add the following lines to the bottom of the file:
+
+<syntaxhighlight lang="text">
+export LD_LIBRARY_PATH=&quot;$LD_LIBRARY_PATH:/opt/IBM/Informix_Client-SDK/lib:/opt/IBM/Informix_Client-SDK/lib/esql&quot; 
+export INFORMIXDIR=&quot;/opt/IBM/Informix_Client-SDK&quot;
+</syntaxhighlight>
+Make sure <code>pdo_informix.so</code> is built using:
+
+<syntaxhighlight lang="bash">find /usr/lib/php/20210902/pdo_informix.so</syntaxhighlight>
+If <code>pdo_informix.so</code> exists, connect it to PHP's modules with:
+
+<syntaxhighlight lang="bash">echo 'extension=pdo_informix.so' | sudo tee /etc/php/8.1/mods-available/pdo_informix.ini && \
+sudo phpenmod -v 8.1 -s ALL pdo_informix</syntaxhighlight>
+<span id="ldap-active-directory"></span>
+=== LDAP &amp; Active Directory ===
+
+'''Likelihood Of Impact: Low'''
+
+DreamFactory uses [https://www.php.net/manual/en/book.ldap.php Lightweight Directory Access Protocol] to lookup information or devices within a network. Therefore, to continue working with these services, you need to install the LDAP [https://www.php.net/manual/en/ldap.installation.php extension] for the new version of PHP. For a quick setup, see the [[#installing-the-php-extension|'Installing the PHP extension']] section.
+
+<span id="mqtt"></span>
+=== MQTT ===
+
+'''Likelihood Of Impact: Low'''
+
+Previously, the MQTT service relied on the [https://github.com/mgdm/Mosquitto-PHP Mosquitto-PHP] extension, which in turn relies upon the [https://mosquitto.org/ libmosquitto] library. This service no longer depends on the system's needs and contains everything needed to work on its own.
+
+<span id="oracle"></span>
+=== Oracle ===
+
+'''Likelihood Of Impact: High'''
+
+This section shows the minimum number of steps to set up required dependencies so that DreamFactory can work with Oracle. For a complete setup, follow the [https://www.oracle.com/database/technologies/releasenote-odbc-ic.html official guide].
+To use the Oracle service, you need to install the new version of the <code>oci8</code> extension compatible with PHP 8.1. You can seamlessly install the required extension version you need via [https://pecl.php.net/package/oci8 pecl]. But before installation, you need to go through a few more steps:
+
+Download the desired Instant Client and the corresponding SDK Package. This example uses the RPM packages.
+
+https://www.oracle.com/database/technologies/instant-client/downloads.html
+
+Install the necessary dependencies using:
+
+<syntaxhighlight lang="bash">sudo apt install -y alien libaio1</syntaxhighlight>
+Install the Oracle client packages, which can take a few minutes, with this command:
+
+<syntaxhighlight lang="bash">
+sudo alien -i oracle-instantclient-basic-21.9.0.0.0-1.el8.x86_64.rpm
+sudo alien -i oracle-instantclient-devel-21.9.0.0.0-1.el8.x86_64.rpm
+</syntaxhighlight>
+Now you are ready to install the <code>oci8</code> extension. The latest version is compatible with PHP 8.1 at present, but you may need to specify the version explicitly.
+
+<syntaxhighlight lang="bash">
+sudo pecl install oci8 (php 8.1 exactly what we need)
+sudo pecl install oci8-2.2.0 (php 7)
+</syntaxhighlight>
+Once complete, make sure that OCI is loaded:
+
+<syntaxhighlight lang="bash">php -m | grep oci8
+
+#oci8</syntaxhighlight>
+If you do not see <code>oci8</code> in PHP's modules, ensure that the configuration file and the OCI shared library file are plugged in.
+
+Check for the presence of <code>osi8.so</code>:
+
+<syntaxhighlight lang="bash">find "/usr/lib/php/20210902/oci8.so"</syntaxhighlight>
+If <code>osi8.so</code> exists, connect it to PHP's modules by running:
+
+<syntaxhighlight lang="bash">echo 'extension=oci8.so' | sudo tee /etc/php/8.1/mods-available/oci8.ini && \
+sudo phpenmod -v 8.1 -s ALL oci8</syntaxhighlight>
+<span id="sap-sql-anywhere"></span>
+=== SAP SQL Anywhere ===
+
+'''Likelihood Of Impact: High'''
+
+To complete this process, install the Sybase module from PPA. See the [[#installing-the-php-extension|how to add PPA to your Apt repositories]] section. This package provides <code>php8.1-pdo-dblib</code>, which is what is needed.
+
+<syntaxhighlight lang="bash">sudo apt install php8.1-sybase</syntaxhighlight>
+Once complete, make sure that the driver is installed successfully. Confirm both PDO and the pdo_dblib extensions are present:
+
+<syntaxhighlight lang="bash">php -m
+...
+#PDO
+#pdo_dblib
+...</syntaxhighlight>
+<span id="snowflake"></span>
+=== Snowflake ===
+
+'''Likelihood Of Impact: High'''
+
+To use the Snowflake service, you need to recompile the <code>pdo_snowflake</code> driver using the new PHP version. After completion, make sure the module is installed into the proper extensions directory. For more infomation you can access the official guide [https://github.com/snowflakedb/pdo_snowflake here].
+
+<span id="microsoft-sql-server"></span>
+=== Microsoft SQL Server ===
+
+'''Likelihood Of Impact: High'''
+
+<blockquote>To use a Microsoft SQL Server database, you should ensure that you have the sqlsrv and pdo_sqlsrv PHP extensions installed, as well as any dependencies they may require such as the Microsoft SQL ODBC driver.
+</blockquote>
+Install ODBC libraries for UNIX from the [https://learn.microsoft.com/en-us/windows-server/administration/linux-package-repository-for-microsoft-software Microsoft repository]:
+
+<syntaxhighlight lang="bash">sudo apt install -y unixodbc-dev</syntaxhighlight>
+If you are encountering issues with the <code>unixodbc-dev</code> package, it may be due to a recent release. As a workaround, you can lock the package version to a stable one (e.g. v2.3.7) until a fix is released. For more details, refer to the relevant [https://github.com/microsoft/linux-package-repositories/issues/36 issue].
+
+Install [https://pecl.php.net/package/sqlsrv sqlsrv] and [https://pecl.php.net/package/pdo_sqlsrv pdo_sqlsrv] from pecl:
+
+<syntaxhighlight lang="bash">
+sudo pecl install sqlsrv
+sudo pecl install pdo_sqlsrv
+</syntaxhighlight>
+Check for the presence of <code>sqlsrv</code> and <code>pdo_sqlsrv</code>:
+
+<syntaxhighlight lang="text">
+find &quot;/usr/lib/php/20210902/sqlsrv.so&quot;
+find &quot;/usr/lib/php/20210902/pdo_sqlsrv.so&quot;
+</syntaxhighlight>
+If you get both SO files, connect it to PHP's modules:
+
+<syntaxhighlight lang="text">
+echo 'extension=sqlsrv.so' | sudo tee /etc/php/8.1/mods-available/sqlsrv.ini
+sudo phpenmod -v 8.1 -s ALL sqlsrv
+
+echo 'extension=pdo_sqlsrv.so' | sudo tee /etc/php/8.1/mods-available/pdo_sqlsrv.ini
+sudo phpenmod -v 8.1 -s ALL pdo_sqlsrv
+</syntaxhighlight>
+Finally, install the Microsoft ODBC driver for SQL Server following the [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16#ubuntu18 official guide], or using the [https://pkgs.org/search/?q=msodbcsql Microsoft repository].
+
+<span id="installing-the-php-extension"></span>
+=== Installing the PHP extension ===
+
+Installation of the necessary dependencies can be quite an agonizing process, so concerned people make this process as painless as possible. [https://deb.sury.org/ Ondřej Surý] maintains the repository with PHP packages and is a very well-respected contributor to the PHP community. See how you can install the required PHP dependencies in three easy steps.
+
+First add [https://launchpad.net/~ondrej/+archive/ubuntu/php <code>ppa:ondrej/php</code>] to our APT repositories with:
+
+<syntaxhighlight lang="bash">sudo add-apt-repository ppa:ondrej/php</syntaxhighlight>
+Update list of available packages:
+
+<syntaxhighlight lang="bash">sudo apt update</syntaxhighlight>
+Install the required dependency. In this example, we demonstrate the installation of the [https://www.php.net/manual/en/book.ldap.php LDAP] extension:
+
+<syntaxhighlight lang="bash">sudo apt install php8.1-ldap</syntaxhighlight>
+
+== See also ==
+* [[Upgrading_Php_Windows|Upgrading PHP On Windows]]
+* [[Upgrading_Migrating_Dreamfactory|Upgrading and Migrating DreamFactory]]
+
+[[Category:Upgrades]]
+[[Category:Upgrading]]

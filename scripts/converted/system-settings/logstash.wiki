@@ -1,0 +1,585 @@
+= Logstash =
+<span id="dreamfactory-elk-stack-grafana-integration-guide"></span>
+= DreamFactory ELK Stack &amp; Grafana Integration Guide =
+
+This guide provides step-by-step instructions for installing and configuring Elasticsearch, Logstash, and Grafana to work with DreamFactory's Logstash connector for API activity monitoring and analytics.
+
+<span id="table-of-contents"></span>
+== Table of Contents ==
+
+# [[#prerequisites|Prerequisites]]
+# [[#installation|Installation]]
+#* [[#elasticsearch|Elasticsearch]]
+#* [[#logstash|Logstash]]
+#* [[#grafana|Grafana]]
+# [[#configuration|Configuration]]
+#* [[#elasticsearch-configuration|Elasticsearch Configuration]]
+#* [[#logstash-configuration|Logstash Configuration]]
+#* [[#grafana-configuration|Grafana Configuration]]
+# [[#dreamfactory-integration|DreamFactory Integration]]
+# [[#dashboard-setup|Dashboard Setup]]
+# [[#troubleshooting|Troubleshooting]]
+
+-----
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+* Ubuntu Server (20.04 or later recommended)
+* Root or sudo access
+* Minimum 2GB RAM (4GB+ recommended)
+* Java 11 or later
+* DreamFactory instance with Logstash connector enabled
+
+-----
+
+<span id="installation"></span>
+== Installation ==
+
+<span id="elasticsearch"></span>
+=== Elasticsearch ===
+
+<span id="step-1-install-java"></span>
+=== Step 1: Install Java ===
+
+<syntaxhighlight lang="bash">sudo apt update
+sudo apt install -y openjdk-11-jdk</syntaxhighlight>
+<span id="step-2-add-elasticsearch-repository"></span>
+=== Step 2: Add Elasticsearch Repository ===
+
+<syntaxhighlight lang="bash">wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+sudo apt update</syntaxhighlight>
+<span id="step-3-install-elasticsearch"></span>
+=== Step 3: Install Elasticsearch ===
+
+<syntaxhighlight lang="bash">sudo apt install -y elasticsearch</syntaxhighlight>
+<span id="step-4-configure-elasticsearch-memory"></span>
+=== Step 4: Configure Elasticsearch Memory ===
+
+For systems with limited RAM, reduce heap size:
+
+<syntaxhighlight lang="bash">sudo mkdir -p /etc/elasticsearch/jvm.options.d
+sudo tee /etc/elasticsearch/jvm.options.d/heap.options << EOF
+-Xms256m
+-Xmx256m
+EOF</syntaxhighlight>
+<span id="step-5-start-and-enable-elasticsearch"></span>
+=== Step 5: Start and Enable Elasticsearch ===
+
+<syntaxhighlight lang="bash">sudo systemctl daemon-reload
+sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch</syntaxhighlight>
+<span id="step-6-verify-installation"></span>
+=== Step 6: Verify Installation ===
+
+Wait 30 seconds, then check status:
+
+<syntaxhighlight lang="bash">sudo systemctl status elasticsearch</syntaxhighlight>
+Get the default password:
+
+<syntaxhighlight lang="bash">sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic</syntaxhighlight>
+Test connection:
+
+<syntaxhighlight lang="bash">curl -k -u elastic:YOUR_PASSWORD https://localhost:9200</syntaxhighlight>
+
+-----
+
+<span id="logstash"></span>
+=== Logstash ===
+
+<span id="step-1-install-logstash"></span>
+=== Step 1: Install Logstash ===
+
+<syntaxhighlight lang="bash">sudo apt install -y logstash</syntaxhighlight>
+<span id="step-2-configure-logstash-memory"></span>
+=== Step 2: Configure Logstash Memory ===
+
+<syntaxhighlight lang="bash">sudo tee /etc/logstash/jvm.options << EOF
+-Xms256m
+-Xmx256m
+EOF</syntaxhighlight>
+<span id="step-3-create-logstash-configuration"></span>
+=== Step 3: Create Logstash Configuration ===
+
+Create the DreamFactory configuration file:
+
+<syntaxhighlight lang="bash">sudo tee /etc/logstash/conf.d/dreamfactory.conf << 'EOF'
+input {
+  gelf {
+    port => 12201
+    type => "dreamfactory"
+  }
+}
+
+filter {
+  if [type] == "dreamfactory" {
+    # Rename host field to avoid conflict with ECS (Elastic Common Schema) host object
+    # Note: ECS is a vendor-neutral standard that works across all cloud providers and on-premise
+    if [host] {
+      mutate {
+        rename => { "host" => "source_hostname" }
+      }
+    }
+    
+    # Add host information as object for ECS compatibility
+    # This follows the ECS standard and works on AWS, Azure, GCP, on-premise, etc.
+    mutate {
+      add_field => { 
+        "log_source" => "dreamfactory"
+        "[host][name]" => "%{source_hostname}"
+      }
+    }
+    
+    # Parse log level if present
+    if [level] {
+      mutate {
+        uppercase => [ "level" ]
+      }
+    }
+    
+    # Extract user_id from JWT session token
+    ruby {
+      code => '
+        begin
+          # Access nested field directly
+          event_data = event.get("event")
+          if event_data && event_data.is_a?(Hash)
+            request_data = event_data["request"]
+            if request_data && request_data.is_a?(Hash)
+              headers = request_data["headers"]
+              if headers && headers.is_a?(Hash)
+                token = headers["x-dreamfactory-session-token"]
+                if token && token.is_a?(String) && token.include?(".")
+                  parts = token.split(".")
+                  if parts.length >= 2
+                    payload_b64 = parts[1]
+                    # Add padding for base64 URL-safe decoding
+                    padding = (4 - payload_b64.length % 4) % 4
+                    payload_b64 += "=" * padding
+                    # Decode and parse
+                    require "base64"
+                    require "json"
+                    payload_json = Base64.urlsafe_decode64(payload_b64)
+                    payload = JSON.parse(payload_json)
+                    if payload["user_id"]
+                      event.set("[user][id]", payload["user_id"])
+                    end
+                  end
+                end
+              end
+            end
+          end
+        rescue => e
+          # Silently fail
+        end
+      '
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["https://localhost:9200"]
+    user => "elastic"
+    password => "YOUR_ELASTICSEARCH_PASSWORD"
+    ssl_enabled => true
+    ssl_verification_mode => "none"
+    index => "logstash-dreamfactory-%{+YYYY.MM.dd}"
+  }
+}
+EOF</syntaxhighlight>
+'''Important:''' Replace <code>YOUR_ELASTICSEARCH_PASSWORD</code> with the password you obtained in Step 6 of Elasticsearch installation.
+
+<span id="step-4-set-file-permissions"></span>
+=== Step 4: Set File Permissions ===
+
+<syntaxhighlight lang="bash">sudo chown logstash:logstash /etc/logstash/conf.d/dreamfactory.conf
+sudo chmod 644 /etc/logstash/conf.d/dreamfactory.conf</syntaxhighlight>
+<span id="step-5-test-configuration"></span>
+=== Step 5: Test Configuration ===
+
+<syntaxhighlight lang="bash">sudo /usr/share/logstash/bin/logstash --path.settings=/etc/logstash --config.test_and_exit</syntaxhighlight>
+<span id="step-6-start-and-enable-logstash"></span>
+=== Step 6: Start and Enable Logstash ===
+
+<syntaxhighlight lang="bash">sudo systemctl daemon-reload
+sudo systemctl enable logstash
+sudo systemctl start logstash</syntaxhighlight>
+<span id="step-7-verify-installation"></span>
+=== Step 7: Verify Installation ===
+
+<syntaxhighlight lang="bash">sudo systemctl status logstash
+sudo tail -f /var/log/logstash/logstash-plain.log</syntaxhighlight>
+
+-----
+
+<span id="grafana"></span>
+=== Grafana ===
+
+<span id="step-1-install-dependencies"></span>
+=== Step 1: Install Dependencies ===
+
+<syntaxhighlight lang="bash">sudo apt install -y software-properties-common
+sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"</syntaxhighlight>
+<span id="step-2-add-grafana-gpg-key"></span>
+=== Step 2: Add Grafana GPG Key ===
+
+<syntaxhighlight lang="bash">wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+sudo apt update</syntaxhighlight>
+<span id="step-3-install-grafana"></span>
+=== Step 3: Install Grafana ===
+
+<syntaxhighlight lang="bash">sudo apt install -y grafana</syntaxhighlight>
+<span id="step-4-start-and-enable-grafana"></span>
+=== Step 4: Start and Enable Grafana ===
+
+<syntaxhighlight lang="bash">sudo systemctl daemon-reload
+sudo systemctl enable grafana-server
+sudo systemctl start grafana-server</syntaxhighlight>
+<span id="step-5-access-grafana-web-ui"></span>
+=== Step 5: Access Grafana Web UI ===
+
+Open your browser and navigate to:
+
+<pre>http://YOUR_SERVER_IP:3000</pre>
+Default credentials: - Username: <code>admin</code> - Password: <code>admin</code> (you'll be prompted to change it)
+
+-----
+
+<span id="configuration"></span>
+== Configuration ==
+
+<span id="elasticsearch-configuration"></span>
+=== Elasticsearch Configuration ===
+
+<span id="basic-security-settings"></span>
+=== Basic Security Settings ===
+
+Elasticsearch 8.x has security enabled by default. The default user is <code>elastic</code> with a randomly generated password.
+
+<span id="index-management"></span>
+=== Index Management ===
+
+Logs are automatically indexed with the pattern: <code>logstash-dreamfactory-YYYY.MM.dd</code>
+
+View indices:
+
+<syntaxhighlight lang="bash">curl -k -u elastic:YOUR_PASSWORD https://localhost:9200/_cat/indices?v</syntaxhighlight>
+
+-----
+
+<span id="logstash-configuration"></span>
+=== Logstash Configuration ===
+
+<span id="key-configuration-points"></span>
+=== Key Configuration Points ===
+
+# '''GELF Input''': Listens on UDP port 12201 for Graylog Extended Log Format (GELF) messages from DreamFactory
+# '''JWT Extraction''': Extracts <code>user_id</code> from DreamFactory session tokens and adds it as <code>user.id</code> field
+# '''Field Mapping''': Renames <code>host</code> to <code>source_hostname</code> to avoid Elasticsearch mapping conflicts
+# '''ECS Compatibility''': Uses Elastic Common Schema (ECS) standard for <code>host.name</code> field - this is vendor-neutral and works across all cloud providers (AWS, Azure, GCP, etc.) and on-premise installations
+# '''Index Pattern''': Creates daily indices for better performance and management
+
+<span id="verify-logstash-is-receiving-logs"></span>
+=== Verify Logstash is Receiving Logs ===
+
+<syntaxhighlight lang="bash">sudo netstat -tlnp | grep 12201</syntaxhighlight>
+<span id="check-logstash-logs"></span>
+=== Check Logstash Logs ===
+
+<syntaxhighlight lang="bash">sudo tail -f /var/log/logstash/logstash-plain.log</syntaxhighlight>
+
+-----
+
+<span id="grafana-configuration"></span>
+=== Grafana Configuration ===
+
+<span id="step-1-add-elasticsearch-data-source"></span>
+=== Step 1: Add Elasticsearch Data Source ===
+
+# Go to '''Configuration''' → '''Data Sources'''
+# Click '''Add data source'''
+# Select '''Elasticsearch'''
+# Configure:
+#* '''Name''': <code>DreamFactory Logs</code>
+#* '''URL''': <code>https://localhost:9200</code>
+#* '''Access''': Server (default)
+#* '''Basic Auth''': Enabled
+#** '''User''': <code>elastic</code>
+#** '''Password''': Your Elasticsearch password
+#* '''TLS/SSL Mode''': Skip TLS Verification
+#* '''Index name''': <code>logstash-dreamfactory-*</code>
+#* '''Time field''': <code>@timestamp</code>
+#* '''Version''': <code>8.0+</code>
+# Click '''Save &amp; Test'''
+
+<span id="step-2-add-infinity-data-source-for-user-enrichment"></span>
+=== Step 2: Add Infinity Data Source (for User Enrichment) ===
+
+'''Prerequisites: Create a Least-Privilege API Key'''
+
+Before configuring the Infinity data source, create a DreamFactory API key with minimal permissions:
+
+# '''Log into DreamFactory Admin Console'''
+# '''Navigate to Roles''' → Create a new role (e.g., "Grafana Read-Only")
+# '''Set Role Permissions''' (see [[Security/Role_Based_Access|Role-Based Access Control]] for detailed information):
+#* '''Service''': <code>system</code>
+#* '''Component''': <code>user</code>
+#* '''Access''': <code>GET</code> only (read-only)
+#* '''Fields''': Allow access to: <code>id</code>, <code>first_name</code>, <code>last_name</code>, <code>email</code> (user/* in the Component section will give permission to view all user fields if needed)
+# '''Create API Key''':
+#* Go to '''Users''' → Select or create a user
+#* Assign the "Grafana Read-Only" role to the user
+#* Generate an API key for this user
+#* '''Note''': This API key will only have read access to user data, not full admin access
+
+'''Alternative: Use Existing Role with Limited Permissions''' - If you have a read-only role, you can use an existing API key with that role - Ensure the role has GET access to <code>system/user</code> endpoint
+
+'''Configure Infinity Data Source''':
+
+<ol style="list-style-type: decimal;">
+<li><p>Install Infinity plugin (if not already installed):</p>
+<syntaxhighlight lang="bash">sudo grafana-cli plugins install yesoreyeram-infinity-datasource
+sudo systemctl restart grafana-server</syntaxhighlight></li>
+<li><p>Go to '''Configuration''' → '''Data Sources'''</p></li>
+<li><p>Click '''Add data source'''</p></li>
+<li><p>Select '''Infinity'''</p></li>
+<li><p>Configure:</p>
+<ul>
+<li>'''Name''': <code>DreamFactory API</code></li>
+<li>'''URL''': <code>http://localhost</code> (or your DreamFactory URL)</li>
+<li>'''Authentication''': API Key
+<ul>
+<li>Add header: <code>X-DreamFactory-API-Key</code> with your least-privilege API key (created in the Prerequisites section above)</li>
+<li>'''Security Note''': Use the read-only API key, not an admin key</li></ul>
+</li></ul>
+</li>
+<li><p>Click '''Save &amp; Test'''</p></li></ol>
+
+-----
+
+<span id="dreamfactory-integration"></span>
+== DreamFactory Integration ==
+
+<span id="step-0-create-least-privilege-api-key-for-grafana"></span>
+=== Step 0: Create Least-Privilege API Key for Grafana ===
+
+The Infinity data source only needs read access to user data. Create a minimal-permission API key:
+
+<span id="option-1-create-a-custom-read-only-role-recommended"></span>
+==== Option 1: Create a Custom Read-Only Role (Recommended) ====
+
+# '''Log into DreamFactory Admin Console'''
+# '''Navigate to''': '''Roles''' → '''Create Role'''
+# '''Role Configuration''':
+#* '''Name''': <code>grafana-readonly</code> (or similar)
+#* '''Description''': <code>Read-only access for Grafana user enrichment</code>
+# '''Set Service Access''':
+#* '''Service''': <code>system</code>
+#* '''Component''': <code>user</code>
+#* '''Access''': <code>GET</code> only
+#* '''Fields''': <code>id</code>, <code>first_name</code>, <code>last_name</code>, <code>email</code> (or leave blank for all fields)
+# '''Save the role'''
+
+<span id="option-2-use-existing-read-only-role"></span>
+==== Option 2: Use Existing Read-Only Role ====
+
+If you already have a read-only role with <code>system/user</code> GET access, you can use that.
+
+<span id="create-api-key-with-the-role"></span>
+==== Create API Key with the Role ====
+
+# '''Navigate to''': '''Users''' → Select a user (or create a dedicated user like <code>grafana-service</code>)
+# '''Assign Role''': Add the <code>grafana-readonly</code> role to the user
+# '''Generate API Key''':
+#* Go to the user's profile
+#* Generate or copy the API key
+#* '''Store securely''' - this key will be used in Grafana configuration
+
+-----
+
+<span id="step-1-enable-logstash-connector-in-dreamfactory"></span>
+=== Step 1: Enable Logstash Connector in DreamFactory ===
+
+# Log into DreamFactory Admin Console
+# Navigate to '''Services''' → '''System''' → '''Logstash'''
+# Enable the Logstash connector
+# Configure:
+#* '''Host''': <code>localhost</code> (or your Logstash server IP)
+#* '''Port''': <code>12201</code>
+#* '''Protocol''': <code>GELF (UDP)</code>
+#* '''Log Context''': <code>Request All</code> Service Event: (These are the Events necessary to integrate Logstash with our template Grafana Dashboard)
+#* Event: user.* | Log level: INFO | Message: System Activity
+#* Event: db.* | Log Level: INFO | Default Database Activity (db is a local SQLite database typically included with all DreamFactory installations)
+#* Event: files.* | Log Level: INFO| File Activity
+#* To add your own Database or other service connection start typing the name of your service and select the service followed by * or your specfic criteria
+# Save configuration
+
+<span id="step-2-verify-logs-are-being-sent"></span>
+=== Step 2: Verify Logs are Being Sent ===
+
+Check if DreamFactory is sending logs: (Generate some API requests or logins to see them appear in the logs)
+
+<syntaxhighlight lang="bash">sudo tcpdump -i any -n udp port 12201</syntaxhighlight>
+Or check Logstash logs:
+
+<syntaxhighlight lang="bash">sudo tail -f /var/log/logstash/logstash-plain.log | grep dreamfactory</syntaxhighlight>
+<span id="step-3-verify-logs-in-elasticsearch"></span>
+=== Step 3: Verify Logs in Elasticsearch ===
+
+<syntaxhighlight lang="bash">curl -k -u elastic:YOUR_PASSWORD "https://localhost:9200/logstash-dreamfactory-*/_search?size=1&pretty"</syntaxhighlight>
+
+-----
+
+<span id="dashboard-setup"></span>
+== Dashboard Setup ==
+
+<span id="creating-the-user-activity-dashboard"></span>
+=== Creating the User Activity Dashboard ===
+
+<span id="panel-1-total-api-calls-by-user"></span>
+=== Panel 1: Total API Calls by User ===
+
+'''Purpose''': Shows the total number of API calls made by each user with email enrichment.
+
+'''Query Configuration''': - '''Data Source''': DreamFactory Logs (Elasticsearch) - '''Query Type''': Count - '''Query''': <code>user.id:* event.request.method:*</code> - '''Bucket Aggregations''': - '''Terms''': <code>user.id</code> (Size: 50, Order: Desc by _count) - '''Time Field''': <code>@timestamp</code>
+
+'''Second Query''' (for email enrichment): - '''Data Source''': DreamFactory API (Infinity) - '''Type''': JSON - '''URL''': <code>/api/v2/system/user?fields=id,first_name,last_name,email&amp;limit=100</code> - '''Parser''': Backend - '''Root Selector''': <code>resource</code>
+
+'''Transformations''': 1. '''Join by field''': Join query A and B on <code>user.id</code> (Mode: Outer) 2. '''Organize fields''': - Exclude: <code>first_name B</code>, <code>last_name B</code>, <code>user.id</code>, <code>user.id 1</code>, <code>user.id 2</code> - Rename: <code>Count</code> → <code>Total API Calls</code>, <code>email B</code> → <code>User Email</code> 3. '''Filter data by values''': - Field: <code>Total API Calls</code> - Condition: <code>IS NOT NULL</code>
+
+'''Field Mappings''': - Map empty/null email values to "Admin User"
+
+The Dashboard should end up looking similar to this:
+
+<a href="#lightbox-grafana-dashboard"> [[File:GrafanaDashboardTemplate.png|thumb|Grafana Dashboard Template]] </a>
+<a href="#" className="lightbox-overlay" id="lightbox-grafana-dashboard"> <span classname="lightbox-close">×</span> [[File:GrafanaDashboardTemplate.png|thumb|Grafana Dashboard Template]] </a>
+
+When there are no calls in the selected time frame for a user the panels should all be empty as the filters we applied should remove any row with no calls.
+
+-----
+
+<span id="panel-2-apis-accessed-by-each-user"></span>
+=== Panel 2: APIs Accessed by Each User ===
+
+'''Purpose''': Shows which specific API endpoints each user accessed with HTTP method details.
+
+'''Query Configuration''': - '''Data Source''': DreamFactory Logs (Elasticsearch) - '''Query Type''': Count - '''Query''': <code>user.id:* event.request.method:* event.request.uri:*</code> - '''Bucket Aggregations''': 1. '''Terms''': <code>user.id</code> (Size: 20, Order: Desc by _count) 2. '''Terms''': <code>event.request.method.keyword</code> (Size: 10, Order: Desc by _count) 3. '''Terms''': <code>event.request.uri.keyword</code> (Size: 25, Order: Desc by _count) - '''Time Field''': <code>@timestamp</code>
+
+'''Second Query''' (for email enrichment): - Same as Panel 1
+
+'''Transformations''': 1. '''Join by field''': Join on <code>user.id</code> (Mode: Outer Tabular) 2. '''Organize fields''': - Exclude: <code>first_name B</code>, <code>last_name B</code>, <code>user.id</code>, <code>user.id 1</code>, <code>user.id 2</code> - Rename: - <code>email B</code> → <code>User Email</code> - <code>event.request.method.keyword</code> → <code>HTTP Method</code> - <code>event.request.uri.keyword</code> → <code>API Endpoint</code> 3. '''Filter data by values''': - Field: <code>Count</code> (or your count column) - Condition: <code>IS NOT NULL</code>
+
+-----
+
+<span id="panel-3-user-access-to-specific-services"></span>
+=== Panel 3: User Access to Specific Services ===
+
+'''Purpose''': Shows which DreamFactory services each user accessed.
+
+'''Query Configuration''': - '''Data Source''': DreamFactory Logs (Elasticsearch) - '''Query Type''': Count - '''Query''': <code>user.id:* event.request.method:* event.request.service:*</code> - '''Bucket Aggregations''': 1. '''Terms''': <code>user.id</code> (Size: 20, Order: Desc by _count) 2. '''Terms''': <code>event.request.service.keyword</code> (Size: 15, Order: Desc by _count) 3. '''Terms''': <code>event.request.method.keyword</code> (Size: 10, Order: Desc by _count) - '''Time Field''': <code>@timestamp</code>
+
+'''Second Query''' (for email enrichment): - Same as Panel 1
+
+'''Transformations''': 1. '''Join by field''': Join on <code>user.id</code> (Mode: Outer Tabular) 2. '''Organize fields''': - Exclude: <code>first_name B</code>, <code>last_name B</code>, <code>user.id</code>, <code>user.id 1</code>, <code>user.id 2</code> - Rename: - <code>email B</code> → <code>User Email</code> - <code>event.request.method.keyword</code> → <code>HTTP Method</code> - <code>event.request.service.keyword</code> → <code>Service</code> 3. '''Filter data by values''': - Field: <code>Count</code> - Condition: <code>IS NOT NULL</code>
+
+-----
+
+<span id="dashboard-settings"></span>
+=== Dashboard Settings ===
+
+'''Time Range''': Set to "Last 24 hours" (adjustable) '''Refresh Interval''': 1 minute (recommended) '''Tags''': <code>dreamfactory</code>, <code>users</code>, <code>api</code>, <code>activity</code>
+
+-----
+
+<span id="dashboard-function-and-use"></span>
+== Dashboard Function and Use ==
+
+<span id="overview"></span>
+=== Overview ===
+
+The dashboard provides comprehensive visibility into DreamFactory API usage by individual users, helping administrators:
+
+# '''Monitor User Activity''': See which users are actively using the API
+# '''Identify API Usage Patterns''': Understand which endpoints and services are most accessed
+# '''Troubleshoot Issues''': Track user-specific API calls for debugging
+# '''Security Auditing''': Monitor API access patterns for security analysis
+
+<span id="key-features"></span>
+=== Key Features ===
+
+<span id="user-identification"></span>
+=== User Identification ===
+
+* '''User ID Extraction''': Automatically extracts user IDs from JWT session tokens
+* '''Email Enrichment''': Joins with DreamFactory user database to show email addresses
+* '''Admin User Handling''': Maps null/empty emails to "Admin User" for system-level operations
+
+<span id="data-filtering"></span>
+=== Data Filtering ===
+
+* '''Method-Based Filtering''': Only shows users with actual HTTP method calls (GET, POST, etc.)
+* '''Complete Data Only''': Filters out rows with missing data using transformation filters
+* '''Real-Time Updates''': Refreshes every minute to show current activity
+
+<span id="aggregation-levels"></span>
+=== Aggregation Levels ===
+
+# '''User-Level''': Total calls per user
+# '''Endpoint-Level''': Specific API endpoints accessed
+# '''Service-Level''': DreamFactory services accessed (db, system, files, etc.)
+
+<span id="use-cases"></span>
+=== Use Cases ===
+
+# '''Activity Monitoring'''
+#* Identify most active users
+#* Track API usage trends
+#* Monitor system load by user
+# '''Troubleshooting'''
+#* Find which user made a specific API call
+#* Track user-specific errors
+#* Debug authentication issues
+# '''Security Auditing'''
+#* Monitor unusual access patterns
+#* Track service access by user
+#* Identify potential security issues
+# '''Capacity Planning'''
+#* Understand API usage patterns
+#* Plan for user growth
+#* Optimize service performance
+
+<span id="interpreting-the-data"></span>
+=== Interpreting the Data ===
+
+* '''Total API Calls''': Sum of all HTTP requests made by a user
+* '''HTTP Method''': Type of request (GET, POST, PUT, DELETE, etc.)
+* '''API Endpoint''': Specific DreamFactory API path accessed
+* '''Service''': DreamFactory service category (db, system, files, etc.)
+* '''User Email''': Email address from DreamFactory user database (or "Admin User" for system operations)
+
+-----
+
+<span id="maintenance"></span>
+== Maintenance ==
+
+<span id="regular-tasks"></span>
+=== Regular Tasks ===
+
+<ol style="list-style-type: decimal;">
+<li><p>'''Monitor Disk Space''': Elasticsearch indices can grow large</p>
+<syntaxhighlight lang="bash">curl -k -u elastic:YOUR_PASSWORD "https://localhost:9200/_cat/indices?v"</syntaxhighlight></li>
+<li><p>'''Index Management''': Consider setting up index lifecycle management</p>
+<syntaxhighlight lang="bash"># Delete old indices (example: older than 30 days)
+curl -k -u elastic:YOUR_PASSWORD -X DELETE "https://localhost:9200/logstash-dreamfactory-2024.12.*"</syntaxhighlight></li>
+<li><p>'''Log Rotation''': Monitor Logstash logs</p>
+<syntaxhighlight lang="bash">sudo logrotate -d /etc/logrotate.d/logstash</syntaxhighlight></li>
+<li><p>'''Performance Monitoring''': Check Elasticsearch cluster health</p>
+<syntaxhighlight lang="bash">curl -k -u elastic:YOUR_PASSWORD "https://localhost:9200/_cluster/health?pretty"</syntaxhighlight>
+
+-----
+
+<p>If you have any issues or need help with a specifc Grafana dashboard panel please reach out to DreamFactory support!</p></li></ol>
+
+[[Category:Logstash]]

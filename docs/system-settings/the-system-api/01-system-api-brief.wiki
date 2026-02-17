@@ -1,0 +1,186 @@
+= Using the System APIs =
+'''Programmatically manage DreamFactory users, services, roles, and API keys through REST System APIs for DevOps automation.'''
+
+<span id="using-the-system-apis"></span>
+= Using the System APIs =
+
+DreamFactory is a '''headless API platform''', meaning that everything you can do through the web-based administration console can also be accomplished programmatically through REST API calls. The administration console is essentially a frontend that makes calls to DreamFactory's System APIs behind the scenes.
+
+All DreamFactory versions include a web-based administration console used to manage all aspects of the platform. While this console offers a user-friendly solution for performing tasks such as managing APIs, administrators, and business logic, many companies desire to instead automate management through scripting. There are two notable reasons for doing so:
+
+<span id="multi-environment-administration"></span>
+== Multi-environment Administration ==
+
+APIs should always be rigorously tested in a variety of test and QA environments prior to being deployed to production. While DreamFactory does offer a service export/import mechanism, it's often much more convenient to write custom scripts capable of automating multi-environment service creation.
+
+<span id="integration-with-third-party-services"></span>
+== Integration with Third Party Services ==
+
+The complexity associated with creating new SaaS products such as API monetization can be dramatically reduced thanks to the ability to integrate DreamFactory into the solution. Following payment, the SaaS could interact with DreamFactory to generate a new role-based access control, API key, and define a volume limit. The new API key could then be presented to the subscriber.
+
+In this chapter we'll walk you through several examples explaining exactly how these two use cases can be achieved.
+
+<span id="discovering-api-calls-through-the-browser"></span>
+== Discovering API Calls Through the Browser ==
+
+One of the most powerful ways to learn the System APIs is to observe what the DreamFactory administration console is doing behind the scenes. Every action you perform in the UI corresponds to specific API calls that you can replicate programmatically.
+
+<span id="using-browser-developer-tools"></span>
+=== Using Browser Developer Tools ===
+
+To see the API calls that DreamFactory makes:
+
+# '''Open Developer Tools''': Right-click anywhere in the DreamFactory admin console and select "Inspect" (or press <code>F12</code>)
+# '''Navigate to Network Tab''': Click on the "Network" tab in the developer tools
+# '''Filter for API Calls''': In the filter box, type <code>api/v2/system</code> to see only System API calls
+# '''Perform Actions''': Use the admin console normally - create users, manage services, etc.
+# '''Inspect Requests''': Click on any API call to see:
+#* '''Request URL''': The exact endpoint being called
+#* '''Request Method''': GET, POST, PUT, PATCH, DELETE
+#* '''Headers''': Including authentication tokens and content type
+#* '''Request Body''': JSON payload for POST/PUT requests
+#* '''Response''': The data returned by the API
+
+<span id="example-creating-a-user"></span>
+=== Example: Creating a User ===
+
+When you create a user through the admin console, you'll see a call like this:
+
+'''Request:'''
+
+<syntaxhighlight lang="http">POST /api/v2/system/user
+Headers:
+  X-DreamFactory-Session-Token: your-session-token
+  Content-Type: application/json
+Body:
+{
+  "resource": [
+    {
+      "name": "john.doe",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "password": "securepassword"
+    }
+  ]
+}</syntaxhighlight>
+'''Response:'''
+
+<syntaxhighlight lang="json">{
+  "resource": [
+    {
+      "id": 123,
+      "name": "john.doe",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "is_active": true,
+      "created_date": "2024-01-15 10:30:00"
+    }
+  ]
+}</syntaxhighlight>
+:::tip Pro Tip Keep the Network tab open while exploring the admin console. You'll quickly learn the API patterns and can copy the exact requests to use in your own scripts or API testing tools like Postman. :::
+
+<span id="general-notes-on-making-api-calls"></span>
+== General Notes on Making API Calls ==
+
+As with the APIs that you create using DreamFactory, the system endpoints use the same authentication method, and thus will, at minimum require a session-token (if an admin), or a session-token together with an API-key (if a user). For users to be able to access the system endpoints, the appropriate permissions must be assigned as a role to that user.
+
+<span id="session-tokens-and-api-keys"></span>
+=== Session Tokens and API Keys ===
+
+If you are the system admin, you will need to provide a session token with any call using the <code>X-DreamFactory-Session-Token</code> header. A user who has the permissions to create admins/users will need to also provide an API Key using the <code>X-DreamFactory-API-Key</code> header.
+
+<span id="using-curl"></span>
+=== Using Curl ===
+
+The majority of the examples below will show the request type, along with the endpoint required. When using curl, you will want to use the following flags:
+
+* <code>-X</code> for your request type (GET, POST etc.)
+* <code>-H</code> for your headers, you will most likely use a combination of the following:
+** <code>-H &quot;accept: application/json&quot;</code>
+** <code>-H &quot;Content-Type: application/json&quot;</code> # For requests with a body
+** <code>-H &quot;X-DreamFactory-Session-Token: &lt;sessionToken&gt;&quot;</code>
+** <code>-H &quot;X-DreamFactory-Api-Key: &lt;sessionToken&gt;&quot;</code>
+* <code>-d</code> for your json body when used.
+
+<span id="common-api-patterns"></span>
+== Common API Patterns ==
+
+DreamFactory System APIs follow consistent patterns that make them easy to learn and use:
+
+<span id="resource-based-urls"></span>
+=== Resource-Based URLs ===
+
+Most System APIs follow the pattern: <code>/api/v2/system/{resource}</code>
+
+* '''Users''': <code>/api/v2/system/user</code>
+* '''Services''': <code>/api/v2/system/service</code>
+* '''Roles''': <code>/api/v2/system/role</code>
+* '''Apps''': <code>/api/v2/system/app</code>
+
+<span id="standard-http-methods"></span>
+=== Standard HTTP Methods ===
+
+* '''GET''': Retrieve data (list or individual items)
+* '''POST''': Create new resources
+* '''PUT''': Update entire resources
+* '''PATCH''': Partial updates
+* '''DELETE''': Remove resources
+
+<span id="common-query-parameters"></span>
+=== Common Query Parameters ===
+
+* <code>?ids=123</code> - Get specific item by ID
+* <code>?filter=field=value</code> - Filter results
+* <code>?fields=name,email</code> - Return only specific fields
+* <code>?related=role_by_role_id</code> - Include related data
+
+<span id="example-api-calls"></span>
+=== Example API Calls ===
+
+Here are some common System API calls you'll see in the browser:
+
+'''List all users:'''
+
+<syntaxhighlight lang="bash">GET /api/v2/system/user</syntaxhighlight>
+'''Get a specific user:'''
+
+<syntaxhighlight lang="bash">GET /api/v2/system/user?ids=123</syntaxhighlight>
+'''Create a new service:'''
+
+<syntaxhighlight lang="bash">POST /api/v2/system/service
+Content-Type: application/json
+{
+  "resource": [
+    {
+      "name": "my-api",
+      "label": "My API",
+      "type": "mysql",
+      "config": { ... }
+    }
+  ]
+}</syntaxhighlight>
+'''Update a role:'''
+
+<syntaxhighlight lang="bash">PATCH /api/v2/system/role?ids=456
+Content-Type: application/json
+{
+  "resource": [
+    {
+      "name": "Updated Role Name"
+    }
+  ]
+}</syntaxhighlight>
+
+== See also ==
+* [[System_Settings/05_Api_Key_Management|API Key Management]]
+* [[System_Settings/02_User_Management|User Management]]
+* [[System_Settings/04_Role_Management|Role Management]]
+* [[System_Settings/03_Service_Management|Service Management]]
+
+[[Category:System_Api]]
+[[Category:Dreamfactory_Administration]]
+[[Category:User_Management]]
+[[Category:API]]
+[[Category:Difficulty_Intermediate]]

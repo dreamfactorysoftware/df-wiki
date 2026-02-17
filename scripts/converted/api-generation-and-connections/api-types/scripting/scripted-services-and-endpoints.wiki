@@ -1,0 +1,81 @@
+= Creating Scripted Services and Endpoints =
+'''Build custom API services using PHP, Python, or Node.js scripts to add business logic and integrations'''
+
+<span id="creating-scripted-services-and-endpoints"></span>
+= Creating Scripted Services and Endpoints =
+
+DreamFactory allows you to create custom scripted services and endpoints using various scripting languages. This feature enables you to add business logic to your APIs and extend their functionality beyond standard REST operations.
+
+<span id="overview"></span>
+== Overview ==
+
+Scripted services in DreamFactory are standalone services that execute custom scripts written in supported scripting languages such as PHP, Python, Node.js, and JavaScript. These services can perform complex operations, integrate with external systems, and provide tailored API responses.
+
+<span id="supported-scripting-languages"></span>
+== Supported Scripting Languages ==
+
+DreamFactory supports several scripting languages for creating scripted services:
+
+* '''Node.js''': Server-side JavaScript handler using the Node.js engine.
+* '''PHP''': Script handler using native PHP.
+* '''Python''': Script handler using native Python.
+* '''Python3''': Script handler using native Python3.
+
+To get a list of the currently supported and configured scripts on a particular instance, use the API endpoint:
+
+<pre>http://example.com/api/v2/system/script_type</pre>
+<span id="creating-a-scripted-service"></span>
+== Creating a Scripted Service ==
+
+To create a scripted service in DreamFactory, follow these steps:
+
+# '''Navigate to API Generations &amp; Connections''': In the DreamFactory WEB UI navigate to API Generation &amp; Connections &gt; Scripting and press the + button.
+# '''Configure Service Details''': Enter the service name, label, and description.
+# '''Choose Scripting Language''': Select the desired scripting language from the available options. (Node.js, PHP, Python3)
+# '''Write the Script''': Enter your custom script in the provided editor.
+# '''Save the Service''': Click "Save" to create the scripted service.
+
+<span id="example-php-scripted-service"></span>
+== Example: PHP Scripted Service ==
+
+Here's an example of a simple PHP scripted service that returns a custom message:
+
+<syntaxhighlight lang="php"><?php
+// Custom logic
+$message = "Hello from DreamFactory Scripted Service!";
+
+// Set response
+$event['response']['content'] = [
+    'success' => true,
+    'message' => $message
+];
+?></syntaxhighlight>
+<span id="best-practices-for-scripted-services"></span>
+== Best Practices for Scripted Services ==
+
+# '''Modularize your code''': Break down complex logic into smaller, reusable functions.
+# '''Handle errors gracefully''': Implement error handling to manage exceptions and provide meaningful error messages.
+# '''Optimize performance''': Minimize script execution time to ensure efficient API responses.
+# '''Secure your scripts''': Validate inputs and sanitize outputs to prevent security vulnerabilities.
+
+<span id="troubleshooting-tips"></span>
+== Troubleshooting Tips ==
+
+# '''Check script syntax''': Ensure your script has correct syntax for the chosen language.
+# '''Enable error logging''': Use DreamFactory's logging features to capture script errors.
+# '''Test incrementally''': Start with simple scripts and gradually add complexity.
+# '''Use platform.api for debugging''': Make API calls within your script to test functionality.
+# '''Monitor performance''': Be mindful of script execution time, especially for complex scripts.
+
+By leveraging scripted services, you can enhance the capabilities of your DreamFactory APIs and tailor them to meet specific business requirements.
+
+== See also ==
+* [[Scripting_Resources|Scripting Resources]]
+* [[Scripted_Services_And_Endpoints|Creating Scripted Services and Endpoints]]
+
+[[Category:Scripted_Services]]
+[[Category:Php_Api]]
+[[Category:Python_Api]]
+[[Category:API]]
+[[Category:Scripting]]
+[[Category:Difficulty_Intermediate]]

@@ -1,0 +1,172 @@
+<span id="github-oauth-setup-guide"></span>
+= GitHub OAuth Setup Guide =
+
+This guide will walk you through setting up GitHub OAuth authentication with DreamFactory.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+* A GitHub account
+* Access to your DreamFactory admin application
+* Appropriate permissions in your GitHub organization (if using organization OAuth apps)
+
+<span id="step-1-github-oauth-app-registration"></span>
+== Step 1: GitHub OAuth App Registration ==
+
+<span id="create-oauth-app"></span>
+=== 1.1 Create OAuth App ===
+
+# Sign in to [https://github.com GitHub]
+# Navigate to your account settings:
+#* Click your profile picture in the top right corner
+#* Select '''Settings'''
+# In the left sidebar, scroll down to '''Developer settings'''
+# Click '''OAuth Apps''' (or '''Developer settings &gt; OAuth Apps''')
+# Click '''New OAuth App'''
+# Fill in the application details:
+#* '''Application name''': Enter a name for your application (e.g., "DreamFactory OAuth")
+#* '''Homepage URL''': Enter your DreamFactory instance URL (e.g., <code>https://your-dreamfactory-instance.com</code>)
+#* '''Authorization callback URL''': This will be configured after creating the DreamFactory service. For now, you can use a placeholder like <code>https://your-dreamfactory-instance.com/api/v2/github_oauth/sso</code> (replace <code>github_oauth</code> with your intended namespace and <code>your-dreamfactory-instance.com</code> with your actual domain)
+# Click '''Register application'''
+
+<span id="generate-client-secret"></span>
+=== 1.2 Generate Client Secret ===
+
+# After creating the OAuth app, you'll be taken to the app's settings page
+# On this page, you'll see your '''Client ID''' (you can copy this now)
+# Click '''Generate a new client secret'''
+# '''Important''': Copy the client secret '''immediately''' and save it securely. You will not be able to view it again after leaving this page. This value will be used as the '''Client Secret''' in DreamFactory.
+
+<span id="collect-required-information"></span>
+=== 1.3 Collect Required Information ===
+
+Before proceeding to DreamFactory configuration, collect the following information from your GitHub OAuth app:
+
+* '''Client ID''': Found on the OAuth app settings page
+* '''Client Secret''': The secret value you saved from step 1.2
+
+<span id="step-2-dreamfactory-configuration"></span>
+== Step 2: DreamFactory Configuration ==
+
+<span id="access-dreamfactory-admin"></span>
+=== 2.1 Access DreamFactory Admin ===
+
+# Open your DreamFactory admin web interface and sign in
+
+<span id="create-user-role-if-needed"></span>
+=== 2.2 Create User Role (if needed) ===
+
+# Navigate to '''API Generation &amp; Connections &gt; Role based Access'''
+# Create a role for users who will sign in via GitHub OAuth (if you don't already have an appropriate role)
+# Configure the role permissions according to your requirements
+# Note the role name for use in the next step
+
+<span id="create-oauth-service"></span>
+=== 2.3 Create OAuth Service ===
+
+# Navigate to '''Security &gt; Authentication'''
+# Click '''Create''' to create a new authentication service
+# Select '''GitHub OAuth''' as the service type
+# Fill in the service configuration:
+
+<span id="basic-configuration"></span>
+==== Basic Configuration ====
+
+{| class="wikitable"
+|-
+! '''Field'''
+! '''Description'''
+|-
+| '''Namespace'''
+| A required field that must end with <code>_oauth</code> (e.g., <code>github_oauth</code>)
+|-
+| '''Label'''
+| The display name for the service (e.g., "GitHub" or "Sign in with GitHub"). This label will be displayed on DreamFactory's login page as the text on the provider's sign-in button
+|-
+| '''Description'''
+| (Optional) A brief description of the service
+|-
+| '''Active'''
+| Enable this toggle to activate the service
+|}
+
+<span id="oauth-configuration"></span>
+==== OAuth Configuration ====
+
+{| class="wikitable"
+|-
+! '''Field'''
+! '''Description'''
+|-
+| '''Client ID'''
+| Enter the '''Client ID''' from GitHub (Step 1.3)
+|-
+| '''Client Secret'''
+| Enter the '''Client Secret''' from GitHub (Step 1.3)
+|-
+| '''Redirect URL'''
+| Enter your DreamFactory redirect URL. This should be in the format: <code>https://your-dreamfactory-instance.com/api/v2/yournamespace_oauth/sso</code> (replace <code>yournamespace_oauth</code> with your actual namespace and <code>your-dreamfactory-instance.com</code> with your actual domain)
+|-
+| '''Default Role'''
+| Select the role that will be applied by default to authenticated users
+|-
+| '''Icon Class'''
+| (Optional) CSS class for an icon
+|}
+
+<ol start="5" style="list-style-type: decimal;">
+<li>Click '''Save''' to create the service</li></ol>
+
+<span id="update-github-oauth-app-redirect-uri"></span>
+=== 2.4 Update GitHub OAuth App Redirect URI ===
+
+# Return to your GitHub OAuth app settings page
+# Under '''Authorization callback URL''', update the URL to match exactly the '''Redirect URL''' you configured in DreamFactory (from Step 2.3)
+# Click '''Update application'''
+
+The service should look like this once complete:
+
+<span id="step-3-testing-the-integration"></span>
+== Step 3: Testing the Integration ==
+
+<span id="test-authentication"></span>
+=== 3.1 Test Authentication ===
+
+# Navigate to your DreamFactory login page (sometimes immediately after creating the service you will need to hard refresh the browser or open the login page from an incognito browser)
+# You should see a button for your GitHub OAuth service (using the Label you configured)
+# Click the button to initiate the OAuth flow
+# You will be redirected to GitHub's authorization page
+# After authorizing the application, you will be redirected back to DreamFactory with a JWT token
+
+<span id="verify-user-access"></span>
+=== 3.2 Verify User Access ===
+
+# After successful authentication, verify that the user has the appropriate role assigned
+# Test API access to ensure the user can access the resources they should have permission for
+
+<span id="step-4-additional-configuration"></span>
+== Step 4: Additional Configuration ==
+
+<span id="configure-cors"></span>
+=== 4.1 Configure CORS ===
+
+'''Important''': Don't forget to add your application and GitHub domains to DreamFactory &gt; '''Config &gt; CORS'''. For detailed instructions on configuring CORS settings, see our [[System_Settings/Cors_Ssl|CORS and SSL documentation]].
+
+<span id="role-per-app-optional"></span>
+=== 4.2 Role per App (Optional) ===
+
+If you need to assign different roles based on the application being accessed:
+
+# In your OAuth service configuration, navigate to the '''Role per App''' section
+# Configure specific roles for different applications as needed
+
+<span id="next-steps"></span>
+== Next Steps ==
+
+Your GitHub OAuth integration is now complete! Users can sign in through GitHub and access DreamFactory with the appropriate permissions based on their assigned roles.
+
+== See also ==
+* [[Security/Okta_Setup|okta-setup]]
+* [[Security/Azure_Ad_Oauth|azure-ad-oauth]]
+
+[[Category:Security]]

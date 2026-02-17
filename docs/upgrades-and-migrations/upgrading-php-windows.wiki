@@ -1,0 +1,122 @@
+= Upgrading PHP On Windows =
+<span id="upgrading-php-on-windows"></span>
+= Upgrading PHP on Windows =
+
+This guide walks through the process of updating the PHP version on a Windows server running DreamFactory. Follow these steps carefully to ensure a smooth upgrade process.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+Before beginning the update process ensure you have backed up:
+
+* Your existing PHP folder
+* Your system database
+* A copy of your <code>.env</code> file
+
+<span id="installation-steps"></span>
+== Installation Steps ==
+
+<span id="download-php"></span>
+=== 1. Download PHP ===
+
+# Visit the official [https://windows.php.net/download/ PHP for Windows] website
+# Download the '''Non-Thread-Safe (NTS)''' version for your architecture (x64 or x86)
+#* Example: <code>php-8.2.25-nts-Win32-vs16-x64.zip</code>
+
+:::tip Important Always use the Non-Thread-Safe (NTS) version of PHP with DreamFactory on Windows. :::
+
+<span id="install-php"></span>
+=== 2. Install PHP ===
+
+# Create a new directory: <code>C:\PHP\php-X.X.X</code> (replace X.X.X with version number)
+# Extract the downloaded ZIP contents to this directory
+# Create a symlink from <code>C:\php</code> to your version-specific directory (optional, but recommended for easier management)
+
+<span id="configure-environment-variables"></span>
+=== 3. Configure Environment Variables ===
+
+<ol style="list-style-type: decimal;">
+<li><p>Open System Properties:</p>
+<pre>Win + R → sysdm.cpl → Enter</pre></li>
+<li><p>Navigate to: Advanced tab → Environment Variables</p></li>
+<li><p>Under System Variables:</p>
+<ul>
+<li>Edit <code>Path</code></li>
+<li>Add new PHP directory path (e.g., <code>C:\PHP\php</code>)</li>
+<li>Remove old PHP path if present</li></ul>
+</li>
+<li><p>Verify installation:</p>
+<syntaxhighlight lang="text">
+php -v
+</syntaxhighlight></li></ol>
+
+<span id="configure-php"></span>
+=== 4. Configure PHP ===
+
+<ol style="list-style-type: decimal;">
+<li>Configure <code>php.ini</code>:
+<ul>
+<li><p>If you are on the same major versio nof PHP you can copy your existing <code>php.ini</code> from the previous installation, OR</p></li>
+<li><p>Create new from <code>php.ini-production</code>:</p>
+<pre>copy php.ini-production php.ini</pre></li></ul>
+</li>
+<li>Enable required extensions in <code>php.ini</code>:
+<ul>
+<li>See [[Getting_Started/Windows_Installation#installing_php|PHP Extensions Guide]] for the complete list</li>
+<li>Ensure SQL Server extensions are properly configured if using [[Getting_Started/Windows_Installation#installing_sql_server_drivers_optional|SQL Server]]</li></ul>
+</li></ol>
+
+<span id="configure-iis"></span>
+=== 5. Configure IIS ===
+
+<ol style="list-style-type: decimal;">
+<li><p>Open IIS Manager</p></li>
+<li><p>Access PHP Manager:</p>
+<ul>
+<li>Register new PHP version: <code>C:\php\php-cgi.exe</code></li>
+<li>Verify extensions are enabled</li>
+<li>Check PHP configuration status</li></ul>
+</li>
+<li><p>Restart Services:</p>
+<pre>iisreset</pre></li></ol>
+
+<span id="verify-installation"></span>
+=== 6. Verify Installation ===
+
+# Check PHP configuration:
+#* Use PHP Manager's "Check phpinfo()"
+#* Verify PHP version
+#* Confirm required extensions are loaded
+# Test DreamFactory:
+#* Access your DreamFactory instance
+#* Check the [[System_Settings/System_Info|System Information]] page
+#* Verify all services are functioning
+
+<span id="troubleshooting"></span>
+== Troubleshooting ==
+
+If you encounter issues:
+
+# '''Check PHP Version''':
+#* Ensure you're using NTS version
+#* Verify architecture matches (x64/x86)
+# '''Verify Extensions''':
+#* Review [[Getting_Started/Windows_Installation#installing_php|required extensions]]
+#* Check extension paths in <code>php.ini</code>
+# '''Review Logs''':
+#* Check PHP error logs
+#* Review IIS logs
+#* Examine DreamFactory logs
+
+For additional help, contact [https://www.dreamfactory.com/support DreamFactory Support].
+
+<span id="related-documentation"></span>
+== Related Documentation ==
+
+* [[Getting_Started/Windows_Installation|Windows Installation Guide]]
+* [[upgrades-and-migrations/upgrading-to-php-8.1|Upgrading to PHP 8.1]]
+* [[Getting_Started/Basic_Configuration|System Configuration]]
+
+[[Category:Upgrades]]
+[[Category:Upgrading]]
+[[Category:Windows]]

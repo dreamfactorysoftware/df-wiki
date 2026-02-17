@@ -1,0 +1,13 @@
+<noinclude>
+Styled external link button for the Main Page links section.
+
+== Parameters ==
+* '''icon''' — emoji or symbol
+* '''label''' — link display text
+* '''url''' — external URL
+
+== Usage ==
+<pre>
+{{ExternalLink|icon=🌐|label=DreamFactory Website|url=https://www.dreamfactory.com}}
+</pre>
+</noinclude><includeonly><div class="mp-ext-link">[{{{url}}} {{{icon|🔗}}} {{{label}}}]</div></includeonly>

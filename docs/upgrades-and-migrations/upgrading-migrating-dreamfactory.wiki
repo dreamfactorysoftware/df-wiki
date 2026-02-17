@@ -1,0 +1,272 @@
+= Upgrading and Migrating DreamFactory =
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
+
+<span id="upgrading-and-migrating-dreamfactory"></span>
+= Upgrading and Migrating DreamFactory =
+
+This guide covers two different scenarios for updating your DreamFactory installation:
+
+* '''Minor Version Upgrades''': In-place updates for patch releases and minor versions (e.g., 7.0.0 → 7.1.0)
+* '''Major Version Migration''': Complete migration to a new server or environment, typically for major version changes or infrastructure updates
+
+Choose the appropriate section based on your needs. Most users will use the minor version upgrade process for routine updates.
+
+-----
+
+<span id="minor-version-upgrades"></span>
+= Minor Version Upgrades =
+
+For minor version upgrades and patch releases, you can perform an in-place upgrade of your existing DreamFactory installation. This process uses Git, Composer, and Laravel's Artisan commands to update your current environment.
+
+<span id="prerequisites"></span>
+== Prerequisites ==
+
+* '''Backup Required''': Always perform complete backups before upgrading
+* '''Git Repository''': Your DreamFactory installation must be a Git repository
+* '''Command Line Access''': Shell/SSH access to your server
+* '''Permissions''': Proper file permissions on storage and cache directories
+
+<span id="upgrade-process"></span>
+== Upgrade Process ==
+
+<span id="step-1-create-backups"></span>
+=== Step 1: Create Backups ===
+
+Navigate to one level above your DreamFactory directory (typically <code>/opt/dreamfactory</code>) and create a file backup:
+
+<syntaxhighlight lang="bash">cd /opt
+cp -r dreamfactory dreamfactory.backup</syntaxhighlight>
+Create a database backup, reference for methods found [[#step-2-back-up-the-system-database|here]].
+
+<span id="step-2-prepare-for-upgrade"></span>
+=== Step 2: Prepare for Upgrade ===
+
+Navigate to your DreamFactory installation directory:
+
+<syntaxhighlight lang="bash">cd /opt/dreamfactory</syntaxhighlight>
+Stash any local changes to preserve modifications:
+
+<syntaxhighlight lang="bash">git stash</syntaxhighlight>
+<span id="step-3-update-source-code"></span>
+=== Step 3: Update Source Code ===
+
+Switch to the master branch:
+
+<syntaxhighlight lang="bash">git checkout master</syntaxhighlight>
+Pull the latest version:
+
+<syntaxhighlight lang="bash">git pull origin master</syntaxhighlight>
+<span id="step-4-update-dependencies-and-permissions"></span>
+=== Step 4: Update Dependencies and Permissions ===
+
+Set proper permissions on cache directories. Replace <code>{web-service-user}</code> with your web server user (e.g., <code>www-data</code>, <code>dreamfactory</code>) and <code>{your-user-group}</code> with your user group:
+
+<syntaxhighlight lang="bash">sudo chown -R {web-service-user}:{your-user-group} storage/ bootstrap/cache/</syntaxhighlight>
+''e.g., <code>sudo chown -R dreamfactory:dreamfactory storage/ bootstrap/cache/</code>''
+
+<syntaxhighlight lang="bash">sudo chmod -R 2775 storage/ bootstrap/cache/</syntaxhighlight>
+Update Composer dependencies:
+
+<syntaxhighlight lang="bash">composer install --no-dev --ignore-platform-reqs</syntaxhighlight>
+Run database migrations:
+
+<syntaxhighlight lang="bash">php artisan migrate --seed</syntaxhighlight>
+Clear application cache and config:
+
+<syntaxhighlight lang="bash">php artisan cache:clear</syntaxhighlight>
+<syntaxhighlight lang="bash">php artisan config:clear</syntaxhighlight>
+<span id="step-5-restart-web-server"></span>
+=== Step 5: Restart Web Server ===
+
+For Nginx (DreamFactory default)
+
+<syntaxhighlight lang="bash">sudo systemctl restart nginx</syntaxhighlight>
+For Apache:
+
+<syntaxhighlight lang="bash">sudo systemctl restart apache2</syntaxhighlight>
+<span id="troubleshooting"></span>
+== Troubleshooting ==
+
+<span id="composer-install-errors"></span>
+=== Composer Install Errors ===
+
+Clear Composer cache:
+
+<syntaxhighlight lang="bash">composer clear-cache</syntaxhighlight>
+Remove vendor directory and reinstall:
+
+<syntaxhighlight lang="bash">rm -rf vendor/</syntaxhighlight>
+<syntaxhighlight lang="bash">composer install --no-dev --ignore-platform-reqs</syntaxhighlight>
+<span id="permission-issues"></span>
+=== Permission Issues ===
+
+Reset permissions on critical directories:
+
+<syntaxhighlight lang="bash">sudo chown -R {web-service-user}:{your-user-group} storage/ bootstrap/cache/</syntaxhighlight>
+''e.g., <code>sudo chown -R dreamfactory:dreamfactory storage/ bootstrap/cache/</code>''
+
+<syntaxhighlight lang="bash">sudo chmod -R 2775 storage/ bootstrap/cache/</syntaxhighlight>
+<span id="migration-command-not-found"></span>
+=== Migration Command Not Found ===
+
+Clear compiled cache files:
+
+<syntaxhighlight lang="bash">rm -rf bootstrap/cache/compiled.php storage/framework/cache/*</syntaxhighlight>
+Retry the composer install:
+
+<syntaxhighlight lang="bash">composer install --no-dev --ignore-platform-reqs</syntaxhighlight>
+<span id="verification"></span>
+== Verification ==
+
+After completing the upgrade:
+
+# '''Check DreamFactory version''' in the admin interface
+# '''Test your APIs''' to ensure they're functioning correctly<br />
+
+# '''Verify user access''' and permissions are intact
+# '''Check system logs''' for any errors
+
+-----
+
+<span id="major-version-migration"></span>
+= Major Version Migration =
+
+For major version changes or when migrating to a new server/environment, you'll need to migrate your DreamFactory instance completely. This process focuses on transferring two critical components: the <code>.env</code> file and the DreamFactory system database.
+
+<span id="why-these-components-matter"></span>
+== Why These Components Matter ==
+
+<span id="env-file"></span>
+=== <code>.env</code> File ===
+
+Contains essential configuration settings including: - The APP_KEY (critical for data encryption) - Database credentials - Caching preferences - API keys - Environmental settings
+
+<span id="dreamfactory-system-database"></span>
+=== DreamFactory System Database ===
+
+Stores all your configuration data: - User accounts - Scripts<br />
+- API configurations - System-level metadata
+
+Migrating these components ensures your new instance contains all original configurations, eliminating manual recreation.
+
+<span id="file-transfer-reference"></span>
+== File Transfer Reference ==
+
+:::info[CLI File Transfer Methods by Deployment Type] <Tabs> <TabItem value="vm/linux" label="VM/Linux"><br />
+'''FROM remote TO local''' <code>bash     scp &lt;user&gt;@&lt;remote-server&gt;:/path/to/file local-destination/</code> Example: <code>scp root@192.168.1.100:/opt/dreamfactory/.env .</code>
+
+<pre>**FROM local TO remote**
+<syntaxhighlight lang="bash">
+scp local-source &lt;user&gt;@&lt;remote-server&gt;:/path/to/destination/
+</syntaxhighlight>
+Example: `scp dump.sql root@192.168.1.100:/opt/dreamfactory/`</pre>
+</TabItem> <TabItem value="docker" label="Docker"> '''FROM container TO local''' <code>bash     docker cp &lt;container_name_or_id&gt;:/path/to/file local-destination/</code> Example: <code>docker cp df-docker-web-1:/opt/dreamfactory/.env .</code>
+
+<pre>**FROM local TO container**
+<syntaxhighlight lang="bash">
+docker cp local-source &lt;container_name_or_id&gt;:/path/to/destination/
+</syntaxhighlight>
+Example: `docker cp dump.sql df-docker-web-1:/opt/dreamfactory/`</pre>
+</TabItem> <TabItem value="kubernetes" label="Kubernetes"> '''FROM pod TO local''' <code>bash     kubectl cp &lt;namespace&gt;/&lt;pod-name&gt;:/path/to/file local-destination/</code> Example: <code>kubectl cp df-namespace/df-pod:/opt/dreamfactory/.env .</code>
+
+<pre>**FROM local TO pod**
+<syntaxhighlight lang="bash">
+kubectl cp local-source &lt;namespace&gt;/&lt;pod-name&gt;:/path/to/destination/
+</syntaxhighlight>
+Example: `kubectl cp dump.sql df-namespace/df-pod:/opt/dreamfactory/`</pre>
+</TabItem> </Tabs> :::
+
+<span id="migration-process"></span>
+== Migration Process ==
+
+<span id="step-1-back-up-the-.env-file"></span>
+=== Step 1: Back Up the .env File ===
+
+Navigate to the DreamFactory root directory:
+
+<syntaxhighlight lang="bash">cd /opt/dreamfactory</syntaxhighlight>
+Copy the <code>.env</code> file to your local machine (see [[#file-transfer-reference|File Transfer Reference]] for deployment-specific commands):
+
+<syntaxhighlight lang="bash">scp <user>@<remote-server>:/opt/dreamfactory/.env .</syntaxhighlight>
+'''Tip:''' Store the <code>.env</code> file in a secure location to recover from any migration issues.
+
+<span id="step-2-back-up-the-system-database"></span>
+=== Step 2: Back Up the System Database ===
+
+Use the system database credentials from the <code>.env</code> file to create a backup:
+
+:::info[Backup Methods by Database Type] <Tabs> <TabItem value="mysql" label="MySQL"> <code>bash     mysqldump -u root -p --databases dreamfactory --no-create-db &gt; dump.sql</code> </TabItem> <TabItem value="sqlserver" label="MS SQL Server"><br />
+Use SSMS (SQL Server Management Studio) to export the database to a file. </TabItem> <TabItem value="postgresql" label="PostgreSQL"> <code>bash     pg_dump -U root -d dreamfactory -F p &gt; dump.sql</code> </TabItem> <TabItem value="sqlite" label="SQLite"> <code>bash     sqlite3 dreamfactory.db &quot;.dump&quot; &gt; dump.sql</code> </TabItem> </Tabs> :::
+
+Replace <code>root</code> with your database user and <code>dreamfactory</code> with your database name if different.
+
+Transfer the backup file to a secure external location:
+
+<syntaxhighlight lang="bash">scp <user>@<remote-server>:/opt/dreamfactory/dump.sql .</syntaxhighlight>
+<span id="step-3-prepare-the-new-dreamfactory-instance"></span>
+=== Step 3: Prepare the New DreamFactory Instance ===
+
+# Set up a new server with a clean operating system installation
+# Follow the [[Getting_Started/Installing_Dreamfactory|DreamFactory installation guide]] for your platform
+# Complete the initial setup by creating an administrator account (this will be replaced with migrated data)
+
+<span id="step-4-additional-configuration"></span>
+=== Step 4: Additional Configuration ===
+
+<span id="mysql-specific-configuration"></span>
+==== MySQL Specific Configuration ====
+
+If upgrading MySQL versions (e.g., 5.6 to 5.7+), you may need to disable strict mode by opening <code>config/database.php</code> and adding <code>'strict' =&gt; false</code> under the MySQL configuration section.
+
+<span id="general-configuration"></span>
+==== General Configuration ====
+
+Ensure all system dependencies are up to date. DreamFactory supports PHP 8.1 or later.
+
+<span id="step-5-import-the-system-database"></span>
+=== Step 5: Import the System Database ===
+
+Transfer the <code>dump.sql</code> file to the new server:
+
+<syntaxhighlight lang="bash">scp dump.sql <user>@<new-server>:/opt/dreamfactory/</syntaxhighlight>
+Clear the default database schema:
+
+<syntaxhighlight lang="bash">php artisan migrate:fresh</syntaxhighlight>
+<syntaxhighlight lang="bash">php artisan migrate:reset</syntaxhighlight>
+Import the database backup:
+
+:::info[Import Methods by Database Type] <Tabs> <TabItem value="mysql" label="MySQL"> <code>bash     mysql -u root -p dreamfactory &lt; dump.sql</code> </TabItem> <TabItem value="sqlserver" label="MS SQL Server"><br />
+Use SSMS (SQL Server Management Studio) to import the database from the file. </TabItem> <TabItem value="postgresql" label="PostgreSQL"> <code>bash     psql -U root -d dreamfactory &lt; dump.sql</code> </TabItem> <TabItem value="sqlite" label="SQLite"> <code>bash     sqlite3 dreamfactory.db &lt; dump.sql</code> </TabItem> </Tabs> :::
+
+Run database migrations to apply schema updates:
+
+<syntaxhighlight lang="bash">php artisan migrate --seed</syntaxhighlight>
+Edit the <code>.env</code> file and replace the APP_KEY with the value from your old instance:
+
+<syntaxhighlight lang="bash">
+APP_KEY=YOUR_OLD_APP_KEY_VALUE
+</syntaxhighlight>
+Clear caches to finalize the configuration:
+
+<syntaxhighlight lang="bash">php artisan cache:clear</syntaxhighlight>
+<syntaxhighlight lang="bash">php artisan config:clear</syntaxhighlight>
+<span id="migration-verification"></span>
+== Migration Verification ==
+
+Log in to the new DreamFactory instance using credentials from the migrated environment. Verify that:
+
+# '''All user accounts''' are present and accessible
+# '''API configurations''' are intact
+# '''Scripts and custom logic''' are functioning
+# '''Database connections''' work properly
+# '''System settings''' match your original configuration
+
+'''Congratulations!''' Your DreamFactory instance has been successfully migrated.
+
+== See also ==
+* [[Upgrading_Php_Windows|Upgrading PHP On Windows]]
+* [[Upgrading_To_Php_8_1|Upgrading to PHP 8.1]]
+
+[[Category:Upgrades]]
+[[Category:Upgrading]]
+[[Category:Migrating]]

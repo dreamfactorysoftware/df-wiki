@@ -1,0 +1,181 @@
+= Installing Additional Drivers =
+<span id="installing-additional-drivers"></span>
+= Installing Additional Drivers =
+
+The DreamFactory installer supports the installation of additional database drivers that are not included by default due to licensing restrictions. This guide covers how to enable Oracle and Simba Trino ODBC drivers during the installation process.
+
+<span id="enabling-oracle"></span>
+== Enabling Oracle ==
+
+Selecting option 1 at the initial menu prompt will result in installation of PHP's Oracle (oci8) extension. You will need to supply commercial license files to enable this functionality. If you choose this option you'll be prompted to identify the location of the the Oracle instant client zip files by providing an absolute path. Due to licensing restrictions we are unable to include these files with the installer, however you can download these files from [https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html here].
+
+After navigating to the Oracle website you'll want to download the basic and sdk instant client files:
+
+* <code>instantclient-basic-linux.x64-21.9.0.0.0dbru.zip</code>
+* <code>instantclient-sdk-linux.x64-21.9.0.0.0dbru.zip</code>
+
+For RPM based systems you'll want to download these files:
+
+* <code>oracle-instantclient-basic-21.9.0.0.0-1.el8.x86_64.rpm</code>
+* <code>oracle-instantclient-devel-21.9.0.0.0-1.el8.x86_64.rpm</code>
+
+You should not unzip these files. Just upload them to your server and write down the absolute path to their location as you'll need to supply this path during the installation process.
+
+The script was tested using Oracle driver versions 19.18 and 21.9.
+
+<span id="enabling-oracle-in-docker"></span>
+== Enabling Oracle in Docker ==
+
+To enable Oracle database connectivity in your DreamFactory Docker container, you need to install the Oracle Instant Client and PHP OCI8 extension.
+
+These instructions are specifically for Ubuntu 24.04 base images. If you're using a different base image or PHP version, you may need to adjust package names and paths accordingly.
+<span id="method-1-installing-on-a-running-container"></span>
+=== Method 1: Installing on a Running Container ===
+
+If you need to install Oracle drivers on an already running container, you can execute the commands directly in the container.
+
+<span id="step-by-step-installation"></span>
+==== Step-by-Step Installation ====
+
+<ol style="list-style-type: decimal;">
+<li><p>'''Install dependencies'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "apt-get update && apt-get install -y wget unzip libaio1t64 php8.3-dev php-pear build-essential"</syntaxhighlight></li>
+<li><p>'''Download Oracle Instant Client'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "cd /tmp && wget --header='Cookie: oraclelicense=accept-securebackup-cookie' https://download.oracle.com/otn_software/linux/instantclient/2350000/instantclient-basic-linux.x64-23.5.0.24.07.zip && wget --header='Cookie: oraclelicense=accept-securebackup-cookie' https://download.oracle.com/otn_software/linux/instantclient/2350000/instantclient-sdk-linux.x64-23.5.0.24.07.zip"</syntaxhighlight></li>
+<li><p>'''Extract and install Oracle Instant Client'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "mkdir -p /opt/oracle && cd /opt/oracle && unzip -q /tmp/instantclient-basic-linux.x64-23.5.0.24.07.zip && unzip -o -q /tmp/instantclient-sdk-linux.x64-23.5.0.24.07.zip && mv \$(ls -d /opt/oracle/instantclient_*) /opt/oracle/instantclient && cd /opt/oracle/instantclient && rm -f jdbc occi mysql *jar *.zip && ln -sf \$(ls libclntsh.so.*.* | head -1) libclntsh.so"</syntaxhighlight></li>
+<li><p>'''Configure library path'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "echo /opt/oracle/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf && ldconfig"</syntaxhighlight></li>
+<li><p>'''Fix Ubuntu 24.04 libaio compatibility'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1 && ldconfig"</syntaxhighlight></li>
+<li><p>'''Install PHP OCI8 extension'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "echo 'instantclient,/opt/oracle/instantclient' | pecl install oci8"</syntaxhighlight></li>
+<li><p>'''Enable OCI8 extension'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "echo 'extension=oci8.so' > /etc/php/8.3/mods-available/oci8.ini && phpenmod oci8 && service php8.3-fpm restart"</syntaxhighlight></li>
+<li><p>'''Verify installation'''</p>
+<syntaxhighlight lang="bash">docker-compose exec web bash -c "php -m | grep oci8"
+docker-compose exec web bash -c "php -r \"echo 'OCI8 Version: ' . phpversion('oci8') . PHP_EOL;\""
+docker-compose exec web bash -c "php -r \"echo 'Oracle Client Version: ' . oci_client_version() . PHP_EOL;\""</syntaxhighlight></li></ol>
+
+<span id="single-combined-command"></span>
+==== Single Combined Command ====
+
+Alternatively, you can run all commands as a single block:
+
+<syntaxhighlight lang="bash">docker-compose exec -T web bash -c "
+apt-get update && \
+apt-get install -y wget unzip libaio1t64 php8.3-dev php-pear build-essential && \
+cd /tmp && \
+wget --header='Cookie: oraclelicense=accept-securebackup-cookie' https://download.oracle.com/otn_software/linux/instantclient/2350000/instantclient-basic-linux.x64-23.5.0.24.07.zip && \
+wget --header='Cookie: oraclelicense=accept-securebackup-cookie' https://download.oracle.com/otn_software/linux/instantclient/2350000/instantclient-sdk-linux.x64-23.5.0.24.07.zip && \
+mkdir -p /opt/oracle && \
+cd /opt/oracle && \
+unzip -q /tmp/instantclient-basic-linux.x64-23.5.0.24.07.zip && \
+unzip -o -q /tmp/instantclient-sdk-linux.x64-23.5.0.24.07.zip && \
+mv \$(ls -d /opt/oracle/instantclient_*) /opt/oracle/instantclient && \
+cd /opt/oracle/instantclient && \
+rm -f jdbc occi mysql *jar *.zip && \
+ln -sf \$(ls libclntsh.so.*.* | head -1) libclntsh.so && \
+echo /opt/oracle/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+ldconfig && \
+ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1 && \
+ldconfig && \
+echo 'instantclient,/opt/oracle/instantclient' | pecl install oci8 && \
+echo 'extension=oci8.so' > /etc/php/8.3/mods-available/oci8.ini && \
+phpenmod oci8 && \
+service php8.3-fpm restart && \
+php -m | grep oci8 && \
+php -r \"echo 'OCI8 Version: ' . phpversion('oci8') . PHP_EOL;\" && \
+php -r \"echo 'Oracle Client Version: ' . oci_client_version() . PHP_EOL;\"
+"</syntaxhighlight>
+:::caution Persistence Installations made directly in a running container will be lost if the container is rebuilt or recreated. For permanent installation, use the Dockerfile method below. :::
+
+<span id="method-2-adding-to-dockerfile-permanent-installation"></span>
+=== Method 2: Adding to Dockerfile (Permanent Installation) ===
+
+To make the Oracle driver installation permanent across container rebuilds, add the following to your Dockerfile:
+
+<syntaxhighlight lang="docker"># Install Oracle dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    libaio1t64 \
+    php8.3-dev \
+    php-pear \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and install Oracle Instant Client
+RUN mkdir -p /opt/oracle && \
+    cd /tmp && \
+    wget --header="Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn_software/linux/instantclient/2350000/instantclient-basic-linux.x64-23.5.0.24.07.zip && \
+    wget --header="Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn_software/linux/instantclient/2350000/instantclient-sdk-linux.x64-23.5.0.24.07.zip && \
+    unzip -q instantclient-basic-linux.x64-23.5.0.24.07.zip -d /opt/oracle && \
+    unzip -o -q instantclient-sdk-linux.x64-23.5.0.24.07.zip -d /opt/oracle && \
+    mv $(ls -d /opt/oracle/instantclient_*) /opt/oracle/instantclient && \
+    cd /opt/oracle/instantclient && \
+    rm -f jdbc occi mysql *jar *.zip && \
+    ln -sf $(ls libclntsh.so.*.* | head -1) libclntsh.so && \
+    rm -f /tmp/instantclient*.zip
+
+# Configure Oracle library path
+RUN echo /opt/oracle/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+    ldconfig
+
+# Fix Ubuntu 24.04 libaio compatibility
+RUN ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1 && \
+    ldconfig
+
+# Install and enable PHP OCI8 extension
+RUN echo 'instantclient,/opt/oracle/instantclient' | pecl install oci8 && \
+    echo 'extension=oci8.so' > /etc/php/8.3/mods-available/oci8.ini && \
+    phpenmod oci8</syntaxhighlight>
+<span id="notes-for-docker-installation"></span>
+=== Notes for Docker Installation ===
+
+* '''Base Image''': These instructions are for Ubuntu 24.04 with PHP 8.3
+* '''Oracle Version''': Oracle Instant Client version 23.5 is used
+* '''PHP Version''': Adjust PHP version numbers (e.g., <code>php8.3-dev</code>, <code>/etc/php/8.3/</code>) if using a different PHP version
+* '''Ubuntu 24.04 Specific''': The <code>libaio1t64</code> package and symlink are specific to Ubuntu 24.04
+* '''Oracle License''': The <code>--header=&quot;Cookie: oraclelicense=accept-securebackup-cookie&quot;</code> flag is required for Oracle downloads to automatically accept license terms, you should review their terms prior to installing Instant Client
+* '''Dynamic Detection''': The Dockerfile uses dynamic directory and library detection to remain compatible with future Oracle Instant Client versions without manual updates
+* '''Non-Interactive Unzip''': The <code>-o</code> flag ensures non-interactive extraction by automatically overwriting duplicate files
+
+<span id="enabling-simba-trino-odbc"></span>
+== Enabling Simba Trino ODBC ==
+
+Selecting the Simba Trino ODBC option (when prompted during installation) will result in the installation of the Simba Trino ODBC driver. Due to licensing restrictions, we are unable to include these files with the installer. You must obtain the Simba Trino ODBC driver and license file from your vendor (e.g., insightsoftware).
+
+After obtaining the files, upload them to your server and note the absolute path to their location. You will need to supply this path during the installation process when prompted.
+
+You will need:
+
+* Simba Trino ODBC driver package for your OS (e.g. <code>SimbaTrinoODBC-&lt;version&gt;.deb</code> or <code>SimbaTrinoODBC-&lt;version&gt;.rpm</code>)
+* <code>SimbaTrinoODBCDriver.lic</code> license file
+
+<span id="steps"></span>
+=== Steps: ===
+
+# Download the Simba Trino ODBC driver and license file from your vendor portal.
+# Upload the <code>.deb</code> or <code>.rpm</code> file and the <code>SimbaTrinoODBCDriver.lic</code> file to your server (e.g., <code>/tmp</code>).
+# When prompted during installation, enter the absolute path to the driver package file (e.g., <code>/tmp/SimbaTrinoODBC-2.0.0.1000-Debian-64bit.deb</code>).
+# When prompted, enter the absolute path to the <code>SimbaTrinoODBCDriver.lic</code> file (e.g., <code>/tmp/SimbaTrinoODBCDriver.lic</code>).
+# The installer will install the driver and move the license file to <code>/opt/simba/trinoodbc/lib/64/</code> automatically.
+
+<span id="note"></span>
+=== Note: ===
+
+* The installer does not download the driver for you. You must obtain it from your vendor.
+* The script was tested with Simba Trino ODBC driver version 2.0.0.1000 and later.
+* If you encounter issues, ensure the driver and license file paths are correct and accessible.
+
+== See also ==
+* [[Getting_Started/Docker_Installation|Docker Installation]]
+* [[Getting_Started/Windows_Installation|Windows Installation]]
+* [[Getting_Started/Installing_Dreamfactory|Installing DreamFactory]]
+* [[Getting_Started/Helm_Installation|helm-installation]]
+
+[[Category:Installation]]
+[[Category:Getting_Started]]
+[[Category:Installing]]
+[[Category:Additional]]
