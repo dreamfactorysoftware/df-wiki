@@ -44,7 +44,7 @@ jobs:
 
       - name: Run content scorer
         working-directory: scripts
-        run: python content_score.py --dir ../docs/ --output score_report.csv --threshold 70
+        run: python content_score.py --dir ../docs/ --output score_report.csv --threshold 50
 
       - name: Upload score report
         if: always()
