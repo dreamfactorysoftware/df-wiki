@@ -130,14 +130,25 @@ class WikiSyncer:
             print("  ✗ Pandoc not installed")
             return None
 
+    def _load_page_map(self, source_dir: Path) -> Dict[str, str]:
+        """Load page_map.json from source directory if it exists."""
+        map_file = source_dir / 'page_map.json'
+        if map_file.exists():
+            return json.loads(map_file.read_text(encoding='utf-8'))
+        return {}
+
     def get_page_name_from_path(self, file_path: Path, source_dir: Path) -> str:
-        """Generate wiki page name from file path."""
-        rel_path = file_path.relative_to(source_dir)
-        # Remove file extension (.md or .wiki)
-        name = str(rel_path.with_suffix(''))
-        # Convert path separators to wiki subpages
-        name = name.replace('/', '/')
-        # Convert hyphens to underscores, title case
+        """Generate wiki page name from file path, using page_map.json if available."""
+        rel_path = str(file_path.relative_to(source_dir))
+
+        # Check explicit mapping first
+        if not hasattr(self, '_page_map'):
+            self._page_map = self._load_page_map(source_dir)
+        if rel_path in self._page_map:
+            return self._page_map[rel_path]
+
+        # Fall back to auto-generated name
+        name = str(Path(rel_path).with_suffix(''))
         parts = name.split('/')
         wiki_name = '/'.join(
             '_'.join(word.capitalize() for word in part.replace('-', '_').split('_'))
