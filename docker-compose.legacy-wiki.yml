@@ -1,0 +1,75 @@
+# Docker Compose for Legacy Wiki Instance
+#
+# Runs the old MediaWiki in an isolated container for content review
+# and selective extraction. DO NOT expose to the internet.
+#
+# Usage:
+#   docker-compose -f docker-compose.legacy-wiki.yml up -d
+#   # Access at http://localhost:8081
+#   # Extract content using scripts/extract_legacy_pages.py
+#   docker-compose -f docker-compose.legacy-wiki.yml down -v
+
+version: '3.8'
+
+services:
+  legacy-wiki-db:
+    image: mysql:5.7
+    container_name: legacy-wiki-db
+    environment:
+      MYSQL_ROOT_PASSWORD: legacy_root_pass
+      MYSQL_DATABASE: df_wiki
+      MYSQL_USER: wiki_user
+      MYSQL_PASSWORD: wiki_pass
+    volumes:
+      # Import the SQL dump on first startup
+      - ./mediawiki/wiki_dump.sql:/docker-entrypoint-initdb.d/001-wiki_dump.sql:ro
+      - legacy_wiki_db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"  # Non-standard port to avoid conflicts
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plegacy_root_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - legacy-wiki-net
+
+  legacy-wiki:
+    image: mediawiki:1.35-fpm
+    container_name: legacy-wiki-app
+    depends_on:
+      legacy-wiki-db:
+        condition: service_healthy
+    volumes:
+      - legacy_wiki_html:/var/www/html
+      - ./legacy-wiki-config:/config:ro
+      - ./legacy-wiki-config/LocalSettings.php:/var/www/html/LocalSettings.php:ro
+    environment:
+      - MEDIAWIKI_DB_TYPE=mysql
+      - MEDIAWIKI_DB_HOST=legacy-wiki-db
+      - MEDIAWIKI_DB_NAME=df_wiki
+      - MEDIAWIKI_DB_USER=wiki_user
+      - MEDIAWIKI_DB_PASSWORD=wiki_pass
+    networks:
+      - legacy-wiki-net
+
+  legacy-wiki-web:
+    image: nginx:alpine
+    container_name: legacy-wiki-web
+    depends_on:
+      - legacy-wiki
+    ports:
+      - "8081:80"
+    volumes:
+      - legacy_wiki_html:/var/www/html:ro
+      - ./legacy-wiki-config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - legacy-wiki-net
+
+volumes:
+  legacy_wiki_db_data:
+  legacy_wiki_html:
+
+networks:
+  legacy-wiki-net:
+    driver: bridge

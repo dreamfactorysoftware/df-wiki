@@ -1,0 +1,69 @@
+# Docker Compose for Staging Wiki Instance
+#
+# Fresh MediaWiki for testing the migration pipeline.
+# This is the TARGET wiki — content gets uploaded here.
+#
+# Usage:
+#   docker-compose -f docker-compose.staging-wiki.yml up -d
+#   # Access at http://localhost:8082
+#   docker-compose -f docker-compose.staging-wiki.yml down -v
+
+services:
+  staging-wiki-db:
+    image: mysql:8.0
+    container_name: staging-wiki-db
+    environment:
+      MYSQL_ROOT_PASSWORD: staging_root_pass
+      MYSQL_DATABASE: staging_wiki
+      MYSQL_USER: wiki_user
+      MYSQL_PASSWORD: wiki_pass
+    volumes:
+      - staging_wiki_db_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pstaging_root_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - staging-wiki-net
+
+  staging-wiki:
+    image: mediawiki:1.39-fpm
+    container_name: staging-wiki-app
+    depends_on:
+      staging-wiki-db:
+        condition: service_healthy
+    volumes:
+      - staging_wiki_html:/var/www/html
+      - ./staging-wiki-config/LocalSettings.php:/var/www/html/LocalSettings.php:ro
+      - ./staging-wiki-extensions/WikiSEO:/var/www/html/extensions/WikiSEO:ro
+    environment:
+      - MEDIAWIKI_DB_TYPE=mysql
+      - MEDIAWIKI_DB_HOST=staging-wiki-db
+      - MEDIAWIKI_DB_NAME=staging_wiki
+      - MEDIAWIKI_DB_USER=wiki_user
+      - MEDIAWIKI_DB_PASSWORD=wiki_pass
+    networks:
+      - staging-wiki-net
+
+  staging-wiki-web:
+    image: nginx:alpine
+    container_name: staging-wiki-web
+    depends_on:
+      - staging-wiki
+    ports:
+      - "8082:80"
+    volumes:
+      - staging_wiki_html:/var/www/html:ro
+      - ./staging-wiki-config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - staging-wiki-net
+
+volumes:
+  staging_wiki_db_data:
+  staging_wiki_html:
+
+networks:
+  staging-wiki-net:
+    driver: bridge
