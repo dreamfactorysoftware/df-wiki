@@ -751,6 +751,9 @@ class BatchScorer:
                     continue
                 if fpath.name == '_ai-reference.md':
                     continue
+                # Skip redirect pages (one-line #REDIRECT files)
+                if 'redirects' in fpath.parts:
+                    continue
                 if self._is_skipped_draft(fpath):
                     skipped_drafts += 1
                     continue
