@@ -26,6 +26,7 @@ $wgNamespacesWithSubpages[NS_MAIN] = true;
 
 ## Site logo — image is 300x300, Vector skin will scale via CSS
 $wgLogo = '/images/5/55/Dreamfactoryicon.webp';
+$wgFavicon = '/favicon.ico';
 
 ## Database settings
 $wgDBtype = "mysql";
