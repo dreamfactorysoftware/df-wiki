@@ -1,1 +1,19 @@
-mediawiki/wiki_dump.sql
+# Source repos (already converted to docs/)
+df-docs/
+guide/
+
+# Legacy wiki (migration complete)
+legacy-wiki-config/
+legacy-content.csv
+docker-compose.legacy-wiki.yml
+mediawiki/
+
+# Migration planning docs
+MIGRATION_BRIEF.md
+SESSION_REPORT.md
+
+# Python virtual environment
+scripts/.venv/
+
+# Sync state (local only)
+scripts/.last_sync.json

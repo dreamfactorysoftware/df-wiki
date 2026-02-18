@@ -1,0 +1,27 @@
+<noinclude>
+== TechArticle ==
+Adds schema.org TechArticle JSON-LD structured data to a page.
+
+'''Usage:''' <code><nowiki>{{TechArticle|description=Brief description of this page}}</nowiki></code>
+
+'''Parameters:'''
+* '''description''' — A short description of the article content (used in search results)
+</noinclude><includeonly>{{#tag:script|
+<nowiki>{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{PAGENAME}}",
+  "description": "{{{description|DreamFactory documentation for {{PAGENAME}}}}}",
+  "url": "https://wiki.dreamfactory.com/{{FULLPAGENAMEE}}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "DreamFactory Software",
+    "url": "https://www.dreamfactory.com"
+  },
+  "inLanguage": "en",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "DreamFactory Wiki",
+    "url": "https://wiki.dreamfactory.com"
+  }
+}</nowiki>|type=application/ld+json}}</includeonly>

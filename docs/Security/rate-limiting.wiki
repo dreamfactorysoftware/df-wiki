@@ -1,6 +1,4 @@
 = Rate Limiting =
-<span id="rate-limiting"></span>
-= Rate Limiting =
 
 DreamFactory provides a comprehensive rate limiting system that allows administrators to control API usage at multiple levels. Rate limits can be applied per instance, per user, per role, per service, or per endpoint, giving you fine-grained control over how your APIs are consumed. This is essential for preventing abuse, ensuring fair resource allocation, and maintaining platform stability.
 

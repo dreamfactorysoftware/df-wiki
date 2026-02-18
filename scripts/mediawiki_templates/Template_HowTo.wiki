@@ -1,0 +1,24 @@
+<noinclude>
+== HowTo ==
+Adds schema.org HowTo JSON-LD structured data for installation and tutorial pages.
+
+'''Usage:''' <code><nowiki>{{HowTo|description=How to install DreamFactory|time=PT30M}}</nowiki></code>
+
+'''Parameters:'''
+* '''description''' — A short description of what this how-to covers
+* '''time''' — Estimated time in ISO 8601 duration format (e.g., PT30M for 30 minutes, PT1H for 1 hour)
+</noinclude><includeonly>{{#tag:script|
+<nowiki>{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "{{PAGENAME}}",
+  "description": "{{{description|How-to guide for {{PAGENAME}}}}}",
+  "url": "https://wiki.dreamfactory.com/{{FULLPAGENAMEE}}",</nowiki>{{#if:{{{time|}}}|<nowiki>
+  "totalTime": "{{{time}}}",</nowiki>}}<nowiki>
+  "publisher": {
+    "@type": "Organization",
+    "name": "DreamFactory Software",
+    "url": "https://www.dreamfactory.com"
+  },
+  "inLanguage": "en"
+}</nowiki>|type=application/ld+json}}</includeonly>

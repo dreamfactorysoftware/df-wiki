@@ -1,0 +1,57 @@
+# DreamFactory Wiki
+> https://wiki.dreamfactory.com
+
+DreamFactory is an open-source API generation and management platform. It automatically generates REST APIs for any database, handles authentication, role-based access control, API rate limiting, and much more.
+
+This wiki is the single source of truth for all DreamFactory documentation.
+
+## Sections
+
+### Getting Started
+- Installing DreamFactory: /Getting_Started/Installing_Dreamfactory
+- Docker Installation: /Getting_Started/Docker_Installation
+- Linux Installation: /Getting_Started/Linux_Installation
+- Windows Installation: /Getting_Started/Windows_Installation
+- Helm (Kubernetes) Installation: /Getting_Started/Helm_Installation
+- Basic Configuration: /Getting_Started/Basic_Configuration
+
+### API Generation and Connections
+- API Creation and Management: /Api_Creation_Management
+- Generating Database-Backed APIs: /Generating_Database_Backed_Api
+- Interacting with the REST API: /Interacting_With_Api
+- Querying and Filtering: /Querying_Filtering
+- Advanced Database API Features: /Advanced_Database_Api_Features
+- Remote HTTP and SOAP Connectors: /Remote_HTTP_And_SOAP_Connectors
+- File Services: /File
+- API Keys: /Api_Keys
+
+### Security
+- Authentication APIs: /Security/Authentication_Apis
+- Role-Based Access Control: /Security/Role_Based_Access
+- Rate Limiting: /Security/Rate_Limiting
+- OAuth Providers (Okta, Azure AD, GitHub): /Security/Okta_Setup, /Security/Azure_Ad_Oauth, /Security/Github_Oauth
+- SQL Server Configuration: /Security/Sql_Server_Configuration
+
+### Scripting
+- Scripting Resources: /Scripting_Resources
+- Scripted Services and Endpoints: /Scripted_Services_And_Endpoints
+- Event Scripts: /Event_Scripts
+
+### AI Services
+- MCP Service: /AI_Services/Mcp_Service
+- MCP Service Creation: /AI_Services/Mcp_Service_Creation
+
+### System Settings
+- CORS and SSL: /System_Settings/Cors_Ssl
+- Logstash Integration: /System_Settings/Logstash
+- System API: /System_Settings/01_System_Api_Brief
+
+### Upgrades
+- Upgrading DreamFactory: /Upgrading_Migrating_Dreamfactory
+
+### Reference
+- Architecture FAQ: /Architecture_FAQ
+- Configuration Parameters: /Appendix_Configuration_Parameters
+- Introduction to REST and DreamFactory: /Introducing_Rest_Dreamfactory
+- GDPR API Gateway: /GDPR_API_Gateway
+- Scalability: /Scalability

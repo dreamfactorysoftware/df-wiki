@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - 'scripts/**'
+      - 'static/**'
+      - 'scripts/mediawiki_templates/**'
+      - 'scripts/main_page_templates/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -73,7 +75,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Deploy to wiki
+      - name: Deploy content pages to wiki
         if: ${{ github.event.inputs.dry_run != 'true' }}
         working-directory: scripts
         env:
@@ -82,7 +84,7 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
         run: python sync_to_wiki.py --source ../docs/ --deploy --force
 
-      - name: Deploy to wiki (dry run)
+      - name: Deploy content pages to wiki (dry run)
         if: ${{ github.event.inputs.dry_run == 'true' }}
         working-directory: scripts
         env:
@@ -90,6 +92,24 @@ jobs:
           WIKI_USER: ${{ secrets.WIKI_USER }}
           WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
         run: python sync_to_wiki.py --source ../docs/ --deploy --dry-run
+
+      - name: Deploy templates to wiki
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        working-directory: scripts
+        env:
+          WIKI_URL: ${{ secrets.WIKI_URL }}
+          WIKI_USER: ${{ secrets.WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
+        run: python deploy_templates.py
+
+      - name: Deploy templates to wiki (dry run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        working-directory: scripts
+        env:
+          WIKI_URL: ${{ secrets.WIKI_URL }}
+          WIKI_USER: ${{ secrets.WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
+        run: python deploy_templates.py --dry-run
 
       - name: Verify deployment
         if: ${{ github.event.inputs.dry_run != 'true' }}
@@ -99,3 +119,13 @@ jobs:
           WIKI_USER: ${{ secrets.WIKI_USER }}
           WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
         run: python sync_to_wiki.py --verify
+
+      - name: Regenerate sitemap
+        if: ${{ github.event.inputs.dry_run != 'true' && github.event.inputs.environment == 'production' }}
+        env:
+          WIKI_SSH_HOST: ${{ secrets.WIKI_SSH_HOST }}
+          WIKI_SSH_USER: ${{ secrets.WIKI_SSH_USER }}
+          WIKI_SSH_KEY: ${{ secrets.WIKI_SSH_KEY }}
+        run: |
+          echo "Sitemap regeneration requires server access."
+          echo "For Docker-based deployments, run: ./scripts/generate_sitemap.sh production"

@@ -1,5 +1,3 @@
-= Scripting Resources =
-<span id="scripting-resources"></span>
 = Scripting resources =
 
 This page provides a comprehensive overview of the resources available for scripting in DreamFactory, including links to sample scripts and documentation references for event scripting and scripted services.

@@ -1,6 +1,4 @@
 = Installing Additional Drivers =
-<span id="installing-additional-drivers"></span>
-= Installing Additional Drivers =
 
 The DreamFactory installer supports the installation of additional database drivers that are not included by default due to licensing restrictions. This guide covers how to enable Oracle and Simba Trino ODBC drivers during the installation process.
 

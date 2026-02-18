@@ -1,0 +1,40 @@
+<noinclude>
+== BreadcrumbList ==
+Adds schema.org BreadcrumbList JSON-LD structured data for navigation.
+
+'''Usage:''' <code><nowiki>{{BreadcrumbList|parent=Parent Page|parent_label=Parent}}</nowiki></code>
+
+'''Parameters:'''
+* '''parent''' — Wiki page name of the parent section
+* '''parent_label''' — Display label for the parent breadcrumb
+</noinclude><includeonly>{{#tag:script|
+<nowiki>{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://wiki.dreamfactory.com/Main_Page"
+    },</nowiki>{{#if:{{{parent|}}}|<nowiki>
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "</nowiki>{{{parent_label|{{{parent}}}}}}<nowiki>",
+      "item": "https://wiki.dreamfactory.com/</nowiki>{{urlencode:{{{parent}}}|}}<nowiki>"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "</nowiki>{{PAGENAME}}<nowiki>",
+      "item": "https://wiki.dreamfactory.com/</nowiki>{{FULLPAGENAMEE}}<nowiki>"
+    }</nowiki>|<nowiki>
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "</nowiki>{{PAGENAME}}<nowiki>",
+      "item": "https://wiki.dreamfactory.com/</nowiki>{{FULLPAGENAMEE}}<nowiki>"
+    }</nowiki>}}<nowiki>
+  ]
+}</nowiki>|type=application/ld+json}}</includeonly>

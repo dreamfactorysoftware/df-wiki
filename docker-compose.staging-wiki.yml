@@ -57,6 +57,7 @@ services:
     volumes:
       - staging_wiki_html:/var/www/html:ro
       - ./staging-wiki-config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./static:/var/www/static:ro
     networks:
       - staging-wiki-net
 

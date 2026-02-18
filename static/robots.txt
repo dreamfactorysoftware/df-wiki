@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /index.php?
+Disallow: /Special:
+Disallow: /User:
+Disallow: /Wiki:General_disclaimer
+Disallow: /Wiki:Privacy_policy
+
+Sitemap: https://wiki.dreamfactory.com/sitemap.xml
+Content-Signal: search=yes, ai-input=yes, ai-train=no

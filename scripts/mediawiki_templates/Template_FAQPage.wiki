@@ -1,0 +1,22 @@
+<noinclude>
+== FAQPage ==
+Adds schema.org FAQPage JSON-LD structured data for FAQ content.
+
+'''Usage:''' <code><nowiki>{{FAQPage|description=Frequently asked questions about DreamFactory architecture}}</nowiki></code>
+
+'''Parameters:'''
+* '''description''' — A short description of the FAQ topic
+</noinclude><includeonly>{{#tag:script|
+<nowiki>{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "name": "{{PAGENAME}}",
+  "description": "{{{description|Frequently asked questions about {{PAGENAME}}}}}",
+  "url": "https://wiki.dreamfactory.com/{{FULLPAGENAMEE}}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "DreamFactory Software",
+    "url": "https://www.dreamfactory.com"
+  },
+  "inLanguage": "en"
+}</nowiki>|type=application/ld+json}}</includeonly>

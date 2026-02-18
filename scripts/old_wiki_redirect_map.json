@@ -1,0 +1,773 @@
+[
+  {
+    "rank": 1,
+    "old_path": "index.php",
+    "views": 63174,
+    "strategy": "no-action",
+    "new_target": null,
+    "note": "MediaWiki default entry point — handled natively"
+  },
+  {
+    "rank": 2,
+    "old_path": "/",
+    "views": 614,
+    "strategy": "no-action",
+    "new_target": null,
+    "note": "Root URL — handled by nginx rewrite to Main_Page"
+  },
+  {
+    "rank": 3,
+    "old_path": "DreamFactory/Installation",
+    "views": 198,
+    "strategy": "redirect",
+    "new_target": "Getting_Started/Installing_Dreamfactory"
+  },
+  {
+    "rank": 4,
+    "old_path": "Main_Page",
+    "views": 161,
+    "strategy": "no-action",
+    "new_target": null,
+    "note": "Already exists as the wiki main page"
+  },
+  {
+    "rank": 5,
+    "old_path": "DreamFactory/API",
+    "views": 102,
+    "strategy": "redirect",
+    "new_target": "Interacting_With_Api"
+  },
+  {
+    "rank": 6,
+    "old_path": "DreamFactory/Tutorials/Querying_records_with_logical_filters",
+    "views": 73,
+    "strategy": "redirect",
+    "new_target": "Querying_Filtering"
+  },
+  {
+    "rank": 7,
+    "old_path": "DreamFactory/Tutorials/Using_the_REST_API",
+    "views": 63,
+    "strategy": "redirect",
+    "new_target": "Interacting_With_Api"
+  },
+  {
+    "rank": 8,
+    "old_path": "DreamFactory/Tutorials",
+    "views": 60,
+    "strategy": "hub",
+    "new_target": null,
+    "hub_links": [
+      {"label": "Interacting with the REST API", "target": "Interacting_With_Api"},
+      {"label": "Querying and Filtering Records", "target": "Querying_Filtering"},
+      {"label": "Advanced Database API Features", "target": "Advanced_Database_Api_Features"},
+      {"label": "Generating a Database-Backed API", "target": "Generating_Database_Backed_Api"},
+      {"label": "Scripting Resources", "target": "Scripting_Resources"},
+      {"label": "Scripted Services and Endpoints", "target": "Scripted_Services_And_Endpoints"},
+      {"label": "Event Scripts", "target": "Event_Scripts"},
+      {"label": "Authentication APIs", "target": "Security/Authentication_Apis"},
+      {"label": "Role-Based Access Control", "target": "Security/Role_Based_Access"},
+      {"label": "API Keys", "target": "Api_Keys"},
+      {"label": "Remote HTTP and SOAP Connectors", "target": "Remote_HTTP_And_SOAP_Connectors"},
+      {"label": "File Services", "target": "File"},
+      {"label": "Converting Excel to JSON", "target": "Converting_Excel_To_Json"},
+      {"label": "Demo DreamFactory Applications", "target": "Demo_DreamFactory_Applications"},
+      {"label": "CORS and SSL Configuration", "target": "System_Settings/Cors_Ssl"},
+      {"label": "Setting Up Logstash / ELK", "target": "System_Settings/Logstash"}
+    ]
+  },
+  {
+    "rank": 9,
+    "old_path": "DreamFactory/Features/Scripting/V8Js_Scripting",
+    "views": 57,
+    "strategy": "redirect",
+    "new_target": "Scripting_Resources"
+  },
+  {
+    "rank": 10,
+    "old_path": "DreamFactory/Overview",
+    "views": 55,
+    "strategy": "redirect",
+    "new_target": "Introduction"
+  },
+  {
+    "rank": 11,
+    "old_path": "DreamFactory/Installation/Windows",
+    "views": 53,
+    "strategy": "redirect",
+    "new_target": "Getting_Started/Windows_Installation"
+  },
+  {
+    "rank": 12,
+    "old_path": "DreamFactory/Features/Database/Schema",
+    "views": 51,
+    "strategy": "redirect",
+    "new_target": "Generating_Database_Backed_Api"
+  },
+  {
+    "rank": 13,
+    "old_path": "DreamFactory/Features/Scripting",
+    "views": 47,
+    "strategy": "redirect",
+    "new_target": "Scripting_Resources"
+  },
+  {
+    "rank": 14,
+    "old_path": "DreamFactory/Features/API_Limits",
+    "views": 45,
+    "strategy": "redirect",
+    "new_target": "Security/Rate_Limiting"
+  },
+  {
+    "rank": 15,
+    "old_path": "DreamFactory/Tutorials/Rotten_Tomatoes_API",
+    "views": 45,
+    "strategy": "redirect-closest",
+    "new_target": "Remote_HTTP_And_SOAP_Connectors"
+  },
+  {
+    "rank": 16,
+    "old_path": "DreamFactory/Tutorials/Server_Side_Scripting",
+    "views": 45,
+    "strategy": "redirect",
+    "new_target": "Scripting_Resources"
+  },
+  {
+    "rank": 17,
+    "old_path": "DreamFactory/Tutorials/cURL_Examples",
+    "views": 44,
+    "strategy": "redirect",
+    "new_target": "Interacting_With_Api"
+  },
+  {
+    "rank": 18,
+    "old_path": "DreamFactory/Features/Database",
+    "views": 41,
+    "strategy": "redirect",
+    "new_target": "Generating_Database_Backed_Api"
+  },
+  {
+    "rank": 19,
+    "old_path": "DreamFactory/Tutorials/Example_Applications",
+    "views": 37,
+    "strategy": "redirect",
+    "new_target": "Demo_DreamFactory_Applications"
+  },
+  {
+    "rank": 20,
+    "old_path": "DreamFactory/Troubleshooting",
+    "views": 36,
+    "strategy": "stub",
+    "new_target": null,
+    "stub_title": "Troubleshooting",
+    "stub_content": "This page covers common troubleshooting steps for DreamFactory. For frequently asked questions, see [[Architecture_FAQ]].",
+    "stub_links": [
+      {"label": "Architecture FAQ", "target": "Architecture_FAQ"},
+      {"label": "Installing DreamFactory", "target": "Getting_Started/Installing_Dreamfactory"},
+      {"label": "Configuration", "target": "Getting_Started/Basic_Configuration"},
+      {"label": "Appendix: Configuration Parameters", "target": "Appendix_Configuration_Parameters"}
+    ]
+  },
+  {
+    "rank": 21,
+    "old_path": "DreamFactory/Features/Database/Records",
+    "views": 35,
+    "strategy": "redirect",
+    "new_target": "Querying_Filtering"
+  },
+  {
+    "rank": 22,
+    "old_path": "DreamFactory/Features/Files",
+    "views": 34,
+    "strategy": "redirect",
+    "new_target": "File"
+  },
+  {
+    "rank": 23,
+    "old_path": "DreamFactory/FAQs",
+    "views": 26,
+    "strategy": "redirect",
+    "new_target": "Architecture_FAQ"
+  },
+  {
+    "rank": 24,
+    "old_path": "DreamFactory/Features/Database/SQL/Stored_Procedures_And_Functions",
+    "views": 26,
+    "strategy": "redirect",
+    "new_target": "Advanced_Database_Api_Features"
+  },
+  {
+    "rank": 25,
+    "old_path": "DreamFactory/Videos",
+    "views": 25,
+    "strategy": "stub",
+    "new_target": null,
+    "stub_title": "Videos",
+    "stub_content": "DreamFactory video tutorials and walkthroughs are available on the [https://www.youtube.com/@DreamFactorySoftware DreamFactory YouTube channel].",
+    "stub_links": [
+      {"label": "Introduction to DreamFactory", "target": "Introduction"},
+      {"label": "Demo Applications", "target": "Demo_DreamFactory_Applications"},
+      {"label": "Tutorials", "target": "DreamFactory/Tutorials"}
+    ]
+  },
+  {
+    "rank": 26,
+    "old_path": "DreamFactory/Features/Auth",
+    "views": 23,
+    "strategy": "redirect",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 27,
+    "old_path": "DreamFactory/Features/Live_API_Docs",
+    "views": 21,
+    "strategy": "redirect",
+    "new_target": "Introducing_Rest_Dreamfactory"
+  },
+  {
+    "rank": 28,
+    "old_path": "DreamFactory/Tutorials/V8_field_validation",
+    "views": 21,
+    "strategy": "redirect",
+    "new_target": "Scripting_Resources"
+  },
+  {
+    "rank": 29,
+    "old_path": "DreamFactory/Tutorials/Using_virtual_foreign_keys",
+    "views": 20,
+    "strategy": "redirect",
+    "new_target": "Advanced_Database_Api_Features"
+  },
+  {
+    "rank": 30,
+    "old_path": "DreamFactory/Features/HTTP_Services",
+    "views": 19,
+    "strategy": "redirect",
+    "new_target": "Remote_HTTP_And_SOAP_Connectors"
+  },
+  {
+    "rank": 31,
+    "old_path": "DreamFactory/Tutorials/Node_push_notification",
+    "views": 19,
+    "strategy": "redirect-closest",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 32,
+    "old_path": "DreamFactory/Tutorials/Node_service_monetization",
+    "views": 19,
+    "strategy": "redirect-closest",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 33,
+    "old_path": "DreamFactory/Upgrades",
+    "views": 19,
+    "strategy": "redirect",
+    "new_target": "Upgrading_Migrating_Dreamfactory"
+  },
+  {
+    "rank": 34,
+    "old_path": "DreamFactory/Features/Database/MySQL_Features",
+    "views": 18,
+    "strategy": "redirect",
+    "new_target": "Generating_Database_Backed_Api"
+  },
+  {
+    "rank": 35,
+    "old_path": "DreamFactory/Installation/Databases/Oracle_DB_Installation",
+    "views": 18,
+    "strategy": "redirect",
+    "new_target": "Getting_Started/Installing_Additional_Drivers"
+  },
+  {
+    "rank": 36,
+    "old_path": "DreamFactory/Tutorials/Node_field_level_security",
+    "views": 18,
+    "strategy": "redirect-closest",
+    "new_target": "Security/Role_Based_Access"
+  },
+  {
+    "rank": 37,
+    "old_path": "DreamFactory/Tutorials/Querying_multiple_tables_with_joins",
+    "views": 18,
+    "strategy": "redirect",
+    "new_target": "Querying_Filtering"
+  },
+  {
+    "rank": 38,
+    "old_path": "DreamFactory/Tutorials/Querying_records_with_an_ID_list",
+    "views": 18,
+    "strategy": "redirect",
+    "new_target": "Querying_Filtering"
+  },
+  {
+    "rank": 39,
+    "old_path": "DFE/Dashboard/Command_Line_Utility",
+    "views": 17,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Basic_Configuration"
+  },
+  {
+    "rank": 40,
+    "old_path": "DreamFactory/Features/Cache",
+    "views": 17,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Php_Laravel"
+  },
+  {
+    "rank": 41,
+    "old_path": "DreamFactory/Tutorials/Forever_sessions",
+    "views": 17,
+    "strategy": "redirect-closest",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 42,
+    "old_path": "DreamFactory/Tutorials/Setting_up_user_roles",
+    "views": 17,
+    "strategy": "redirect",
+    "new_target": "Security/Role_Based_Access"
+  },
+  {
+    "rank": 43,
+    "old_path": "DreamFactory/Tutorials/Temp_Conversion_SOAP_API",
+    "views": 17,
+    "strategy": "redirect",
+    "new_target": "Remote_HTTP_And_SOAP_Connectors"
+  },
+  {
+    "rank": 44,
+    "old_path": "DreamFactory/Features/Database/Related_Data",
+    "views": 16,
+    "strategy": "redirect",
+    "new_target": "Advanced_Database_Api_Features"
+  },
+  {
+    "rank": 45,
+    "old_path": "DreamFactory/Features/Roles",
+    "views": 16,
+    "strategy": "redirect",
+    "new_target": "Security/Role_Based_Access"
+  },
+  {
+    "rank": 46,
+    "old_path": "DreamFactory/Tutorials/Access_Using_API_Key",
+    "views": 16,
+    "strategy": "redirect",
+    "new_target": "Api_Keys"
+  },
+  {
+    "rank": 47,
+    "old_path": "DreamFactory/Tutorials/Basic_Auth",
+    "views": 16,
+    "strategy": "redirect",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 48,
+    "old_path": "DreamFactory/Tutorials/Connecting_to_SQL",
+    "views": 16,
+    "strategy": "redirect",
+    "new_target": "Generating_Database_Backed_Api"
+  },
+  {
+    "rank": 49,
+    "old_path": "DreamFactory/Tutorials/Sending_Push_Notifications_Using_APNS",
+    "views": 16,
+    "strategy": "redirect-closest",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 50,
+    "old_path": "DreamFactory/Features",
+    "views": 15,
+    "strategy": "hub",
+    "new_target": null,
+    "hub_links": [
+      {"label": "Database-Backed APIs", "target": "Generating_Database_Backed_Api"},
+      {"label": "Querying and Filtering", "target": "Querying_Filtering"},
+      {"label": "Advanced Database Features", "target": "Advanced_Database_Api_Features"},
+      {"label": "SQL Server Integration", "target": "Sql_Server"},
+      {"label": "Scripting Resources", "target": "Scripting_Resources"},
+      {"label": "Scripted Services and Endpoints", "target": "Scripted_Services_And_Endpoints"},
+      {"label": "Event Scripts", "target": "Event_Scripts"},
+      {"label": "Authentication", "target": "Security/Authentication_Apis"},
+      {"label": "Role-Based Access Control", "target": "Security/Role_Based_Access"},
+      {"label": "Rate Limiting (API Limits)", "target": "Security/Rate_Limiting"},
+      {"label": "File Services", "target": "File"},
+      {"label": "Converting Excel to JSON (CSV)", "target": "Converting_Excel_To_Json"},
+      {"label": "Remote HTTP and SOAP Connectors", "target": "Remote_HTTP_And_SOAP_Connectors"},
+      {"label": "Log Services (Logstash)", "target": "System_Settings/Logstash"},
+      {"label": "API Keys", "target": "Api_Keys"},
+      {"label": "Live API Docs", "target": "Introducing_Rest_Dreamfactory"},
+      {"label": "CORS and SSL", "target": "System_Settings/Cors_Ssl"}
+    ]
+  },
+  {
+    "rank": 51,
+    "old_path": "DreamFactory/Release_Notes",
+    "views": 15,
+    "strategy": "stub",
+    "new_target": null,
+    "stub_title": "Release Notes",
+    "stub_content": "For the latest DreamFactory release notes, see the [https://github.com/dreamfactorysoftware/dreamfactory/releases DreamFactory GitHub Releases] page.",
+    "stub_links": [
+      {"label": "Upgrading and Migrating DreamFactory", "target": "Upgrading_Migrating_Dreamfactory"},
+      {"label": "Upgrading PHP on Windows", "target": "Upgrading_Php_Windows"},
+      {"label": "Upgrading to PHP 8.1", "target": "Upgrading_To_Php_8_1"}
+    ]
+  },
+  {
+    "rank": 52,
+    "old_path": "DreamFactory/Features/Log_Services",
+    "views": 14,
+    "strategy": "redirect",
+    "new_target": "System_Settings/Logstash"
+  },
+  {
+    "rank": 53,
+    "old_path": "DreamFactory/Tutorials/Access_Using_JWT_and_API_Key",
+    "views": 14,
+    "strategy": "redirect",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 54,
+    "old_path": "DreamFactory/Tutorials/Connecting_to_Data_Sources",
+    "views": 14,
+    "strategy": "redirect",
+    "new_target": "Api_Creation_Management"
+  },
+  {
+    "rank": 55,
+    "old_path": "DreamFactory/Tutorials/Enabling_CORS_access",
+    "views": 14,
+    "strategy": "redirect",
+    "new_target": "System_Settings/Cors_Ssl"
+  },
+  {
+    "rank": 56,
+    "old_path": "DreamFactory/Tutorials/Paginating_with_limits_and_offsets",
+    "views": 14,
+    "strategy": "redirect",
+    "new_target": "Querying_Filtering"
+  },
+  {
+    "rank": 57,
+    "old_path": "DreamFactory/Tutorials/Querying_stored_procedures",
+    "views": 14,
+    "strategy": "redirect",
+    "new_target": "Advanced_Database_Api_Features"
+  },
+  {
+    "rank": 58,
+    "old_path": "DreamFactory/Features/Database/SQLServer_Features",
+    "views": 13,
+    "strategy": "redirect",
+    "new_target": "Sql_Server"
+  },
+  {
+    "rank": 59,
+    "old_path": "DreamFactory/Features/Scripting/Event_Scripting",
+    "views": 13,
+    "strategy": "redirect",
+    "new_target": "Event_Scripts"
+  },
+  {
+    "rank": 60,
+    "old_path": "DreamFactory/Software_Dependencies",
+    "views": 13,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Installing_Dreamfactory"
+  },
+  {
+    "rank": 61,
+    "old_path": "DreamFactory/Tutorials/Connecting_to_GraphQL",
+    "views": 13,
+    "strategy": "redirect-closest",
+    "new_target": "Api_Creation_Management"
+  },
+  {
+    "rank": 62,
+    "old_path": "DreamFactory/Tutorials/PHP_platform_api_crud",
+    "views": 13,
+    "strategy": "redirect",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 63,
+    "old_path": "DreamFactory/Tutorials/Uploading_File",
+    "views": 13,
+    "strategy": "redirect",
+    "new_target": "File"
+  },
+  {
+    "rank": 64,
+    "old_path": "DreamFactory/Tutorials/Using_the_API_Docs",
+    "views": 13,
+    "strategy": "redirect",
+    "new_target": "Introducing_Rest_Dreamfactory"
+  },
+  {
+    "rank": 65,
+    "old_path": "DreamFactory/Yum/CentOS_7/Installation_CentOS_7",
+    "views": 13,
+    "strategy": "redirect",
+    "new_target": "Getting_Started/Linux_Installation"
+  },
+  {
+    "rank": 66,
+    "old_path": "Wiki:About",
+    "views": 13,
+    "strategy": "no-action",
+    "new_target": null,
+    "note": "MediaWiki built-in page"
+  },
+  {
+    "rank": 67,
+    "old_path": "DreamFactory/Features/CSV",
+    "views": 12,
+    "strategy": "redirect",
+    "new_target": "Converting_Excel_To_Json"
+  },
+  {
+    "rank": 68,
+    "old_path": "DreamFactory/Features/Database/SQL",
+    "views": 12,
+    "strategy": "redirect",
+    "new_target": "Generating_Database_Backed_Api"
+  },
+  {
+    "rank": 69,
+    "old_path": "DreamFactory/Features/Database/SQLite_Features",
+    "views": 12,
+    "strategy": "redirect",
+    "new_target": "Generating_Database_Backed_Api"
+  },
+  {
+    "rank": 70,
+    "old_path": "DreamFactory/Installation/Databases/MySQL_Installation",
+    "views": 12,
+    "strategy": "redirect",
+    "new_target": "Getting_Started/Installing_Additional_Drivers"
+  },
+  {
+    "rank": 71,
+    "old_path": "DreamFactory/Tutorials/V8_custom_scripting_service_add",
+    "views": 12,
+    "strategy": "redirect",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 72,
+    "old_path": "DreamFactory/Yum",
+    "views": 12,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Linux_Installation"
+  },
+  {
+    "rank": 73,
+    "old_path": "DreamFactory/Installation/Databases/SQLServer_as_a_System_Database",
+    "views": 11,
+    "strategy": "redirect",
+    "new_target": "Security/Sql_Server_Configuration"
+  },
+  {
+    "rank": 74,
+    "old_path": "DreamFactory/Tutorials/Edmunds_API",
+    "views": 11,
+    "strategy": "redirect-closest",
+    "new_target": "Remote_HTTP_And_SOAP_Connectors"
+  },
+  {
+    "rank": 75,
+    "old_path": "DreamFactory/Tutorials/Logging_in",
+    "views": 11,
+    "strategy": "redirect",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 76,
+    "old_path": "DreamFactory/Tutorials/Querying_SQL_views",
+    "views": 11,
+    "strategy": "redirect",
+    "new_target": "Advanced_Database_Api_Features"
+  },
+  {
+    "rank": 77,
+    "old_path": "DreamFactory/Tutorials/Retrieving_AD_Users",
+    "views": 11,
+    "strategy": "redirect-closest",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 78,
+    "old_path": "DreamFactory/Tutorials/Setting_up_An_ELK_Stack",
+    "views": 11,
+    "strategy": "redirect",
+    "new_target": "System_Settings/Logstash"
+  },
+  {
+    "rank": 79,
+    "old_path": "DreamFactory/Tutorials/Specifying_fields",
+    "views": 11,
+    "strategy": "redirect",
+    "new_target": "Querying_Filtering"
+  },
+  {
+    "rank": 80,
+    "old_path": "DreamFactory/Tutorials/V8_platform_api_crud",
+    "views": 11,
+    "strategy": "redirect",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 81,
+    "old_path": "Wiki:General_disclaimer",
+    "views": 11,
+    "strategy": "no-action",
+    "new_target": null,
+    "note": "MediaWiki built-in page"
+  },
+  {
+    "rank": 82,
+    "old_path": "DreamFactory/APT",
+    "views": 10,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Linux_Installation"
+  },
+  {
+    "rank": 83,
+    "old_path": "DreamFactory/APT/Ubuntu_16.04/Upgrades_Ubuntu_16",
+    "views": 10,
+    "strategy": "redirect-closest",
+    "new_target": "Upgrading_Migrating_Dreamfactory"
+  },
+  {
+    "rank": 84,
+    "old_path": "DreamFactory/Apps",
+    "views": 10,
+    "strategy": "redirect",
+    "new_target": "Demo_DreamFactory_Applications"
+  },
+  {
+    "rank": 85,
+    "old_path": "DreamFactory/Tutorials/Connecting_to_SOAP_Services",
+    "views": 10,
+    "strategy": "redirect",
+    "new_target": "Remote_HTTP_And_SOAP_Connectors"
+  },
+  {
+    "rank": 86,
+    "old_path": "DreamFactory/Tutorials/Enabling_script_access",
+    "views": 10,
+    "strategy": "redirect",
+    "new_target": "Scripting_Resources"
+  },
+  {
+    "rank": 87,
+    "old_path": "DreamFactory/Tutorials/Node_custom_scripting_service_math",
+    "views": 10,
+    "strategy": "redirect",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 88,
+    "old_path": "DreamFactory/Tutorials/PHP_Custom_scripting_service_math",
+    "views": 10,
+    "strategy": "redirect",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 89,
+    "old_path": "DreamFactory/Tutorials/Retrieving_AD_Groups",
+    "views": 10,
+    "strategy": "redirect-closest",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 90,
+    "old_path": "DreamFactory/Tutorials/Sending_Push_Notifications",
+    "views": 10,
+    "strategy": "redirect-closest",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 91,
+    "old_path": "DreamFactory/Tutorials/Using_OAuth",
+    "views": 10,
+    "strategy": "redirect",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 92,
+    "old_path": "DreamFactory/APT/Ubuntu_16.04/Installation_Ubuntu_16",
+    "views": 9,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Linux_Installation"
+  },
+  {
+    "rank": 93,
+    "old_path": "DreamFactory/Features/Lookups",
+    "views": 9,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Basic_Configuration"
+  },
+  {
+    "rank": 94,
+    "old_path": "DreamFactory/Features/Scripting/Script_Services",
+    "views": 9,
+    "strategy": "redirect",
+    "new_target": "Scripted_Services_And_Endpoints"
+  },
+  {
+    "rank": 95,
+    "old_path": "DreamFactory/Installation/Modules/v8js_Installation",
+    "views": 9,
+    "strategy": "redirect-closest",
+    "new_target": "Getting_Started/Installing_Additional_Drivers"
+  },
+  {
+    "rank": 96,
+    "old_path": "DreamFactory/Security_Bulletins",
+    "views": 9,
+    "strategy": "stub",
+    "new_target": null,
+    "stub_title": "Security Bulletins",
+    "stub_content": "For security advisories and bulletins related to DreamFactory, please refer to the [https://github.com/dreamfactorysoftware/dreamfactory/security DreamFactory Security page on GitHub].",
+    "stub_links": [
+      {"label": "Authentication APIs", "target": "Security/Authentication_Apis"},
+      {"label": "Role-Based Access Control", "target": "Security/Role_Based_Access"},
+      {"label": "Security FAQ", "target": "Security/Security_Faq"}
+    ]
+  },
+  {
+    "rank": 97,
+    "old_path": "DreamFactory/Tutorials/Configuration",
+    "views": 9,
+    "strategy": "redirect",
+    "new_target": "Getting_Started/Basic_Configuration"
+  },
+  {
+    "rank": 98,
+    "old_path": "DreamFactory/Tutorials/Refreshing_a_JWT",
+    "views": 9,
+    "strategy": "redirect",
+    "new_target": "Security/Authentication_Apis"
+  },
+  {
+    "rank": 99,
+    "old_path": "DreamFactory/Tutorials/Setting_up_guest_access",
+    "views": 9,
+    "strategy": "redirect",
+    "new_target": "Security/Role_Based_Access"
+  },
+  {
+    "rank": 100,
+    "old_path": "DreamFactory/Tutorials/V8_custom_formulas",
+    "views": 9,
+    "strategy": "redirect",
+    "new_target": "Scripting_Resources"
+  }
+]

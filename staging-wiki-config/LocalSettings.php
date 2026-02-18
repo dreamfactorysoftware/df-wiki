@@ -14,7 +14,10 @@ $wgMetaNamespace = "DreamFactory_Wiki";
 ## Server and paths
 $wgServer = WebRequest::detectServer();
 $wgScriptPath = "";
-$wgArticlePath = "/index.php/$1";
+$wgArticlePath = "/$1";
+
+## Enable subpages in main namespace (required for old wiki redirects like DreamFactory/Installation)
+$wgNamespacesWithSubpages[NS_MAIN] = true;
 
 ## Site logo — image is 300x300, Vector skin will scale via CSS
 $wgLogo = '/images/5/55/Dreamfactoryicon.webp';

@@ -1,6 +1,4 @@
 = Installing DreamFactory =
-<span id="installing-dreamfactory"></span>
-= Installing DreamFactory =
 
 Welcome to the installation guide for DreamFactory! This section focuses on the initial installation of DreamFactory on our supported platforms.
 

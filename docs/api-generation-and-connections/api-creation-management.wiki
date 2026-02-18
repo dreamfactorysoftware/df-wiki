@@ -1,6 +1,4 @@
 = API Creation and Management =
-<span id="api-creation-and-management"></span>
-= API Creation and Management =
 
 DreamFactory uses a service-oriented architecture where every API connection is represented as a '''service'''. A service encapsulates the configuration, authentication, and endpoint definitions needed to interact with an external data source or system. Once created, each service is automatically assigned a namespace (e.g., <code>/api/v2/mysql</code>, <code>/api/v2/s3files</code>) through which all of its endpoints are accessible via DreamFactory's unified REST interface.
 

@@ -1,0 +1,12 @@
+= Troubleshooting =
+
+This page covers common troubleshooting steps for DreamFactory. For frequently asked questions, see [[Architecture_FAQ]].
+
+== Related Pages ==
+
+* [[Architecture_FAQ|Architecture FAQ]]
+* [[Getting_Started/Installing_Dreamfactory|Installing DreamFactory]]
+* [[Getting_Started/Basic_Configuration|Configuration]]
+* [[Appendix_Configuration_Parameters|Appendix: Configuration Parameters]]
+
+[[Category:Navigation]]
