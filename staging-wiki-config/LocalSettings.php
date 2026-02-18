@@ -1,4 +1,9 @@
 <?php
+# ============================================================
+# STAGING ONLY — do NOT use this config in production.
+# See production-wiki-config/LocalSettings.php for production.
+# ============================================================
+#
 # LocalSettings.php for Staging Wiki (migration target)
 # Writable instance for testing the upload pipeline.
 
@@ -12,7 +17,7 @@ $wgSitename = "DreamFactory Wiki (Staging)";
 $wgMetaNamespace = "DreamFactory_Wiki";
 
 ## Server and paths
-$wgServer = WebRequest::detectServer();
+$wgServer = "http://localhost:8082";
 $wgScriptPath = "";
 $wgArticlePath = "/$1";
 
@@ -43,7 +48,7 @@ $wgUpgradeKey = "b2c3d4e5f6a1b2c3";
 $wgEnableUploads = true;
 $wgFileExtensions = array_merge(
     $wgFileExtensions,
-    [ 'svg', 'webp' ]
+    [ 'webp' ]
 );
 
 ## Skin
@@ -104,9 +109,9 @@ $wgGroupPermissions['bot']['noratelimit'] = true;
 $wgGroupPermissions['bot']['bot'] = true;
 $wgGroupPermissions['sysop']['noratelimit'] = true;
 $wgGroupPermissions['*']['noratelimit'] = true;
-$wgGroupPermissions['*']['editinterface'] = true;
-$wgGroupPermissions['*']['editsitecss'] = true;
-$wgGroupPermissions['*']['editsitejs'] = true;
+$wgGroupPermissions['*']['editinterface'] = false;
+$wgGroupPermissions['*']['editsitecss'] = false;
+$wgGroupPermissions['*']['editsitejs'] = false;
 
 ## Debug (staging only)
 $wgShowExceptionDetails = true;
