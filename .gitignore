@@ -12,6 +12,9 @@ mediawiki/
 MIGRATION_BRIEF.md
 SESSION_REPORT.md
 
+# Staging wiki extensions (cloned locally)
+staging-wiki-extensions/
+
 # Python virtual environment
 scripts/.venv/
 
