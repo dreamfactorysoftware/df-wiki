@@ -9,7 +9,7 @@ API connector category card for the Main Page connectors grid.
 
 == Usage ==
 <pre>
-{{ConnectorType|type=SQL Databases|icon=🗄️|items=MySQL, PostgreSQL, SQL Server, Oracle, SQLite, IBM Db2|link=API/Generating A Database-Backed API}}
+{{ConnectorType|type=SQL Databases|icon=🗄️|items=MySQL, PostgreSQL, SQL Server, Oracle, SQLite, IBM Db2|link=Generating Database Backed Api}}
 </pre>
 </noinclude><includeonly><div class="mp-connector-card">
 <div class="mp-connector-header">

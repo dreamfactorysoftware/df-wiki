@@ -35,7 +35,7 @@ __NOEDITSECTION__
 {{NavCard|icon=🐳|title=Docker Install|link=Getting Started/Docker Installation|description=Get running in minutes with Docker Compose}}
 {{NavCard|icon=🐧|title=Linux Install|link=Getting Started/Linux Installation|description=Install DreamFactory on Ubuntu, Debian, CentOS, or RHEL}}
 {{NavCard|icon=🔐|title=Authentication|link=Security/Authentication Apis|description=Secure your APIs with key-based and role-based access}}
-{{NavCard|icon=🗄️|title=Database APIs|link=API/Generating A Database-Backed API|description=Instantly generate a governed REST API for any SQL or NoSQL database}}
+{{NavCard|icon=🗄️|title=Database APIs|link=Generating Database Backed Api|description=Instantly generate a governed REST API for any SQL or NoSQL database}}
 {{NavCard|icon=👥|title=Role-Based Access|link=Security/Role Based Access|description=Fine-grained access control for API endpoints and data}}
 {{NavCard|icon=⚡|title=Scripted Services|link=Scripted Services And Endpoints|description=Add custom logic with server-side scripting}}
 {{NavCard|icon=📁|title=File APIs|link=Creating Aws S3 Rest Api|description=Manage S3, Azure Blob, SFTP, and local file storage via REST}}
@@ -47,7 +47,7 @@ __NOEDITSECTION__
 <div class="mp-section" id="connectors">
 <h2 class="mp-section-heading">Supported API Connectors</h2>
 <div class="mp-connector-grid">
-{{ConnectorType|type=SQL Databases|icon=🗄️|items=MySQL, PostgreSQL, SQL Server, Oracle, SQLite, IBM Db2, SAP SQL Anywhere, Firebird|link=API/Generating A Database-Backed API}}
+{{ConnectorType|type=SQL Databases|icon=🗄️|items=MySQL, PostgreSQL, SQL Server, Oracle, SQLite, IBM Db2, SAP SQL Anywhere, Firebird|link=Generating Database Backed Api}}
 {{ConnectorType|type=NoSQL|icon=🍃|items=MongoDB, AWS DynamoDB, Azure Cosmos DB, CouchDB|link=Advanced Database Api Features}}
 {{ConnectorType|type=File Storage|icon=📂|items=AWS S3, Azure Blob, Google Cloud Storage, SFTP, FTP, Local|link=Creating Aws S3 Rest Api}}
 {{ConnectorType|type=Remote APIs|icon=🌐|items=HTTP, SOAP, Push Notifications, Email (SMTP), Apple Push|link=Remote HTTP And SOAP Connectors}}
@@ -79,7 +79,7 @@ __NOEDITSECTION__
 </div>
 <div class="mp-popular-col">
 <h3>APIs &amp; Data</h3>
-* [[API/Generating A Database-Backed API|Database-Backed APIs]]
+* [[Generating Database Backed Api|Database-Backed APIs]]
 * [[Advanced Database Api Features|Advanced DB Features]]
 * [[Querying Filtering|Querying &amp; Filtering]]
 * [[Creating Aws S3 Rest Api|AWS S3 File API]]
