@@ -108,7 +108,13 @@ $wgRateLimits['upload']['bot'] = [ 0, 60 ];
 ## Allow bots to bypass some restrictions
 $wgGroupPermissions['bot']['noratelimit'] = true;
 $wgGroupPermissions['bot']['bot'] = true;
+$wgGroupPermissions['bot']['editinterface'] = true;
+$wgGroupPermissions['bot']['editsitecss'] = true;
+$wgGroupPermissions['bot']['editsitejs'] = true;
 $wgGroupPermissions['sysop']['noratelimit'] = true;
+$wgGroupPermissions['sysop']['editinterface'] = true;
+$wgGroupPermissions['sysop']['editsitecss'] = true;
+$wgGroupPermissions['sysop']['editsitejs'] = true;
 $wgGroupPermissions['*']['noratelimit'] = true;
 $wgGroupPermissions['*']['editinterface'] = false;
 $wgGroupPermissions['*']['editsitecss'] = false;
