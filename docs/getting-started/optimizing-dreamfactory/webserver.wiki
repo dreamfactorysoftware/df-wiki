@@ -1,3 +1,4 @@
+<span id="web-server-optimization"></span>
 = Web Server Optimization =
 
 The web server is a critical component of your DreamFactory deployment. Proper configuration of NGINX or Apache, combined with PHP-FPM tuning, can dramatically improve API throughput and response latency. This guide covers the essential settings for production DreamFactory environments.

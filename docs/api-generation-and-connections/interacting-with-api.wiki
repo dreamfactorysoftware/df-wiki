@@ -1,4 +1,3 @@
-= Interacting With the API =
 '''Learn to interact with DreamFactory APIs using HTTP clients for CRUD operations, filtering, joins, and stored procedures'''
 
 <span id="interacting-with-the-api"></span>

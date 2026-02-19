@@ -1,3 +1,4 @@
+<span id="database-apis"></span>
 = Database APIs =
 
 Ensuring the DreamFactory-generated database APIs are running at peak performance is accomplished by ensuring your database is properly configured, has been allocated appropriate hardware and network resources, and by turning on DreamFactory's database caching feature. All of these tasks are covered in this topic.

@@ -1,4 +1,3 @@
-= User Management =
 '''Manage users and admins via the System API with endpoints for creating, updating, and deleting accounts'''
 
 <span id="user-management"></span>

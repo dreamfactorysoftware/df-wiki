@@ -1,4 +1,3 @@
-= MCP Server =
 '''Integrate DreamFactory with AI assistants and dev tools using the Model Context Protocol (MCP) for database operations.'''
 
 <span id="mcp-server"></span>
@@ -133,7 +132,6 @@ By leveraging the MCP server, you can extend DreamFactory's functionality and cr
 == See also ==
 * [[AI_Services/Mcp_Service_Creation|Creating an MCP Server Service]]
 * [[AI_Services/Mcp_Custom_Login_Page|Custom Login Page for MCP]]
-* [[AI_Services/Mcp_Service|MCP Server]]
 
 [[Category:Mcp]]
 [[Category:Model_Context_Protocol]]

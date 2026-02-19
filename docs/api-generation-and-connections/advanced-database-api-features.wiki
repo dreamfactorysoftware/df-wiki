@@ -116,11 +116,11 @@ select product_name, date(sold_at) from sales;
 </syntaxhighlight>
 Using the <code>date()</code> function is easy enough when writing standard SQL. But how would this be accomplished via an API call? Fortunately, DreamFactory's <code>Schema</code> tab (located at Admin Settings &gt; Schema) offers a very easy way to modify column formatting using a database function. Click on the Schema tab, select your database-based service, and then choose a table. You'll see a section named <code>Fields</code> that itemizes each column found in that table:
 
-[[File:table-columns.jpg|thumb|DreamFactory table columns]]
+[[File:table-columns.png|thumb|DreamFactory table columns]]
 
 Click on a field such as <code>sold_at</code> and scroll to the bottom of the column detail page. You'll find a section named <code>DB Function Use</code>. Click the <code>+</code> button and you'll be able to modify the column output via a database function:
 
-[[File:column-db-function-use.jpg|thumb|DreamFactory DB functions]]
+[[File:column-db-function-use.png|thumb|DreamFactory DB functions]]
 
 You can use the select box to determine when the database function is applied, meaning you can use different functions according to which HTTP method is used in conjunction with the endpoint call.
 
@@ -167,11 +167,11 @@ select concat(`first_name`, &quot; &quot;, `last_name`) from employees;
 </syntaxhighlight>
 You still probably want the option of retrieving the first and last name in some use cases, but also retrieving the concatenated name in others. To do so, you can create a ''virtual field''. Click on the <code>Schema</code> tab and choose the service and table you'd like to modify. Then click the <code>Add Field</code> (purple circle with +) button:
 
-[[File:fields-add-field.jpg|thumb|Adding a virtual field]]
+[[File:fields-add-field.png|thumb|Adding a virtual field]]
 
 On this screen you'll define the virtual field. To do so, it is critically important that you click the <code>Is Virtual?</code> checkbox. Neglecting to do so will prompt DreamFactory to alter the actual database schema! In most cases this will fail due to the connecting user not possessing sufficient permissions, however if the connecting user is assigned alter privileges then the table will in fact be modified. Additionally assign a field name, label, and column type:
 
-[[File:virtual-field.jpg|thumb|Defining a virtual field]]
+[[File:virtual-field.png|thumb|Defining a virtual field]]
 
 Next, scroll to the bottom of the screen and add a new database function entry. To concatenate the <code>first_name</code> and <code>last_name</code> fields together I've used the following function:
 

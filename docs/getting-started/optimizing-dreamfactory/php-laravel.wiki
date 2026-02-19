@@ -1,3 +1,4 @@
+<span id="php-and-laravel-optimization"></span>
 = PHP and Laravel Optimization =
 
 DreamFactory is built on PHP and the Laravel framework. Properly configuring the PHP runtime and leveraging Laravel's built-in optimization features can significantly improve API response times and overall throughput. This guide covers the key settings and techniques for getting the best performance from your DreamFactory installation.

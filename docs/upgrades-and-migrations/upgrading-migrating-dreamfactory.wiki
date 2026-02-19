@@ -1,5 +1,3 @@
-= Upgrading and Migrating DreamFactory =
-import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 <span id="upgrading-and-migrating-dreamfactory"></span>
 = Upgrading and Migrating DreamFactory =

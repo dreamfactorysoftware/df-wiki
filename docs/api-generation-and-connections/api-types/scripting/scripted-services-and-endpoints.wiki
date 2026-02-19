@@ -1,4 +1,3 @@
-= Creating Scripted Services and Endpoints =
 '''Build custom API services using PHP, Python, or Node.js scripts to add business logic and integrations'''
 
 <span id="creating-scripted-services-and-endpoints"></span>
@@ -71,7 +70,6 @@ By leveraging scripted services, you can enhance the capabilities of your DreamF
 
 == See also ==
 * [[Scripting_Resources|Scripting Resources]]
-* [[Scripted_Services_And_Endpoints|Creating Scripted Services and Endpoints]]
 
 [[Category:Scripted_Services]]
 [[Category:Php_Api]]

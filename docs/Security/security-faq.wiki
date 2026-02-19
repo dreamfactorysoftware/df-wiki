@@ -1,7 +1,5 @@
-= Security FAQ =
 '''Answers to common security questions about DreamFactory's platform, compliance, encryption, and best practices'''
 
-import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 <span id="security-faq"></span>
 = Security FAQ =

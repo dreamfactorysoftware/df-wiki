@@ -1,7 +1,5 @@
-= Querying and Filtering Records =
 '''Learn how to query, filter, sort, and paginate database records using DreamFactory's REST API'''
 
-import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 <span id="querying-and-filtering-records-in-dreamfactory"></span>
 = Querying and Filtering Records in DreamFactory =
@@ -319,7 +317,6 @@ Date/time formats can be configured globally in your DreamFactory configuration.
 == See also ==
 * [[Generating_Database_Backed_Api|Generating a Database-backed API]]
 * [[Sql_Server|Microsoft SQL Server]]
-* [[Querying_Filtering|Querying and Filtering Records]]
 
 [[Category:Database_Query]]
 [[Category:Api_Filtering]]

@@ -1,4 +1,3 @@
-= Creating an AWS S3 REST API =
 '''Generate a REST API for AWS S3 buckets to manage files with role-based access and rate limiting'''
 
 <span id="creating-an-aws-s3-rest-api"></span>
@@ -44,7 +43,6 @@ Snapshot of the file on S3:
 * [[Converting_Excel_To_Json|Converting Excel to a JSON Response]]
 * [[Creating_Sftp_Rest_Api|Creating an SFTP REST API]]
 * [[File|File System APIs]]
-* [[Creating_Aws_S3_Rest_Api|Creating an AWS S3 REST API]]
 
 [[Category:Aws_S3]]
 [[Category:File_Storage]]

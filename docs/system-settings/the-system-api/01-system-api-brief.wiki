@@ -1,4 +1,3 @@
-= Using the System APIs =
 '''Programmatically manage DreamFactory users, services, roles, and API keys through REST System APIs for DevOps automation.'''
 
 <span id="using-the-system-apis"></span>

@@ -1,3 +1,4 @@
+<span id="upgrading-php-on-windows"></span>
 = Upgrading PHP on Windows =
 
 This guide walks through the process of updating the PHP version on a Windows server running DreamFactory. Follow these steps carefully to ensure a smooth upgrade process.

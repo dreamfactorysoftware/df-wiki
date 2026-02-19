@@ -1,4 +1,3 @@
-= Docker Installation =
 '''Install DreamFactory using Docker and docker-compose with MySQL, Redis, and a sample PostgreSQL database for testing.'''
 
 <span id="docker-installation"></span>

@@ -1,3 +1,4 @@
+<span id="windows-installation"></span>
 = Windows Installation =
 
 This page contains installation instructions for Windows.

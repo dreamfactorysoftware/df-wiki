@@ -1,4 +1,3 @@
-= Role Management =
 '''Create and configure roles via the System API using verb masks to control API endpoint access permissions'''
 
 <span id="role-management"></span>
