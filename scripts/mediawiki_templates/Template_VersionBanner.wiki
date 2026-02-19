@@ -15,7 +15,7 @@ This template creates a version banner for documentation pages.
 
 [[Category:Templates]]
 [[Category:Version Templates]]
-</noinclude><includeonly><div style="background:{{{color|#e3f2fd}}}; border:1px solid {{{border|#2196f3}}}; padding:15px; margin-bottom:20px; border-radius:4px;">
+</noinclude><includeonly><div style="background:{{{color|#e3f2fd}}}; border:1px solid {{{border|#2196f3}}}; padding:15px; margin-bottom:20px; border-radius:4px; color:#0d47a1;">
 '''DreamFactory {{{version}}} Documentation'''{{#ifeq:{{{current|no}}}|yes|| — ''This documentation is for an older version.''}}
 
 [[Main Page|View Current Documentation]] {{!}} [[:Category:DreamFactory {{{version}}}|All {{{version}}} Docs]]

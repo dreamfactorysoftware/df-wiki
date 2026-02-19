@@ -10,6 +10,6 @@ This template creates a warning box for highlighting critical information.
 * '''1''' - The warning text (required)
 
 [[Category:Templates]]
-</noinclude><includeonly><div style="background-color:#fff3cd; border-left:4px solid #ffc107; padding:12px 15px; margin:15px 0;">
+</noinclude><includeonly><div style="background-color:#fff3cd; border-left:4px solid #ffc107; padding:12px 15px; margin:15px 0; color:#664d03;">
 '''⚠️ Warning:''' {{{1}}}
 </div></includeonly>

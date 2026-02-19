@@ -10,6 +10,6 @@ This template creates a tip box for helpful suggestions.
 * '''1''' - The tip text (required)
 
 [[Category:Templates]]
-</noinclude><includeonly><div style="background-color:#e8f5e9; border-left:4px solid #4caf50; padding:12px 15px; margin:15px 0;">
+</noinclude><includeonly><div style="background-color:#e8f5e9; border-left:4px solid #4caf50; padding:12px 15px; margin:15px 0; color:#1b5e20;">
 '''💡 Tip:''' {{{1}}}
 </div></includeonly>
