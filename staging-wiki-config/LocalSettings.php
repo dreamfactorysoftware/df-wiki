@@ -17,7 +17,7 @@ $wgSitename = "DreamFactory Wiki (Staging)";
 $wgMetaNamespace = "DreamFactory_Wiki";
 
 ## Server and paths
-$wgServer = "http://localhost:8082";
+$wgServer = "http://138.68.41.148:8082";
 $wgScriptPath = "";
 $wgArticlePath = "/$1";
 

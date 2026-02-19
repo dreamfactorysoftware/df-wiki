@@ -19,6 +19,8 @@ Environment variables:
 import os
 import sys
 import json
+import csv
+import re
 import argparse
 import subprocess
 from pathlib import Path
@@ -137,17 +139,58 @@ class WikiSyncer:
             return json.loads(map_file.read_text(encoding='utf-8'))
         return {}
 
+    def _load_inventory_mapping(self) -> Dict[str, str]:
+        """Build file-path → wiki-page-name mapping from migration_inventory.csv."""
+        inv_path = SCRIPT_DIR / 'migration_inventory.csv'
+        if not inv_path.exists():
+            return {}
+        mapping = {}
+        with open(inv_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                source = row.get('source_path', '')
+                target = row.get('target_wiki_page', '')
+                status = row.get('status', '')
+                if not source or not target:
+                    continue
+                if status == 'Skip-EmptyDraft':
+                    continue
+                # Convert source_path to docs/-relative .wiki path
+                # e.g., "df-docs/df-docs/docs/introduction/introduction.md"
+                #     → "introduction/introduction.wiki"
+                for prefix in ['df-docs/df-docs/docs/', 'guide/dreamfactory-book-v2/content/en/docs/']:
+                    if source.startswith(prefix):
+                        source = source[len(prefix):]
+                        break
+                wiki_path = re.sub(r'\.md$', '.wiki', source)
+                # Handle _index.md → parent directory name
+                if wiki_path.endswith('_index.wiki'):
+                    wiki_path = str(Path(wiki_path).parent) + '.wiki'
+                    if wiki_path == '..wiki':
+                        continue  # root _index, skip
+                mapping[wiki_path] = target
+        return mapping
+
     def get_page_name_from_path(self, file_path: Path, source_dir: Path) -> str:
-        """Generate wiki page name from file path, using page_map.json if available."""
+        """Generate wiki page name from file path.
+
+        Lookup order: inventory CSV → page_map.json → auto-generate.
+        """
         rel_path = str(file_path.relative_to(source_dir))
 
-        # Check explicit mapping first
+        # 1. Check inventory CSV mapping (content pages)
+        if not hasattr(self, '_inventory_map'):
+            self._inventory_map = self._load_inventory_mapping()
+        if rel_path in self._inventory_map:
+            return self._inventory_map[rel_path]
+
+        # 2. Fall back to page_map.json (redirects and legacy overrides)
         if not hasattr(self, '_page_map'):
             self._page_map = self._load_page_map(source_dir)
         if rel_path in self._page_map:
             return self._page_map[rel_path]
 
-        # Fall back to auto-generated name
+        # 3. Auto-generate (last resort)
         name = str(Path(rel_path).with_suffix(''))
         parts = name.split('/')
         wiki_name = '/'.join(
@@ -155,6 +198,55 @@ class WikiSyncer:
             for part in parts
         )
         return wiki_name
+
+    def _auto_add_inventory_entries(self, source_files: List[Path], source_dir: Path) -> int:
+        """Detect unmapped .wiki files and append them to the inventory CSV."""
+        # Ensure both mappings are loaded
+        if not hasattr(self, '_inventory_map'):
+            self._inventory_map = self._load_inventory_mapping()
+        if not hasattr(self, '_page_map'):
+            self._page_map = self._load_page_map(source_dir)
+
+        new_entries = []
+        for src_file in source_files:
+            if src_file.suffix != '.wiki':
+                continue
+            rel_path = str(src_file.relative_to(source_dir))
+            if rel_path in self._inventory_map or rel_path in self._page_map:
+                continue
+            # Skip dotfiles and known non-content files
+            if src_file.name.startswith('.') or src_file.name == 'page_map.json':
+                continue
+            # Generate wiki page name (same logic as auto-generate fallback)
+            name = str(Path(rel_path).with_suffix(''))
+            parts = name.split('/')
+            wiki_name = '/'.join(
+                '_'.join(word.capitalize() for word in part.replace('-', '_').split('_'))
+                for part in parts
+            )
+            title = Path(rel_path).stem.replace('-', ' ').replace('_', ' ').title()
+            new_entries.append((rel_path, wiki_name, title))
+
+        if not new_entries:
+            return 0
+
+        inv_path = SCRIPT_DIR / 'migration_inventory.csv'
+        with open(inv_path, 'a', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            for rel_path, wiki_name, title in new_entries:
+                writer.writerow([
+                    f'docs/{rel_path}', 'auto', title, wiki_name,
+                    'P3-Low', 'Auto-Added', '', '0', '0', '0', '0', '', '',
+                    'Auto-added by sync pipeline'
+                ])
+                # Update in-memory cache so get_page_name_from_path() uses it
+                self._inventory_map[rel_path] = wiki_name
+
+        print(f"\nAuto-added {len(new_entries)} new page(s) to inventory CSV:")
+        for rel_path, wiki_name, _ in new_entries:
+            print(f"  {rel_path} → {wiki_name}")
+
+        return len(new_entries)
 
     def deploy_page(self, page_name: str, content: str, summary: str = None) -> bool:
         """Deploy a single page to wiki."""
@@ -184,6 +276,9 @@ class WikiSyncer:
             list(source_path.rglob('*.wiki')) + list(source_path.rglob('*.md'))
         )
         print(f"\nSyncing {len(source_files)} files from {source_dir}")
+
+        # Auto-add any unmapped files to inventory CSV
+        self._auto_add_inventory_entries(source_files, source_path)
 
         # Check for conflicts first
         page_names = [
