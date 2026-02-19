@@ -4,12 +4,12 @@ This template creates a warning box for highlighting critical information.
 == Usage ==
 <pre>
 {{Warning|Your warning text here}}
+{{Warning|title=Short title|Detailed body text}}
 </pre>
 
 == Parameters ==
-* '''1''' - The warning text (required)
+* '''1''' - The warning text (required unless title is given)
+* '''title''' - Optional title text
 
 [[Category:Templates]]
-</noinclude><includeonly><div class="df-admonition df-warning">
-'''⚠️ Warning:''' {{{1}}}
-</div></includeonly>
+</noinclude><includeonly><div class="df-admonition df-warning">{{#if:{{{title|}}}|'''⚠️ Warning: {{{title}}}''' {{{1|}}}|'''⚠️ Warning:''' {{{1}}}}}</div></includeonly>

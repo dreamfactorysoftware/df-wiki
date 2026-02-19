@@ -4,12 +4,12 @@ This template creates a note/info box for highlighting important information.
 == Usage ==
 <pre>
 {{Note|Your note text here}}
+{{Note|title=Short title|Detailed body text}}
 </pre>
 
 == Parameters ==
-* '''1''' - The note text (required)
+* '''1''' - The note text (required unless title is given)
+* '''title''' - Optional title text
 
 [[Category:Templates]]
-</noinclude><includeonly><div class="df-admonition df-note">
-'''ℹ️ Note:''' {{{1}}}
-</div></includeonly>
+</noinclude><includeonly><div class="df-admonition df-note">{{#if:{{{title|}}}|'''ℹ️ Note: {{{title}}}''' {{{1|}}}|'''ℹ️ Note:''' {{{1}}}}}</div></includeonly>
