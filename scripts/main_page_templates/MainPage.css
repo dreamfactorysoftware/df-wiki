@@ -1,3 +1,74 @@
+/* ═══════════════════ ADMONITION BOXES ═══════════════════ */
+
+.df-admonition {
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 2px;
+}
+
+.df-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    color: #664d03;
+}
+
+.df-note {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    color: #0d47a1;
+}
+
+.df-tip {
+    background-color: #e8f5e9;
+    border-left: 4px solid #4caf50;
+    color: #1b5e20;
+}
+
+/* Ensure links inside admonitions are visible */
+.df-admonition a { color: inherit; text-decoration: underline; }
+
+/* Dark mode admonitions */
+.dark-mode .df-warning {
+    background-color: #3d2f00;
+    border-left-color: #ffc107;
+    color: #ffe082;
+}
+
+.dark-mode .df-note {
+    background-color: #0a1929;
+    border-left-color: #2196f3;
+    color: #90caf9;
+}
+
+.dark-mode .df-tip {
+    background-color: #0a200e;
+    border-left-color: #4caf50;
+    color: #a5d6a7;
+}
+
+/* OS-level dark mode */
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) .df-warning {
+        background-color: #3d2f00;
+        border-left-color: #ffc107;
+        color: #ffe082;
+    }
+
+    html:not(.light-mode) .df-note {
+        background-color: #0a1929;
+        border-left-color: #2196f3;
+        color: #90caf9;
+    }
+
+    html:not(.light-mode) .df-tip {
+        background-color: #0a200e;
+        border-left-color: #4caf50;
+        color: #a5d6a7;
+    }
+}
+
+/* END ADMONITION BOXES */
+
 /* ═══════════════════════════════════════════════════════
    DreamFactory Main Page Styles
    Appended to MediaWiki:Common.css by upload_main_page.py
