@@ -1,4 +1,3 @@
-= Introducing REST and DreamFactory =
 '''Learn REST API fundamentals and how DreamFactory automates API generation, security, documentation, and business logic integration.'''
 
 <span id="introducing-rest-and-dreamfactory"></span>
@@ -198,7 +197,6 @@ There you have it; a thorough overview of REST APIs and the DreamFactory platfor
 
 == See also ==
 * [[Introduction|Introduction]]
-* [[Introducing_Rest_Dreamfactory|Introducing REST and DreamFactory]]
 
 [[Category:Rest_Api]]
 [[Category:Http_Methods]]

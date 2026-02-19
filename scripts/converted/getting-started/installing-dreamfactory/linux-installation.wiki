@@ -1,4 +1,3 @@
-= Linux Installation =
 <span id="linux-installation"></span>
 = Linux installation =
 

@@ -1,4 +1,3 @@
-= Windows Installation =
 <span id="windows-installation"></span>
 = Windows Installation =
 

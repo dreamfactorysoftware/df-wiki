@@ -1,4 +1,3 @@
-= Installing Additional Drivers =
 <span id="installing-additional-drivers"></span>
 = Installing Additional Drivers =
 

@@ -1,4 +1,3 @@
-= PHP and Laravel =
 <span id="php-and-laravel-optimization"></span>
 = PHP and Laravel Optimization =
 

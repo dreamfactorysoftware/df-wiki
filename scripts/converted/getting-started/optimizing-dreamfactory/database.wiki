@@ -1,4 +1,3 @@
-= Database APIs =
 <span id="database-apis"></span>
 = Database APIs =
 

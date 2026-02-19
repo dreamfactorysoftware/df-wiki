@@ -1,4 +1,3 @@
-= Installing DreamFactory =
 <span id="installing-dreamfactory"></span>
 = Installing DreamFactory =
 

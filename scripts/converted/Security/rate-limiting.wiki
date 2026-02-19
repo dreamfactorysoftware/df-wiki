@@ -1,4 +1,3 @@
-= Rate Limiting =
 <span id="rate-limiting"></span>
 = Rate Limiting =
 

@@ -1,4 +1,3 @@
-= Configuring Windows Authentication for SQL Server =
 <span id="configuring-windows-authentication-for-sql-server"></span>
 = Configuring Windows Authentication for SQL Server =
 

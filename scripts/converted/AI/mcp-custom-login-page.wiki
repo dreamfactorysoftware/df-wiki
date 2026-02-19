@@ -1,4 +1,3 @@
-= Custom Login Page for MCP =
 <span id="custom-login-page-for-mcp-oauth"></span>
 = Custom Login Page for MCP OAuth =
 

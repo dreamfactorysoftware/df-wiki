@@ -1,4 +1,3 @@
-= API Keys =
 '''Create and configure API keys in DreamFactory to authenticate requests and control access to your APIs'''
 
 <span id="api-keys"></span>
@@ -28,7 +27,7 @@ Click '''Save''' button and the new API key is generated.
 * [[Event_Scripts|Event Scripts]]
 * [[Interacting_With_Api|Interacting With the API]]
 * [[Advanced_Database_Api_Features|Advanced Database API Features]]
-* [[Api_Creation_Management|api-creation-management]]
+* [[Api_Creation_Management|API Creation and Management]]
 
 [[Category:Api_Key]]
 [[Category:Authentication]]

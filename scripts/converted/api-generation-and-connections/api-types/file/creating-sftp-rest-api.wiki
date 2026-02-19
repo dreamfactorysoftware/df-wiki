@@ -1,4 +1,3 @@
-= Creating an SFTP REST API =
 <span id="creating-an-sftp-rest-api"></span>
 = Creating an SFTP REST API =
 

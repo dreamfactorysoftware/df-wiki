@@ -1,4 +1,3 @@
-= Upgrading PHP On Windows =
 <span id="upgrading-php-on-windows"></span>
 = Upgrading PHP on Windows =
 

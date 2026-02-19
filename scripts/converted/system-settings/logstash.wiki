@@ -1,4 +1,3 @@
-= Logstash =
 <span id="dreamfactory-elk-stack-grafana-integration-guide"></span>
 = DreamFactory ELK Stack &amp; Grafana Integration Guide =
 

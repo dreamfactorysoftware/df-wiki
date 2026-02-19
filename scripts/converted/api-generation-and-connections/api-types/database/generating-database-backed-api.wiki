@@ -1,4 +1,3 @@
-= Generating a Database-backed API =
 '''Generate REST APIs from MySQL, PostgreSQL, SQL Server, Oracle, MongoDB and 15+ other databases in minutes'''
 
 <span id="generating-a-database-backed-api"></span>

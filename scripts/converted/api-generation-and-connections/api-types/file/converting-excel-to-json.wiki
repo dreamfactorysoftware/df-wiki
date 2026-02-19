@@ -1,4 +1,3 @@
-= Converting Excel to a JSON Response =
 <span id="converting-excel-to-a-json-response"></span>
 = Converting Excel to a JSON Response =
 

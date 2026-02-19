@@ -1,4 +1,3 @@
-= Web Server =
 <span id="web-server-optimization"></span>
 = Web Server Optimization =
 

@@ -594,8 +594,11 @@ def add_page_metadata(content: str, frontmatter: Dict) -> str:
 
     title = frontmatter.get('title', '')
     if title:
-        # Don't add redundant title if content already starts with it
-        if not content.strip().startswith(f'= {title} ='):
+        # Don't add redundant title if content already has an H1 near the top.
+        # Check the first 10 non-blank lines for any = ... = heading.
+        first_lines = [l for l in content.strip().splitlines()[:10] if l.strip()]
+        has_h1 = any(re.match(r'^= .+ =$', l.strip()) for l in first_lines)
+        if not has_h1:
             metadata_parts.append(f'= {title} =')
 
     description = frontmatter.get('description', '')
@@ -676,6 +679,9 @@ def clean_pandoc_artifacts(content: str) -> str:
     content = content.replace('\u201d', '"')  # Right double quotation mark
     content = content.replace('\u2018', "'")  # Left single quotation mark
     content = content.replace('\u2019', "'")  # Right single quotation mark
+
+    # Remove leftover Docusaurus import statements (e.g. import Tabs from '@theme/Tabs')
+    content = re.sub(r'^import .+ from [\'"]@theme/.+[\'"];?\s*$', '', content, flags=re.MULTILINE)
 
     return content
 

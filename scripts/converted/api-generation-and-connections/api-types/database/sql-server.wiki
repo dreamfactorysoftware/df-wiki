@@ -1,4 +1,3 @@
-= Microsoft SQL Server =
 '''Connect Microsoft SQL Server to DreamFactory and generate secure REST APIs with RBAC, rate limiting, and SSO'''
 
 <span id="connecting-microsoft-sql-server-to-dreamfactory"></span>

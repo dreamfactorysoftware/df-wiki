@@ -1,4 +1,3 @@
-= Event Scripts =
 '''Execute custom scripts on API events to validate requests, modify responses, and add business logic to your APIs'''
 
 <span id="event-scripts"></span>
@@ -149,7 +148,7 @@ By mastering event scripts, you can extend DreamFactory's functionality and crea
 * [[Api_Keys|API Keys]]
 * [[Interacting_With_Api|Interacting With the API]]
 * [[Advanced_Database_Api_Features|Advanced Database API Features]]
-* [[Api_Creation_Management|api-creation-management]]
+* [[Api_Creation_Management|API Creation and Management]]
 
 [[Category:Event_Scripts]]
 [[Category:Pre-Process]]

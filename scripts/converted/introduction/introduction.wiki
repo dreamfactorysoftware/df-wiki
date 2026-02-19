@@ -1,4 +1,3 @@
-= Introduction =
 '''DreamFactory is an open-source REST API platform that auto-generates secure, documented APIs for databases, files, and services.'''
 
 <span id="welcome-to-dreamfactory-documentation"></span>
