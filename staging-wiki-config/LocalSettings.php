@@ -105,20 +105,34 @@ $wgRateLimits['create']['bot'] = [ 0, 60 ];
 $wgRateLimits['upload']['anon'] = [ 0, 60 ];
 $wgRateLimits['upload']['bot'] = [ 0, 60 ];
 
-## Allow bots to bypass some restrictions
+## Anonymous users — read-only, no account creation
+$wgGroupPermissions['*']['edit'] = false;
+$wgGroupPermissions['*']['createpage'] = false;
+$wgGroupPermissions['*']['createtalk'] = false;
+$wgGroupPermissions['*']['createaccount'] = false;
+$wgGroupPermissions['*']['noratelimit'] = true;
+$wgGroupPermissions['*']['editinterface'] = false;
+$wgGroupPermissions['*']['editsitecss'] = false;
+$wgGroupPermissions['*']['editsitejs'] = false;
+
+## Registered users — can edit but not create accounts for others
+$wgGroupPermissions['user']['edit'] = true;
+$wgGroupPermissions['user']['createpage'] = true;
+$wgGroupPermissions['user']['createtalk'] = true;
+
+## Sysops — only admins can create new accounts
+$wgGroupPermissions['sysop']['createaccount'] = true;
+$wgGroupPermissions['sysop']['noratelimit'] = true;
+$wgGroupPermissions['sysop']['editinterface'] = true;
+$wgGroupPermissions['sysop']['editsitecss'] = true;
+$wgGroupPermissions['sysop']['editsitejs'] = true;
+
+## Bots
 $wgGroupPermissions['bot']['noratelimit'] = true;
 $wgGroupPermissions['bot']['bot'] = true;
 $wgGroupPermissions['bot']['editinterface'] = true;
 $wgGroupPermissions['bot']['editsitecss'] = true;
 $wgGroupPermissions['bot']['editsitejs'] = true;
-$wgGroupPermissions['sysop']['noratelimit'] = true;
-$wgGroupPermissions['sysop']['editinterface'] = true;
-$wgGroupPermissions['sysop']['editsitecss'] = true;
-$wgGroupPermissions['sysop']['editsitejs'] = true;
-$wgGroupPermissions['*']['noratelimit'] = true;
-$wgGroupPermissions['*']['editinterface'] = false;
-$wgGroupPermissions['*']['editsitecss'] = false;
-$wgGroupPermissions['*']['editsitejs'] = false;
 
 ## Debug (staging only)
 $wgShowExceptionDetails = true;
