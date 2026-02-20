@@ -58,12 +58,18 @@ def get_page_name(filepath: Path) -> str:
     Template_Foo.wiki -> Template:Foo
     Template_FooBar.wiki -> Template:FooBar
     MainPage.css -> MediaWiki:MainPage.css
+    Sidebar.wiki -> MediaWiki:Sidebar
     MainPage.wiki -> Template:MainPage
     """
     stem = filepath.stem
     suffix = filepath.suffix
 
-    if stem.startswith('Template_'):
+    # Files that map to MediaWiki: namespace (system pages)
+    MEDIAWIKI_PAGES = {'Sidebar'}
+
+    if stem in MEDIAWIKI_PAGES and suffix == '.wiki':
+        return f'MediaWiki:{stem}'
+    elif stem.startswith('Template_'):
         # Template_TechArticle -> Template:TechArticle
         name = stem[len('Template_'):]
         return f'Template:{name}'

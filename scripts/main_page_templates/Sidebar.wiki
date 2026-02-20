@@ -1,0 +1,74 @@
+* navigation
+** mainpage|Home
+** Special:AllPages|All Pages
+** Special:Categories|Categories
+** Special:RecentChanges|Recent Changes
+* Introduction
+** Introduction|Introduction
+** Introducing Rest Dreamfactory|REST & DreamFactory
+* Getting Started
+** Getting Started/Installing Dreamfactory|Installing DreamFactory
+** Getting Started/Docker Installation|Docker Installation
+** Getting Started/Linux Installation|Linux Installation
+** Getting Started/Windows Installation|Windows Installation
+** Getting Started/Helm Installation|Helm Installation
+** Getting Started/Raspberrypi Install|Raspberry Pi Install
+** Getting Started/Installing Additional Drivers|Additional Drivers
+** Getting Started/Basic Configuration|Basic Configuration
+** Getting Started/Date Time|Date & Time
+** Getting Started/Database|Database Optimization
+** Getting Started/Php Laravel|PHP & Laravel
+** Getting Started/Webserver|Web Server
+* APIs & Connections
+** Api Creation Management|API Creation & Management
+** Api Generation And Connections/Api Discovery|API Discovery & Specs
+** Generating Database Backed Api|Database-Backed APIs
+** Querying Filtering|Querying & Filtering
+** Sql Server|SQL Server
+** Advanced Database Api Features|Advanced DB Features
+** Api Keys|API Keys
+** Interacting With Api|Interacting with APIs
+** Event Scripts|Event Scripts
+** Remote HTTP And SOAP Connectors|Remote HTTP & SOAP
+** Integrating Salesforce Data|Salesforce Integration
+* File APIs
+** File|File Storage Overview
+** Creating Sftp Rest Api|SFTP REST API
+** Creating Aws S3 Rest Api|AWS S3 REST API
+** Converting Excel To Json|Excel to JSON
+* Scripting
+** Scripted Services And Endpoints|Scripted Services
+** Scripting Resources|Scripting Resources
+* Security
+** Security/Authentication Apis|Authentication APIs
+** Security/Role Based Access|Role-Based Access
+** Security/Rate Limiting|Rate Limiting
+** Security/Azure Ad Oauth|Azure AD OAuth
+** Security/Github Oauth|GitHub OAuth
+** Security/Okta Setup|Okta Setup
+** Security/Sql Server Configuration|SQL Server Config
+** Security/Security Faq|Security FAQ
+* System Settings
+** System Settings/01 System Api Brief|System API Overview
+** System Settings/02 User Management|User Management
+** System Settings/03 Service Management|Service Management
+** System Settings/04 Role Management|Role Management
+** System Settings/05 Api Key Management|API Key Management
+** System Settings/Cors Ssl|CORS & SSL
+** System Settings/Logstash|Logstash
+* AI Services
+** AI Services/Mcp Service|MCP Service
+** AI Services/Mcp Service Creation|MCP Service Creation
+** AI Services/Mcp Custom Login Page|MCP Custom Login
+* Upgrades
+** Upgrading Migrating Dreamfactory|Upgrading DreamFactory
+** Upgrading To Php 8 1|Upgrading to PHP 8.1
+** Upgrading Php Windows|Upgrading PHP (Windows)
+* Reference
+** Appendix Configuration Parameters|Configuration Parameters
+** Architecture FAQ|Architecture FAQ
+** GDPR API Gateway|GDPR & API Gateway
+** Scalability|Scalability
+** Demo DreamFactory Applications|Demo Applications
+* TOOLBOX
+* SEARCH
