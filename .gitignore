@@ -25,3 +25,4 @@ scripts/.last_sync.json
 .env
 .env.*
 !.env.example
+!.env.staging.example

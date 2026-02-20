@@ -28,12 +28,12 @@ $wgNamespacesWithSubpages[NS_MAIN] = true;
 $wgLogo = '/images/5/55/Dreamfactoryicon.webp';
 $wgFavicon = '/favicon.ico';
 
-## Database settings
+## Database settings (credentials from environment variables)
 $wgDBtype = "mysql";
 $wgDBserver = "staging-wiki-db";
-$wgDBname = "staging_wiki";
-$wgDBuser = "wiki_user";
-$wgDBpassword = "wiki_pass";
+$wgDBname = getenv('MW_DB_NAME') ?: "staging_wiki";
+$wgDBuser = getenv('MW_DB_USER');
+$wgDBpassword = getenv('MW_DB_PASSWORD');
 $wgDBprefix = "";
 $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 
@@ -41,9 +41,9 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgMainCacheType = CACHE_NONE;
 $wgMemCachedServers = [];
 
-## Security keys (local staging only — not used in production)
-$wgSecretKey = "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3";
-$wgUpgradeKey = "b2c3d4e5f6a1b2c3";
+## Security keys (from environment variables)
+$wgSecretKey = getenv('MW_SECRET_KEY');
+$wgUpgradeKey = getenv('MW_UPGRADE_KEY');
 
 ## File uploads — enabled for image migration
 $wgEnableUploads = true;

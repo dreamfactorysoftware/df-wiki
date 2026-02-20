@@ -4,24 +4,24 @@
 # This is the TARGET wiki — content gets uploaded here.
 #
 # Usage:
-#   docker-compose -f docker-compose.staging-wiki.yml up -d
-#   # Access at http://localhost:8082
-#   docker-compose -f docker-compose.staging-wiki.yml down -v
+#   cp .env.staging.example .env.staging  # fill in credentials
+#   docker compose -f docker-compose.staging-wiki.yml --env-file .env.staging up -d
+#   docker compose -f docker-compose.staging-wiki.yml down -v
 
 services:
   staging-wiki-db:
     image: mysql:8.0
     container_name: staging-wiki-db
     environment:
-      MYSQL_ROOT_PASSWORD: staging_root_pass
-      MYSQL_DATABASE: staging_wiki
-      MYSQL_USER: wiki_user
-      MYSQL_PASSWORD: wiki_pass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MW_DB_NAME}
+      MYSQL_USER: ${MW_DB_USER}
+      MYSQL_PASSWORD: ${MW_DB_PASSWORD}
     volumes:
       - staging_wiki_db_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pstaging_root_pass"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,11 +39,11 @@ services:
       - ./staging-wiki-config/LocalSettings.php:/var/www/html/LocalSettings.php:ro
       - ./staging-wiki-extensions/WikiSEO:/var/www/html/extensions/WikiSEO:ro
     environment:
-      - MEDIAWIKI_DB_TYPE=mysql
-      - MEDIAWIKI_DB_HOST=staging-wiki-db
-      - MEDIAWIKI_DB_NAME=staging_wiki
-      - MEDIAWIKI_DB_USER=wiki_user
-      - MEDIAWIKI_DB_PASSWORD=wiki_pass
+      MW_DB_NAME: ${MW_DB_NAME}
+      MW_DB_USER: ${MW_DB_USER}
+      MW_DB_PASSWORD: ${MW_DB_PASSWORD}
+      MW_SECRET_KEY: ${MW_SECRET_KEY}
+      MW_UPGRADE_KEY: ${MW_UPGRADE_KEY}
     networks:
       - staging-wiki-net
 
