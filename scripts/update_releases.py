@@ -106,7 +106,7 @@ def main():
                         help="Print output without uploading")
     args = parser.parse_args()
 
-    wiki_url = args.wiki_url or os.environ.get('WIKI_URL', 'https://wiki.dreamfactory.com')
+    wiki_url = args.wiki_url or os.environ.get('WIKI_URL') or 'https://wiki.dreamfactory.com'
     username = args.username or os.environ.get('WIKI_USER')
     password = args.password or os.environ.get('WIKI_PASSWORD')
 

@@ -4,12 +4,21 @@ on:
   schedule:
     - cron: '15 */6 * * *'  # Every 6 hours at :15
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
 
 jobs:
   update-releases:
-    name: Update DreamFactory Releases
+    name: Update DreamFactory Releases (${{ github.event.inputs.environment || 'production' }})
     runs-on: ubuntu-latest
-    environment: production
+    environment: ${{ github.event.inputs.environment || 'production' }}
     steps:
       - uses: actions/checkout@v4
 
