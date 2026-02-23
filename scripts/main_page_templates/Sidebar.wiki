@@ -63,7 +63,7 @@
 ** AI Services/Openclaw Nanoclaw Secure Deployment|OpenClaw / NanoClaw
 * Upgrades
 ** Upgrading Migrating Dreamfactory|Upgrading DreamFactory
-** Upgrading Php|Upgrading PHP
+** Upgrades And Migrations/Upgrading Php|Upgrading PHP
 ** Upgrading Php Windows|Upgrading PHP (Windows)
 * Reference
 ** Appendix Configuration Parameters|Configuration Parameters
