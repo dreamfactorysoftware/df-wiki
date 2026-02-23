@@ -89,6 +89,11 @@ def upload_releases(wiki_host, wiki_path, scheme, content, dry_run=False,
     page = site.pages["Template:DreamFactory Releases"]
     page.save(content, summary="Update GitHub releases (automated)")
     print("  Updated Template:DreamFactory Releases")
+
+    # Purge Main Page cache so the transclusion updates immediately
+    main_page = site.pages["Main Page"]
+    main_page.purge()
+    print("  Purged Main Page cache")
     return True
 
 
