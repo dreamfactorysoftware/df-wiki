@@ -73,8 +73,7 @@ Section forthcoming.
 
 If video-based learning is more your style, check out the ~12 minute Youtube video we created which walks you through the configuration and access process:
 
-<iframe width="672" height="378" src="https://www.youtube.com/embed/z-K2VeFaGRQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-</iframe>
+[https://www.youtube.com/watch?v=z-K2VeFaGRQ Watch on YouTube: Remote HTTP and SOAP Connectors]
 
 [[Category:Legacy_Guide]]
 [[Category:Using]]
