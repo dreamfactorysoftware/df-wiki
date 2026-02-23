@@ -26,3 +26,4 @@ scripts/.last_sync.json
 .env.*
 !.env.example
 !.env.staging.example
+staging-wiki-config/ssl/
