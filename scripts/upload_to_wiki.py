@@ -249,6 +249,8 @@ def main():
                         help='Simulate upload without making changes')
     parser.add_argument('--single-page', '-s',
                         help='Upload a single .wiki file')
+    parser.add_argument('--page-name',
+                        help='Explicit wiki page name for --single-page upload')
 
     args = parser.parse_args()
 
@@ -275,7 +277,7 @@ def main():
         wiki_file = Path(args.single_page)
         if wiki_file.exists():
             content = wiki_file.read_text(encoding='utf-8')
-            page_name = wiki_file.stem.replace('-', '_').title()
+            page_name = args.page_name or wiki_file.stem.replace('-', '_').title()
             uploader.upload_page(page_name, content)
         else:
             print(f"Error: File not found: {args.single_page}")

@@ -10,6 +10,7 @@ Usage:
 """
 
 import argparse
+import os
 import re
 from datetime import datetime
 
@@ -72,7 +73,8 @@ def format_releases(releases):
     return "\n".join(parts)
 
 
-def upload_releases(wiki_host, wiki_path, scheme, content, dry_run=False):
+def upload_releases(wiki_host, wiki_path, scheme, content, dry_run=False,
+                    username=None, password=None):
     """Upload formatted releases to the wiki."""
     if dry_run:
         print("[DRY RUN] Would upload Template:DreamFactory Releases")
@@ -80,7 +82,11 @@ def upload_releases(wiki_host, wiki_path, scheme, content, dry_run=False):
         return True
 
     site = mwclient.Site(wiki_host, path=wiki_path, scheme=scheme)
-    site.force_login = False
+    if username and password:
+        site.login(username, password)
+        print(f"  Logged in as: {username}")
+    else:
+        site.force_login = False
     page = site.pages["Template:DreamFactory Releases"]
     page.save(content, summary="Update GitHub releases (automated)")
     print("  Updated Template:DreamFactory Releases")
@@ -93,9 +99,14 @@ def main():
                         help="MediaWiki URL")
     parser.add_argument("--count", type=int, default=5,
                         help="Number of releases to fetch")
+    parser.add_argument("--username", "-u", help="MediaWiki username")
+    parser.add_argument("--password", "-p",
+                        help="MediaWiki password (or use WIKI_PASSWORD env var)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print output without uploading")
     args = parser.parse_args()
+
+    password = args.password or os.environ.get('WIKI_PASSWORD')
 
     # Parse URL
     url = args.wiki_url.replace("https://", "").replace("http://", "")
@@ -112,7 +123,8 @@ def main():
         print(f"    {r['version']} ({r['date']})")
 
     content = format_releases(releases)
-    upload_releases(host, path, scheme, content, dry_run=args.dry_run)
+    upload_releases(host, path, scheme, content, dry_run=args.dry_run,
+                    username=args.username, password=password)
     return 0
 
 
