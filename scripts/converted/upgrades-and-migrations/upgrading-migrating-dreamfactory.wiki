@@ -263,7 +263,7 @@ Log in to the new DreamFactory instance using credentials from the migrated envi
 
 == See also ==
 * [[Upgrading_Php_Windows|Upgrading PHP On Windows]]
-* [[Upgrading_To_Php_8_1|Upgrading to PHP 8.1]]
+* [[Upgrading_Php|Upgrading PHP]]
 
 [[Category:Upgrades]]
 [[Category:Upgrading]]

@@ -6,6 +6,6 @@ For the latest DreamFactory release notes, see the [https://github.com/dreamfact
 
 * [[Upgrading_Migrating_Dreamfactory|Upgrading and Migrating DreamFactory]]
 * [[Upgrading_Php_Windows|Upgrading PHP on Windows]]
-* [[Upgrading_To_Php_8_1|Upgrading to PHP 8.1]]
+* [[Upgrading_Php|Upgrading PHP]]
 
 [[Category:Navigation]]

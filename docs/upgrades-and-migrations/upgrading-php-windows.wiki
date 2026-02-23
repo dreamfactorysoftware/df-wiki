@@ -113,7 +113,7 @@ For additional help, contact [https://www.dreamfactory.com/support DreamFactory 
 == Related Documentation ==
 
 * [[Getting_Started/Windows_Installation|Windows Installation Guide]]
-* [[upgrades-and-migrations/upgrading-to-php-8.1|Upgrading to PHP 8.1]]
+* [[Upgrading_Php|Upgrading PHP]]
 * [[Getting_Started/Basic_Configuration|System Configuration]]
 
 [[Category:Upgrades]]

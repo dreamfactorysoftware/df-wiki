@@ -104,7 +104,7 @@ Programmatically manage DreamFactory for automation and DevOps workflows.
 Keep your DreamFactory instance up to date.
 
 * '''[[upgrades-and-migrations/upgrading-and-migrating-dreamfactory|Upgrading &amp; Migrating DreamFactory]]''' - Move between environments
-* '''[[upgrades-and-migrations/upgrading-to-php-8.1|Upgrading to PHP 8.1]]''' - PHP 8.1 migration guide
+* '''[[Upgrading_Php|Upgrading PHP]]''' - PHP version upgrade guide
 * '''[[upgrades-and-migrations/upgrading-php-on-windows|Upgrading PHP on Windows]]''' - Windows-specific PHP upgrades
 
 -----
