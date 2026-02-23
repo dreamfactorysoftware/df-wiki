@@ -60,9 +60,10 @@
 ** AI Services/Mcp Service|MCP Service
 ** AI Services/Mcp Service Creation|MCP Service Creation
 ** AI Services/Mcp Custom Login Page|MCP Custom Login
+** AI Services/Openclaw Nanoclaw Secure Deployment|OpenClaw / NanoClaw
 * Upgrades
 ** Upgrading Migrating Dreamfactory|Upgrading DreamFactory
-** Upgrading To Php 8 1|Upgrading to PHP 8.1
+** Upgrading Php|Upgrading PHP
 ** Upgrading Php Windows|Upgrading PHP (Windows)
 * Reference
 ** Appendix Configuration Parameters|Configuration Parameters

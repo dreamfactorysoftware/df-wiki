@@ -1,0 +1,326 @@
+'''This guide walks you through securely deploying OpenClaw or NanoClaw agents against production data sources governed by DreamFactory. Follow every step in order. Do not skip any layer.'''
+
+<span id="prerequisites"></span>
+= Prerequisites =
+
+* A running DreamFactory instance with admin access
+* Docker, Podman, or macOS Tahoe (for Apple Container support)
+* Access to at least one production data source (SQL Server, PostgreSQL, MySQL, MongoDB, etc.)
+* A secret manager (HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault)
+* A reverse proxy (Nginx, Caddy, or Traefik) with TLS certificates
+* An identity provider (Entra ID, LDAP, SAML, or OAuth)
+
+<span id="step-1-choose-your-runtime"></span>
+= Step 1: Choose Your Runtime =
+
+<span id="nanoclaw-vs-openclaw"></span>
+== NanoClaw vs. OpenClaw ==
+
+Choose NanoClaw unless you have a documented requirement for multi-platform messaging or multi-LLM support.
+
+{| class="wikitable"
+! Criteria !! NanoClaw !! OpenClaw
+|-
+| Codebase size || ~500 lines (core) || ~400,000+ lines
+|-
+| Human auditability || Full audit in 8 minutes || Requires dedicated security team
+|-
+| Container isolation || OS-level (Apple Container on macOS, Docker on Linux) || Application-level by default; Docker optional
+|-
+| LLM support || Claude only (via Agent SDK) || Claude, GPT, Gemini, Llama, and others
+|-
+| Messaging platforms || WhatsApp (extensible via skills) || 15+ platforms out of the box
+|-
+| Skill ecosystem || Skills added via Claude Code (purpose-built forks) || ClawHub marketplace (5,000+ skills, 47% with security concerns)
+|}
+
+<span id="when-to-use-openclaw"></span>
+== When to Use OpenClaw ==
+
+Use OpenClaw only if your organization requires:
+
+* Native Slack or Teams integration across large teams
+* Connections to multiple LLM providers for redundancy or cost optimization
+* Access to the ClawHub skill ecosystem for specialized workflows
+* Cross-platform Linux deployment where Apple Container is not available
+
+<span id="step-2-container-isolation"></span>
+= Step 2: Container Isolation =
+
+Never run an AI agent on a host machine without containerization. A compromised agent has full access to everything the host user can access, including SSH keys, browser sessions, credentials files, and production databases.
+
+<span id="nanoclaw-on-macos"></span>
+== NanoClaw on macOS (Apple Container) ==
+
+NanoClaw on macOS uses Apple Container, which provides hypervisor-level isolation. Each agent runs inside a lightweight VM with its own kernel on Apple silicon. Even if the agent gains root inside its container, it cannot escape.
+
+No additional configuration is needed. Each WhatsApp group gets its own isolated context and filesystem.
+
+<span id="nanoclaw-on-linux"></span>
+== NanoClaw on Linux (Docker) ==
+
+On Linux, NanoClaw falls back to Docker with namespace isolation. Apply the hardening flags listed in the next section.
+
+<span id="openclaw-docker-hardening"></span>
+== OpenClaw (Docker Hardening) ==
+
+Apply all of the following flags when running the OpenClaw container:
+
+<syntaxhighlight lang="bash">
+docker run \
+  --read-only \
+  --cap-drop=ALL \
+  --user 1000:1000 \
+  --security-opt=no-new-privileges \
+  --memory=512m \
+  --cpus=1 \
+  openclaw:latest
+</syntaxhighlight>
+
+* <code>--read-only</code> — Prevents the agent from modifying its own runtime
+* <code>--cap-drop=ALL</code> — Removes all Linux capabilities
+* <code>--user 1000:1000</code> — Runs as non-root
+* <code>--security-opt=no-new-privileges</code> — Prevents privilege escalation
+* <code>--memory=512m --cpus=1</code> — Prevents resource exhaustion from runaway loops
+
+<span id="consider-podman"></span>
+== Consider Podman ==
+
+Podman runs containers without a root daemon. If an attacker escapes a Docker container, they land as root on the host. If they escape a Podman container, they land as an unprivileged user. For Linux deployments, Podman is the stronger choice.
+
+<span id="step-3-network-lockdown"></span>
+= Step 3: Network Lockdown =
+
+<span id="bind-gateway-to-localhost"></span>
+== Bind Gateway to Localhost ==
+
+The OpenClaw gateway must never be exposed to the public internet. Over 42,000 instances were found exposed with no authentication within the first two weeks of adoption. Bind the gateway to <code>127.0.0.1</code> only.
+
+<span id="deploy-reverse-proxy-with-tls"></span>
+== Deploy Reverse Proxy with TLS ==
+
+Route all external access through an authenticated reverse proxy (Nginx, Caddy, or Traefik) with TLS 1.3 encryption.
+
+<span id="restrict-outbound-connections"></span>
+== Restrict Outbound Connections ==
+
+Block all outbound connections from the container except to:
+
+* Your approved LLM API endpoint
+* Your DreamFactory gateway
+
+The agent should not be able to reach arbitrary internet addresses.
+
+<span id="implement-microsegmentation"></span>
+== Implement Microsegmentation ==
+
+OpenClaw's Skills modules are designed for lateral movement between systems. Enforce network policy checks at every access point using a Zero Trust model.
+
+<span id="step-4-dreamfactory-data-gateway"></span>
+= Step 4: DreamFactory Data Gateway =
+
+This is the layer most deployments skip, and it is the most consequential. The AI agent should never have direct access to a database. DreamFactory is a secure, self-hosted enterprise data access platform that provides governed API access to any data source, connecting enterprise applications and on-prem LLMs with role-based access and identity passthrough.
+
+<span id="deploy-dreamfactory"></span>
+== Deploy DreamFactory ==
+
+Connect your data source(s) to DreamFactory. DreamFactory supports 30+ connectors including SQL Server, Oracle, PostgreSQL, MySQL, MongoDB, Snowflake, and Databricks.
+
+<span id="generate-rest-apis"></span>
+== Generate REST APIs ==
+
+DreamFactory generates governed REST APIs from your existing databases and exposes them through a native MCP server. The agent authenticates to DreamFactory. DreamFactory authenticates to the database. The agent never sees database credentials.
+
+<span id="configure-role-based-access-control"></span>
+== Configure Role-Based Access Control ==
+
+Set up RBAC with the following principles:
+
+* Start every new data source as read-only
+* Apply table-level restrictions so the agent only sees permitted tables
+* Apply field-level restrictions to hide columns the agent does not need
+* Apply row-level filtering where applicable
+* Grant write access only to specific tables and fields when operationally required
+* Require approval workflows for destructive operations (DELETE, DROP)
+
+<span id="configure-field-level-masking"></span>
+== Configure Field-Level Masking ==
+
+Mask sensitive fields before data reaches the agent:
+
+* Social Security numbers
+* Credit card numbers
+* Medical record IDs
+* Any other PII or PHI relevant to your data
+
+<span id="enable-audit-logging"></span>
+== Enable Audit Logging ==
+
+Enable full audit logging on every interaction. Each log entry should capture user identity, timestamp, endpoint, parameters, and response metadata.
+
+<span id="connect-identity-provider"></span>
+== Connect Identity Provider ==
+
+Integrate DreamFactory with your identity provider (Entra ID, LDAP, SAML, or OAuth) so the agent inherits the permissions of the user it is acting for. Configure group-to-role mapping for automatic role assignment.
+
+<span id="connect-agent-to-dreamfactory-mcp"></span>
+== Connect the Agent to DreamFactory MCP ==
+
+Point the agent to DreamFactory's MCP endpoint. Run test queries and verify:
+
+* RBAC enforcement (agent is denied access to restricted tables)
+* Field masking works on sensitive columns
+* Audit logs capture the test queries correctly
+
+{{Warning|Prompt injection attacks succeed at a 91% rate against unprotected LLM agents. The DreamFactory data gateway is your last line of defense. It does not matter what the agent asks for. It only gets what its role allows.}}
+
+<span id="step-5-skill-governance"></span>
+= Step 5: Skill Governance =
+
+<span id="nanoclaw-skills"></span>
+== NanoClaw Skills ==
+
+NanoClaw skills are instructions for Claude Code that modify your fork of the codebase. Every skill produces code that you own and can review. There is no opaque plugin running in a shared runtime. Review all generated code before deploying.
+
+<span id="openclaw-skills"></span>
+== OpenClaw Skills ==
+
+Third-party skills are the most dangerous component of the OpenClaw ecosystem. The ClawHavoc incident exposed 341 malicious skills on ClawHub. 47% of all ClawHub skills had at least one security concern.
+
+* '''Allowlist only.''' Maintain an internal registry of approved skills. Block installation of any skill not on the list.
+* '''Source code review.''' Read the code of every skill before installation. Do not rely on ClawHub reputation scores.
+* '''VirusTotal verification.''' Confirm the scan status shows "benign" before installing.
+* '''Scope restriction.''' Define allowed actions explicitly (READ_ONLY where possible). Never import entire toolkits when you only need one function.
+* '''Regular re-audit.''' Skills update automatically. Re-review after every update.
+
+<span id="step-6-credential-management"></span>
+= Step 6: Credential Management =
+
+OpenClaw's MEMORY.md file and environment configuration are primary targets for infostealers (RedLine, Lumma, Vidar).
+
+<span id="use-a-secret-manager"></span>
+== Use a Secret Manager ==
+
+Store all API keys and credentials in HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault. Never store credentials in <code>.env</code> files or <code>MEMORY.md</code>.
+
+<span id="rotate-keys"></span>
+== Rotate Keys ==
+
+Rotate API keys monthly at minimum. Rotate immediately if any agent behavior is anomalous.
+
+<span id="separate-environments"></span>
+== Separate Environments ==
+
+Development agents must never have production keys. Maintain separate credential sets per environment.
+
+<span id="monitor-key-usage"></span>
+== Monitor Key Usage ==
+
+Set up alerts for API key usage outside expected patterns (geography, time of day, request volume).
+
+<span id="step-7-verify-and-patch"></span>
+= Step 7: Verify and Patch =
+
+<span id="verify-agent-version"></span>
+== Verify Agent Version ==
+
+CVE-2026-25253 (CVSS 8.8) was disclosed January 30, 2026. Verify you are running OpenClaw version 2026.1.29 or later.
+
+<span id="penetration-test"></span>
+== Penetration Test ==
+
+Before going live, run a penetration test against the agent:
+
+* Attempt prompt injection
+* Attempt direct database access (bypassing DreamFactory)
+* Attempt to install an unapproved skill
+
+Document findings and remediate all gaps.
+
+<span id="pre-deployment-checklist"></span>
+= Pre-Deployment Checklist =
+
+{| class="wikitable"
+! # !! Item !! Owner
+|-
+| 1 || Runtime selected (NanoClaw or OpenClaw) and decision documented || Engineering Lead
+|-
+| 2 || Agent running inside a container (Apple Container, Docker, or Podman) || DevOps
+|-
+| 3 || Container hardened: non-root, read-only filesystem, capabilities dropped || DevOps
+|-
+| 4 || Gateway bound to localhost; reverse proxy with TLS deployed || Network/Security
+|-
+| 5 || Outbound connections restricted to approved endpoints only || Network/Security
+|-
+| 6 || DreamFactory deployed and connected to data sources || Data Engineering
+|-
+| 7 || RBAC policies defined and tested (start read-only) || Operations + Security
+|-
+| 8 || Field-level masking configured for sensitive columns || Data Engineering
+|-
+| 9 || Audit logging enabled and verified || Security
+|-
+| 10 || Identity provider connected with group-to-role mapping || IT/Identity
+|-
+| 11 || All credentials stored in secret manager (no .env files) || DevOps
+|-
+| 12 || Key rotation schedule established (monthly minimum) || Security
+|-
+| 13 || All installed skills reviewed and approved by security team || Security
+|-
+| 14 || Agent version verified at 2026.1.29 or later (CVE patched) || DevOps
+|-
+| 15 || Penetration test completed against the agent || Security
+|-
+| 16 || Monitoring and alerting deployed for anomalous queries || Operations
+|-
+| 17 || Audit review cadence established (weekly for first 60 days) || Operations Lead
+|-
+| 18 || Incident response plan documented for agent compromise || Security
+|}
+
+<span id="ongoing-maintenance"></span>
+= Ongoing Maintenance =
+
+* '''First 60 days:''' Weekly audit log reviews
+* '''After 60 days:''' Monthly audit log reviews
+* '''Quarterly:''' Skill re-audits
+* '''Annually:''' Full penetration test
+* '''Every update:''' Re-review any skills that have auto-updated
+
+<span id="troubleshooting"></span>
+= Troubleshooting =
+
+<span id="common-issues"></span>
+== Common Issues ==
+
+; Agent returns "access denied" on all queries
+: Verify RBAC roles are assigned correctly in DreamFactory. Check that the identity provider group-to-role mapping is configured and that the test user belongs to the correct group.
+
+; Agent can reach external URLs it should not
+: Outbound network rules are not applied correctly. Verify container network policy blocks all addresses except your LLM endpoint and DreamFactory.
+
+; Audit logs are empty
+: Confirm audit logging is enabled in DreamFactory admin settings and that the agent is connecting through the MCP endpoint, not directly to the database.
+
+; Skills fail to load after update
+: If you are using an allowlist, the updated skill may have a new hash or package name. Re-review and re-approve the updated version.
+
+; CVE-2026-25253 scan flags your instance
+: Upgrade to OpenClaw version 2026.1.29 or later. Rebuild the container image after upgrading.
+
+<span id="see-also"></span>
+== See Also ==
+
+* [[AI_Services/Mcp_Service|DreamFactory MCP Server Setup]]
+* [[AI_Services/Mcp_Service_Creation|Creating an MCP Server Service]]
+* [[Security/Role_Based_Access|DreamFactory RBAC Configuration]]
+* [[Security/Authentication_Apis|Identity Provider Integration]]
+* [[Getting_Started/Docker_Installation|Docker Installation]]
+
+[[Category:Ai_Integration]]
+[[Category:Security]]
+[[Category:Mcp]]
+[[Category:Docker]]
+[[Category:Difficulty_Advanced]]

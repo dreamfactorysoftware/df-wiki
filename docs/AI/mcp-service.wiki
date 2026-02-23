@@ -132,6 +132,7 @@ By leveraging the MCP server, you can extend DreamFactory's functionality and cr
 == See also ==
 * [[AI_Services/Mcp_Service_Creation|Creating an MCP Server Service]]
 * [[AI_Services/Mcp_Custom_Login_Page|Custom Login Page for MCP]]
+* [[AI_Services/Openclaw_Nanoclaw_Secure_Deployment|OpenClaw / NanoClaw Secure Deployment]]
 
 [[Category:Mcp]]
 [[Category:Model_Context_Protocol]]
