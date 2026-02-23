@@ -18,7 +18,6 @@ import requests
 import mwclient
 
 GITHUB_API = "https://api.github.com/repos/dreamfactorysoftware/dreamfactory/releases"
-DEFAULT_WIKI = "localhost:8082"
 
 
 def fetch_releases(count=5):
@@ -95,26 +94,29 @@ def upload_releases(wiki_host, wiki_path, scheme, content, dry_run=False,
 
 def main():
     parser = argparse.ArgumentParser(description="Fetch GitHub releases for the wiki")
-    parser.add_argument("--wiki-url", default=f"http://{DEFAULT_WIKI}",
-                        help="MediaWiki URL")
+    parser.add_argument("--wiki-url",
+                        help="MediaWiki URL (or use WIKI_URL env var)")
     parser.add_argument("--count", type=int, default=5,
                         help="Number of releases to fetch")
-    parser.add_argument("--username", "-u", help="MediaWiki username")
+    parser.add_argument("--username", "-u",
+                        help="MediaWiki username (or use WIKI_USER env var)")
     parser.add_argument("--password", "-p",
                         help="MediaWiki password (or use WIKI_PASSWORD env var)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print output without uploading")
     args = parser.parse_args()
 
+    wiki_url = args.wiki_url or os.environ.get('WIKI_URL', 'https://wiki.dreamfactory.com')
+    username = args.username or os.environ.get('WIKI_USER')
     password = args.password or os.environ.get('WIKI_PASSWORD')
 
     # Parse URL
-    url = args.wiki_url.replace("https://", "").replace("http://", "")
+    url = wiki_url.replace("https://", "").replace("http://", "")
     host = url.split("/")[0]
     path = "/" + "/".join(url.split("/")[1:]) if "/" in url else "/"
     if not path.endswith("/"):
         path += "/"
-    scheme = "https" if args.wiki_url.startswith("https://") else "http"
+    scheme = "https" if wiki_url.startswith("https://") else "http"
 
     print(f"Fetching {args.count} releases from GitHub...")
     releases = fetch_releases(args.count)
@@ -124,7 +126,7 @@ def main():
 
     content = format_releases(releases)
     upload_releases(host, path, scheme, content, dry_run=args.dry_run,
-                    username=args.username, password=password)
+                    username=username, password=password)
     return 0
 
 

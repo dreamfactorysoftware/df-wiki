@@ -111,6 +111,24 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
         run: python deploy_templates.py --dry-run
 
+      - name: Update GitHub releases
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        working-directory: scripts
+        env:
+          WIKI_URL: ${{ secrets.WIKI_URL }}
+          WIKI_USER: ${{ secrets.WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
+        run: python update_releases.py
+
+      - name: Update GitHub releases (dry run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        working-directory: scripts
+        env:
+          WIKI_URL: ${{ secrets.WIKI_URL }}
+          WIKI_USER: ${{ secrets.WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
+        run: python update_releases.py --dry-run
+
       - name: Verify deployment
         if: ${{ github.event.inputs.dry_run != 'true' }}
         working-directory: scripts
