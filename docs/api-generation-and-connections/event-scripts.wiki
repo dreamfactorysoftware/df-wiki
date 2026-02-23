@@ -75,7 +75,7 @@ $relatedData = $platform->api->get('related_service/data');
 $event['response']['content']['related_data'] = $relatedData;
 ?></syntaxhighlight></li></ul>
 
-These examples illustrate how you can use event scripts to implement custom business logic, validate data, and enrich API responses. For more examples and detailed scripts, visit the [https://github.com/dreamfactorysoftware/df-scriptingexamples df-scriptingexamples] repository.
+These examples illustrate how you can use event scripts to implement custom business logic, validate data, and enrich API responses. For more examples and detailed scripts, visit the [https://github.com/dreamfactorysoftware/example-scripts df-scriptingexamples] repository.
 
 <span id="programmatic-resources-available-to-a-script"></span>
 == Programmatic Resources Available to a Script ==

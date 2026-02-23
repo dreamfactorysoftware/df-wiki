@@ -66,7 +66,7 @@ Section forthcoming.
 <span id="converting-soap-to-rest"></span>
 == Converting SOAP to REST ==
 
-{{Tip|The SOAP-to-REST connector is available in the DreamFactory Silver and Gold Editions. Interested in a demo or free trial for either edition? [https://www.dreamfactory.com/contact Contact us!]}}
+{{Tip|The SOAP-to-REST connector is available in the DreamFactory Silver and Gold Editions. Interested in a demo or free trial for either edition? [https://www.dreamfactory.com/demo Contact us!]}}
 
 <span id="video-based-learning"></span>
 == Video-based Learning ==
