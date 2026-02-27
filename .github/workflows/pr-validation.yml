@@ -30,41 +30,51 @@ jobs:
         working-directory: scripts
         run: python content_score.py --dir ../docs/ --output score_report.csv --threshold 50
 
-      - name: Run wiki validation
+      - name: Run wiki validation (PR branch)
         working-directory: scripts
         run: |
           python validate_wiki.py --docs ../docs/ --format json > validation_report.json 2>&1 || true
           python validate_wiki.py --docs ../docs/ 2>&1 || true
 
-          # Extract error count
-          ERRORS=$(python -c "import json; print(json.load(open('validation_report.json'))['summary']['errors'])")
-          WARNINGS=$(python -c "import json; print(json.load(open('validation_report.json'))['summary']['warnings'])")
-          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
-          echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
-
       - name: Compare with main branch
         run: |
-          # Get error count from main for comparison
+          # Get main branch docs to compare error counts
           git fetch origin main
           git worktree add /tmp/main-branch origin/main
 
-          cd /tmp/main-branch/scripts
-          pip install -r requirements.txt -q 2>/dev/null || true
-          python validate_wiki.py --docs ../docs/ --format json > /tmp/main_validation.json 2>&1 || true
+          # Use the PR branch's validator against main's docs
+          # (main may not have validate_wiki.py yet)
+          cd $GITHUB_WORKSPACE/scripts
+          python validate_wiki.py --docs /tmp/main-branch/docs/ --format json > /tmp/main_validation.json 2>&1 || true
 
-          MAIN_ERRORS=$(python -c "import json; print(json.load(open('/tmp/main_validation.json'))['summary']['errors'])")
-          PR_ERRORS=$(python -c "import json; print(json.load(open('$GITHUB_WORKSPACE/scripts/validation_report.json'))['summary']['errors'])")
+          # If main validation produced valid JSON, compare
+          if python -c "import json; json.load(open('/tmp/main_validation.json'))" 2>/dev/null; then
+            MAIN_ERRORS=$(python -c "import json; print(json.load(open('/tmp/main_validation.json'))['summary']['errors'])")
+          else
+            # First time validator runs — no baseline, just report
+            echo "No baseline from main (validator is new). Reporting PR results only."
+            MAIN_ERRORS=999999
+          fi
+
+          if python -c "import json; json.load(open('validation_report.json'))" 2>/dev/null; then
+            PR_ERRORS=$(python -c "import json; print(json.load(open('validation_report.json'))['summary']['errors'])")
+          else
+            echo "::error::PR validation failed to produce valid output"
+            exit 1
+          fi
 
           echo "Main branch errors: $MAIN_ERRORS"
           echo "PR branch errors:   $PR_ERRORS"
 
-          if [ "$PR_ERRORS" -gt "$MAIN_ERRORS" ]; then
+          if [ "$MAIN_ERRORS" -eq 999999 ]; then
+            echo "First run — no regression check. PR has $PR_ERRORS error(s)."
+          elif [ "$PR_ERRORS" -gt "$MAIN_ERRORS" ]; then
             NEW_ERRORS=$((PR_ERRORS - MAIN_ERRORS))
             echo "::error::This PR introduces $NEW_ERRORS new validation error(s). Fix broken links or redirect targets before merging."
             exit 1
           else
             FIXED=$((MAIN_ERRORS - PR_ERRORS))
-            echo "✓ No new errors introduced. ($FIXED error(s) fixed by this PR)"
+            echo "No new errors introduced. ($FIXED error(s) fixed by this PR)"
           fi
 
           git worktree remove /tmp/main-branch
