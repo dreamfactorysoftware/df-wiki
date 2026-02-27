@@ -13,13 +13,16 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 ## General settings
-$wgSitename = "DreamFactory Wiki (Staging)";
+$wgSitename = "DreamFactory Wiki";
 $wgMetaNamespace = "DreamFactory_Wiki";
 
 ## Server and paths
 $wgServer = "https://wiki.dreamfactory.com";
 $wgScriptPath = "";
 $wgArticlePath = "/$1";
+
+## Canonical URLs — emit <link rel="canonical"> on every page
+$wgEnableCanonicalServerLink = true;
 
 ## Enable subpages in main namespace (required for old wiki redirects like DreamFactory/Installation)
 $wgNamespacesWithSubpages[NS_MAIN] = true;
