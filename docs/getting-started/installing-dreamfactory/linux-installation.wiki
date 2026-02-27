@@ -1,5 +1,16 @@
+{{#seo:
+|title=Linux Installation - DreamFactory Documentation
+|title_mode=replace
+|description=Install DreamFactory on Ubuntu, Debian, CentOS, or RHEL using the automated installer for production deployments.
+|keywords=DreamFactory, Linux, Ubuntu, Debian, CentOS, installation, server, automated installer
+|canonical=https://wiki.dreamfactory.com/Getting_Started/Linux_Installation
+|og:title=Linux Installation
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Install DreamFactory on Ubuntu, Debian, CentOS, or RHEL using the automated installer for production deployments.
+}}
 <span id="linux-installation"></span>
-= Linux installation =
+== Linux installation ==
 
 DreamFactory can be installed on most common Linux platforms using our automated installer. The installer is designed to deploy DreamFactory as the primary application on the server (the site is published on port 80 of the local host). This guide provides instructions for downloading and running the installer on a new Linux server.
 

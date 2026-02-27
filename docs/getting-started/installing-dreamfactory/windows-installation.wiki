@@ -1,5 +1,16 @@
+{{#seo:
+|title=Windows Installation - DreamFactory Documentation
+|title_mode=replace
+|description=Install DreamFactory on Windows Server 2019 or 2022 with IIS, PHP, and SQL Server or MySQL.
+|keywords=DreamFactory, Windows, IIS, installation, Windows Server, PHP
+|canonical=https://wiki.dreamfactory.com/Getting_Started/Windows_Installation
+|og:title=Windows Installation
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Install DreamFactory on Windows Server 2019 or 2022 with IIS, PHP, and SQL Server or MySQL.
+}}
 <span id="windows-installation"></span>
-= Windows Installation =
+== Windows Installation ==
 
 This page contains installation instructions for Windows.
 

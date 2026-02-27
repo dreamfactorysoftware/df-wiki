@@ -1,8 +1,19 @@
+{{#seo:
+|title=Querying and Filtering - DreamFactory Documentation
+|title_mode=replace
+|description=Query, filter, sort, and paginate database records using DreamFactory's REST API parameters and operators.
+|keywords=DreamFactory, query, filter, sort, paginate, REST API, database, parameters
+|canonical=https://wiki.dreamfactory.com/Querying_Filtering
+|og:title=Querying and Filtering
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Query, filter, sort, and paginate database records using DreamFactory's REST API parameters and operators.
+}}
 '''Learn how to query, filter, sort, and paginate database records using DreamFactory's REST API'''
 
 
 <span id="querying-and-filtering-records-in-dreamfactory"></span>
-= Querying and Filtering Records in DreamFactory =
+== Querying and Filtering Records in DreamFactory ==
 
 <span id="quick-reference"></span>
 == Quick Reference ==

@@ -1,5 +1,16 @@
+{{#seo:
+|title=Helm Installation - DreamFactory Documentation
+|title_mode=replace
+|description=Deploy DreamFactory on Kubernetes using the official Helm chart with configurable database and cache backends.
+|keywords=DreamFactory, Helm, Kubernetes, K8s, installation, deployment, chart
+|canonical=https://wiki.dreamfactory.com/Getting_Started/Helm_Installation
+|og:title=Helm Installation
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Deploy DreamFactory on Kubernetes using the official Helm chart with configurable database and cache backends.
+}}
 <span id="helm-installation"></span>
-= Helm Installation =
+== Helm Installation ==
 
 This guide covers how to install DreamFactory 7.x using the official Helm chart.
 

@@ -1,7 +1,18 @@
+{{#seo:
+|title=Generating a Database-Backed API - DreamFactory Documentation
+|title_mode=replace
+|description=Generate REST APIs from MySQL, PostgreSQL, SQL Server, Oracle, MongoDB and 15+ other databases in minutes.
+|keywords=DreamFactory, database API, REST API, MySQL, PostgreSQL, SQL Server, MongoDB, API generation
+|canonical=https://wiki.dreamfactory.com/Generating_Database_Backed_Api
+|og:title=Generating a Database-Backed API
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Generate REST APIs from MySQL, PostgreSQL, SQL Server, Oracle, MongoDB and 15+ other databases in minutes.
+}}
 '''Generate REST APIs from MySQL, PostgreSQL, SQL Server, Oracle, MongoDB and 15+ other databases in minutes'''
 
 <span id="generating-a-database-backed-api"></span>
-= Generating a Database-backed API =
+== Generating a Database-backed API ==
 
 <span id="quick-reference"></span>
 == Quick Reference ==

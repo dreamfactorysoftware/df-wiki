@@ -1,5 +1,16 @@
+{{#seo:
+|title=Okta SSO Setup - DreamFactory Documentation
+|title_mode=replace
+|description=Configure Okta Single Sign-On authentication with DreamFactory using OAuth 2.0 and OpenID Connect.
+|keywords=DreamFactory, Okta, SSO, OAuth, OpenID Connect, single sign-on, authentication
+|canonical=https://wiki.dreamfactory.com/Security/Okta_Setup
+|og:title=Okta SSO Setup
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Configure Okta Single Sign-On authentication with DreamFactory using OAuth 2.0 and OpenID Connect.
+}}
 <span id="okta-sso-setup-guide"></span>
-= Okta SSO Setup Guide =
+== Okta SSO Setup Guide ==
 
 This guide will walk you through setting up Okta Single Sign-On (SSO) authentication with DreamFactory.
 

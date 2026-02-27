@@ -1,0 +1,72 @@
+{{#seo:
+|title=About DreamFactory - DreamFactory Documentation
+|title_mode=replace
+|description=DreamFactory is an open-source API generation platform used by enterprises worldwide for governed database access.
+|keywords=DreamFactory, about, API platform, open source, enterprise, REST API, database
+|canonical=https://wiki.dreamfactory.com/About
+|og:title=About DreamFactory
+|og:type=website
+|og:site_name=DreamFactory Documentation
+|og:description=DreamFactory is an open-source API generation platform used by enterprises worldwide for governed database access.
+}}
+== About DreamFactory ==
+
+'''DreamFactory Software''' is the company behind the DreamFactory platform — an open-source REST API generation and management tool used by enterprises, government agencies, and developers worldwide. DreamFactory eliminates months of hand-coded API development by automatically generating fully documented, secured REST APIs from any database or external service.
+
+=== What DreamFactory Does ===
+
+DreamFactory connects to your existing data sources and instantly generates production-ready REST APIs. Rather than writing boilerplate CRUD endpoints, authentication middleware, and API documentation by hand, DreamFactory handles all of this automatically. The platform supports over 20 database types — including MySQL, PostgreSQL, SQL Server, Oracle, MongoDB, and Snowflake — along with file storage services, email providers, and remote HTTP/SOAP connectors.
+
+Core capabilities include:
+
+* '''[[Security/Role_Based_Access|Role-Based Access Control (RBAC)]]''' — granular permissions per endpoint, per role, per HTTP verb. Administrators define exactly which tables, fields, and operations each role can access.
+* '''API Key Management''' — [[Security/Rate_Limiting|rate limiting]], usage tracking, and key rotation to control how APIs are consumed and prevent abuse.
+* '''[[Security/Authentication_Apis|SSO Integration]]''' — authenticate API consumers via OAuth 2.0, SAML 2.0, LDAP, Active Directory, [[Security/Okta_Setup|Okta]], or [[Security/Azure_Ad_Oauth|Azure AD]]. Supports identity passthrough so database queries execute under the caller's identity.
+* '''Live OpenAPI Documentation''' — every service automatically generates an [[Api_Endpoints|OpenAPI (Swagger) specification]] with full endpoint documentation, [[Query_Parameters|query parameter]] descriptions, and [[Error_Codes|error code]] references.
+* '''[[AI_Services/Mcp_Service|MCP Server]]''' — Model Context Protocol support enables AI assistants and LLMs to interact with your databases through DreamFactory's governed API layer. This is critical for organizations deploying on-premises LLMs that need controlled access to enterprise data.
+* '''On-Premises Deployment''' — DreamFactory runs entirely on your infrastructure. Deploy in air-gapped environments, behind corporate firewalls, or in regulated industries where data cannot leave your network.
+
+=== How It Works ===
+
+The typical DreamFactory workflow is:
+
+# '''[[Generating_Database_Backed_Api|Connect a database]]''' — provide connection credentials for any supported database. DreamFactory introspects the schema and generates endpoints for every table, view, and stored procedure.
+# '''[[Security/Role_Based_Access|Configure access controls]]''' — create roles that define which services, tables, and fields each API consumer can access. Apply rate limits and API key requirements.
+# '''Consume the API''' — applications, scripts, and AI tools call the generated REST endpoints using standard HTTP methods. DreamFactory handles authentication, authorization, query building, and response formatting.
+
+For advanced use cases, DreamFactory supports [[Scripted_Services_And_Endpoints|scripted services]] for custom business logic, [[Event_Scripts|event scripts]] for request/response hooks, and [[Advanced_Database_Api_Features|advanced database features]] like transactions, stored procedures, and virtual fields.
+
+=== Deployment Options ===
+
+DreamFactory is available in several deployment configurations:
+
+* '''[[Getting_Started/Docker_Installation|Docker]]''' — the fastest way to get started. A single <code>docker-compose up</code> command launches DreamFactory with MySQL, Redis, and a sample PostgreSQL database.
+* '''[[Getting_Started/Linux_Installation|Linux]]''' — automated installer for Ubuntu, Debian, CentOS, and RHEL production servers.
+* '''[[Getting_Started/Windows_Installation|Windows]]''' — Windows Server 2019/2022 with IIS.
+* '''[[Getting_Started/Helm_Installation|Kubernetes (Helm)]]''' — official Helm chart for orchestrated deployments with configurable database and cache backends.
+* '''Open-source''' — the core platform is available under the Apache 2.0 license on [https://github.com/dreamfactorysoftware/dreamfactory GitHub].
+* '''Commercial editions''' — enterprise support, advanced security features (SAML, LDAP, AD), and dedicated infrastructure options.
+
+=== Use Cases ===
+
+Organizations use DreamFactory for a range of data access and integration scenarios:
+
+* '''Enterprise application integration''' — connect legacy databases to modern web and mobile applications without custom middleware.
+* '''AI and LLM data access''' — provide governed, rate-limited database access to on-premises language models through the [[AI_Services/Mcp_Service|MCP Server]] or standard REST endpoints.
+* '''Partner and third-party API access''' — expose controlled subsets of your data to external consumers with per-partner roles, rate limits, and audit logging.
+* '''Internal tooling''' — give development teams instant database APIs for prototyping, testing, and internal applications without waiting for backend engineering resources.
+* '''Regulatory compliance''' — deploy on-premises with full audit trails, identity passthrough, and fine-grained access controls to meet HIPAA, SOC 2, and GDPR requirements.
+
+=== Contact and Resources ===
+
+* '''Website:''' [https://www.dreamfactory.com dreamfactory.com]
+* '''GitHub:''' [https://github.com/dreamfactorysoftware github.com/dreamfactorysoftware]
+* '''Getting Started:''' [[Getting_Started/Docker_Installation|Docker Installation Guide]]
+* '''[[Getting_Started/Basic_Configuration|Configuration Guide]]'''
+
+=== About This Wiki ===
+
+This documentation is maintained by the DreamFactory team and covers installation, configuration, API generation, security, scripting, and AI integration. Content is version-controlled on [https://github.com/dreamfactorysoftware/df-wiki GitHub] and automatically deployed to this wiki via a CI/CD pipeline that handles format conversion, SEO metadata, cross-linking, and content quality scoring.
+
+[[Category:DreamFactory]]
+[[Category:Getting Started]]
