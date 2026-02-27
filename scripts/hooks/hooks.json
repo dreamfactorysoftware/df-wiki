@@ -4,10 +4,15 @@
     "execute-command": "/etc/webhook/deploy.sh",
     "command-working-directory": "/repo",
     "response-message": "Deploy triggered",
+    "pass-environment-to-command": [
+      { "source": "string", "envname": "NGINX_CONTAINER", "name": "${NGINX_CONTAINER}" },
+      { "source": "string", "envname": "APP_CONTAINER", "name": "${APP_CONTAINER}" },
+      { "source": "string", "envname": "WIKI_SERVER", "name": "${WIKI_SERVER}" }
+    ],
     "trigger-rule": {
       "match": {
         "type": "value",
-        "value": "{{ getenv \"WEBHOOK_TOKEN\" }}",
+        "value": "${WEBHOOK_TOKEN}",
         "parameter": {
           "source": "url",
           "name": "token"

@@ -1,5 +1,5 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 echo "=== Deploy triggered at $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
 

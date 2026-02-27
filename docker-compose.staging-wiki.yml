@@ -64,8 +64,9 @@ services:
       - staging-wiki-net
 
   staging-wiki-hook:
-    image: almir/webhook
+    build: ./scripts/hooks
     container_name: staging-wiki-hook
+    entrypoint: ["/bin/sh", "/etc/webhook/start.sh"]
     depends_on:
       - staging-wiki-web
     volumes:
