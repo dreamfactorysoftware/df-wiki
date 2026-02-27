@@ -1,7 +1,18 @@
+{{#seo:
+|title=Scripted Services and Endpoints - DreamFactory Documentation
+|title_mode=replace
+|description=Build custom API services using PHP, Python, or Node.js scripts to add business logic and integrations.
+|keywords=DreamFactory, scripting, PHP, Python, Node.js, custom API, business logic
+|canonical=https://wiki.dreamfactory.com/Scripted_Services_And_Endpoints
+|og:title=Scripted Services and Endpoints
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Build custom API services using PHP, Python, or Node.js scripts to add business logic and integrations.
+}}
 '''Build custom API services using PHP, Python, or Node.js scripts to add business logic and integrations'''
 
 <span id="creating-scripted-services-and-endpoints"></span>
-= Creating Scripted Services and Endpoints =
+== Creating Scripted Services and Endpoints ==
 
 DreamFactory allows you to create custom scripted services and endpoints using various scripting languages. This feature enables you to add business logic to your APIs and extend their functionality beyond standard REST operations.
 

@@ -1,5 +1,16 @@
+{{#seo:
+|title=Basic Configuration - DreamFactory Documentation
+|title_mode=replace
+|description=Configure DreamFactory environment settings, database connections, caching, and common post-installation tasks.
+|keywords=DreamFactory, configuration, .env, settings, database, cache, environment
+|canonical=https://wiki.dreamfactory.com/Getting_Started/Basic_Configuration
+|og:title=Basic Configuration
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Configure DreamFactory environment settings, database connections, caching, and common post-installation tasks.
+}}
 <span id="basic-configuration"></span>
-= Basic Configuration =
+== Basic Configuration ==
 
 This page outlines the basic configuration settings for DreamFactory. For the most part, this entails adding or updating parameters in the .env file located in the <code>dreamfactory</code> directory. Common tasks and procedures are outlined below, and each parameter is individually documented in the '''Configuration Parameters''' section of this page.
 

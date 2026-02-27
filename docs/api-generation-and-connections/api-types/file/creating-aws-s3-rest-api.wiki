@@ -1,7 +1,18 @@
+{{#seo:
+|title=AWS S3 REST API - DreamFactory Documentation
+|title_mode=replace
+|description=Generate a REST API for AWS S3 buckets to manage files with role-based access and rate limiting.
+|keywords=DreamFactory, AWS S3, REST API, file storage, cloud, buckets
+|canonical=https://wiki.dreamfactory.com/Creating_Aws_S3_Rest_Api
+|og:title=AWS S3 REST API
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Generate a REST API for AWS S3 buckets to manage files with role-based access and rate limiting.
+}}
 '''Generate a REST API for AWS S3 buckets to manage files with role-based access and rate limiting'''
 
 <span id="creating-an-aws-s3-rest-api"></span>
-= Creating an AWS S3 REST API =
+== Creating an AWS S3 REST API ==
 
 The DreamFactory AWS S3 connector offers a convenient REST-based interface for interacting with S3 objects and buckets. Supporting all of the standard CRUD operations, it's easy to interact with and manage your S3 data. Further, because the S3 API is native to DreamFactory, it's easy to integrate S3 actions alongside other API-driven tasks such as:
 

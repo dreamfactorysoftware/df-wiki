@@ -1,4 +1,15 @@
-= Advanced Database API Features =
+{{#seo:
+|title=Advanced Database API Features - DreamFactory Documentation
+|title_mode=replace
+|description=Use database transactions, stored procedures, virtual fields, and schema management to extend DreamFactory APIs.
+|keywords=DreamFactory, database, transactions, stored procedures, virtual fields, schema, advanced
+|canonical=https://wiki.dreamfactory.com/Advanced_Database_Api_Features
+|og:title=Advanced Database API Features
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Use database transactions, stored procedures, virtual fields, and schema management to extend DreamFactory APIs.
+}}
+== Advanced Database API Features ==
 '''Use database transactions, functions, and virtual fields to extend DreamFactory API capabilities'''
 
 [[Generating_Database_Backed_Api|Generating a Database-backed API]] provides a solid introduction to carrying out CRUD operations in conjunction with a DreamFactory-generated API, however you're going to need some additional firepower in order to successfully integrate these APIs into your projects. This chapter introduces several of DreamFactory's advanced database API-related features, covering topics such as database transactions, calling database functions via API endpoints, and more.

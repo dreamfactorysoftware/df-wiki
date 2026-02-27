@@ -1,4 +1,15 @@
-= Using DreamFactory's Remote HTTP and SOAP Connectors =
+{{#seo:
+|title=Remote HTTP and SOAP Connectors - DreamFactory Documentation
+|title_mode=replace
+|description=Proxy third-party HTTP and SOAP APIs through DreamFactory with authentication, rate limiting, and RBAC.
+|keywords=DreamFactory, HTTP connector, SOAP, proxy, remote API, third-party, integration
+|canonical=https://wiki.dreamfactory.com/Remote_HTTP_And_SOAP_Connectors
+|og:title=Remote HTTP and SOAP Connectors
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Proxy third-party HTTP and SOAP APIs through DreamFactory with authentication, rate limiting, and RBAC.
+}}
+== Using DreamFactory's Remote HTTP and SOAP Connectors ==
 Although the DreamFactory Platform is best known for the ability to generate REST APIs, many also take advantage of the platform's Remote Service connectors.
 
 <span id="proxying-a-remote-http-api"></span>

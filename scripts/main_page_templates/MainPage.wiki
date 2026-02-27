@@ -1,8 +1,9 @@
 {{#seo:
 |title=DreamFactory Documentation Wiki
 |title_mode=replace
-|description=Official documentation for DreamFactory — a secure, self-hosted enterprise data access platform that provides governed API access to any data source, connecting enterprise applications and on-prem LLMs with role-based access and identity passthrough.
+|description=Official docs for DreamFactory — generate governed REST APIs from any database with RBAC, SSO, and MCP for on-prem LLMs.
 |keywords=DreamFactory, AI data gateway, REST API, API generation, governed data access, database API, API security, MCP, LLM, documentation
+|canonical=https://wiki.dreamfactory.com/
 |type=website
 |site_name=DreamFactory Wiki
 |locale=en_US

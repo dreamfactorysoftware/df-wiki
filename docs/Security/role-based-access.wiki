@@ -1,7 +1,18 @@
+{{#seo:
+|title=Role-Based Access Control - DreamFactory Documentation
+|title_mode=replace
+|description=Configure granular RBAC permissions for API access using DreamFactory roles, services, and endpoint-level controls.
+|keywords=DreamFactory, RBAC, role-based access, permissions, API security, roles
+|canonical=https://wiki.dreamfactory.com/Security/Role_Based_Access
+|og:title=Role-Based Access Control
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Configure granular RBAC permissions for API access using DreamFactory roles, services, and endpoint-level controls.
+}}
 '''Configure granular permissions for API access using DreamFactory's role-based access control system'''
 
 <span id="role-based-access-control-rbac"></span>
-= Role Based Access Control (RBAC) =
+== Role Based Access Control (RBAC) ==
 
 <span id="quick-reference"></span>
 == Quick Reference ==

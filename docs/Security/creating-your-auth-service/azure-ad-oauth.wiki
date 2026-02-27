@@ -1,5 +1,16 @@
+{{#seo:
+|title=Azure AD OAuth Setup - DreamFactory Documentation
+|title_mode=replace
+|description=Configure Azure Active Directory (Entra ID) OAuth authentication with DreamFactory for enterprise SSO.
+|keywords=DreamFactory, Azure AD, Entra ID, OAuth, SSO, Azure Active Directory, enterprise
+|canonical=https://wiki.dreamfactory.com/Security/Azure_Ad_Oauth
+|og:title=Azure AD OAuth Setup
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Configure Azure Active Directory (Entra ID) OAuth authentication with DreamFactory for enterprise SSO.
+}}
 <span id="azure-active-directory-oauth-setup-guide"></span>
-= Azure Active Directory OAuth Setup Guide =
+== Azure Active Directory OAuth Setup Guide ==
 
 This guide will walk you through setting up Azure Active Directory (Azure AD/Entra ID) OAuth authentication with DreamFactory.
 

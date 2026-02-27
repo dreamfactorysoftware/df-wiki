@@ -251,11 +251,11 @@ class WikiSyncer:
         return len(new_entries)
 
     @staticmethod
-    def _enrich_content(content: str, source_path: str) -> str:
-        """Enrich .wiki content with categories and see-also links before deploy.
+    def _enrich_content(content: str, source_path: str, page_name: str = '') -> str:
+        """Enrich .wiki content with categories, see-also links, and SEO metadata.
 
         Only runs safe enrichment steps — no Pandoc cleanup, no link conversion.
-        Idempotent: skips pages that already have sufficient categories/links.
+        Idempotent: skips pages that already have sufficient categories/links/SEO.
         """
         try:
             # Skip redirects — they don't need enrichment
@@ -267,6 +267,23 @@ class WikiSyncer:
 
             # See-also cross-links for under-linked pages
             content = add_see_also_section(content, source_path)
+
+            # Auto-generate {{#seo:}} with canonical URL if missing
+            if '{{#seo:' not in content and page_name:
+                # Derive a basic title from the page name
+                title = page_name.rsplit('/', 1)[-1].replace('_', ' ')
+                canonical = f"https://wiki.dreamfactory.com/{page_name}"
+                seo_block = (
+                    "{{#seo:\n"
+                    f"|title={title} - DreamFactory Documentation\n"
+                    "|title_mode=replace\n"
+                    f"|canonical={canonical}\n"
+                    f"|og:title={title}\n"
+                    "|og:type=article\n"
+                    "|og:site_name=DreamFactory Documentation\n"
+                    "}}\n"
+                )
+                content = seo_block + content
         except Exception as e:
             print(f"  ⚠ enrich warning for {source_path}: {e}")
         return content
@@ -346,9 +363,9 @@ class WikiSyncer:
             else:
                 wiki_content = self.convert_markdown_to_wiki(src_file)
 
-            # Enrich: auto-add categories and see-also links if missing
+            # Enrich: auto-add categories, see-also links, and SEO metadata
             if wiki_content and src_file.suffix == '.wiki':
-                wiki_content = self._enrich_content(wiki_content, str(src_file))
+                wiki_content = self._enrich_content(wiki_content, str(src_file), page_name)
 
             if wiki_content:
                 if self.deploy_page(page_name, wiki_content):

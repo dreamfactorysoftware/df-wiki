@@ -1,0 +1,43 @@
+{{#seo:
+|title=About DreamFactory - DreamFactory Documentation
+|title_mode=replace
+|description=DreamFactory is an open-source API generation platform used by enterprises worldwide for governed database access.
+|keywords=DreamFactory, about, API platform, open source, enterprise
+|canonical=https://wiki.dreamfactory.com/About
+|og:title=About DreamFactory
+|og:type=website
+|og:site_name=DreamFactory Documentation
+|og:description=DreamFactory is an open-source API generation platform used by enterprises worldwide for governed database access.
+}}
+== About DreamFactory ==
+
+'''DreamFactory Software''' is the company behind the DreamFactory platform — an open-source REST API generation and management tool used by enterprises, government agencies, and developers worldwide.
+
+=== What DreamFactory Does ===
+
+DreamFactory automatically generates secure, documented REST APIs from any database. It supports over 20 database types — including MySQL, PostgreSQL, SQL Server, Oracle, MongoDB, and Snowflake — and provides:
+
+* '''Role-Based Access Control (RBAC)''' — granular permissions per endpoint, per role
+* '''API Key Management''' — rate limiting, usage tracking, key rotation
+* '''SSO Integration''' — OAuth 2.0, SAML 2.0, LDAP, Active Directory, Okta, Azure AD
+* '''Live OpenAPI Documentation''' — auto-generated Swagger specs for every service
+* '''MCP Server''' — Model Context Protocol support for AI assistants and LLMs
+* '''On-Premises Deployment''' — air-gapped, self-hosted, fully governed
+
+=== Deployment Options ===
+
+DreamFactory is available as:
+* Open-source (Apache 2.0 license) on [https://github.com/dreamfactorysoftware/dreamfactory GitHub]
+* Commercial editions with enterprise support, advanced security features, and dedicated infrastructure
+
+=== Contact ===
+
+* '''Website:''' [https://www.dreamfactory.com dreamfactory.com]
+* '''GitHub:''' [https://github.com/dreamfactorysoftware github.com/dreamfactorysoftware]
+* '''Documentation:''' You're reading it
+
+=== About This Wiki ===
+
+This documentation is maintained by the DreamFactory team and community contributors. Content is version-controlled on [https://github.com/dreamfactorysoftware/df-wiki GitHub] and automatically deployed to this wiki.
+
+[[Category:DreamFactory]]

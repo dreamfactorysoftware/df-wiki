@@ -1,7 +1,18 @@
+{{#seo:
+|title=Docker Installation - DreamFactory Documentation
+|title_mode=replace
+|description=Install DreamFactory using Docker and docker-compose with MySQL, Redis, and a sample PostgreSQL database.
+|keywords=DreamFactory, Docker, docker-compose, installation, MySQL, Redis, PostgreSQL, containers
+|canonical=https://wiki.dreamfactory.com/Getting_Started/Docker_Installation
+|og:title=Docker Installation
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Install DreamFactory using Docker and docker-compose with MySQL, Redis, and a sample PostgreSQL database.
+}}
 '''Install DreamFactory using Docker and docker-compose with MySQL, Redis, and a sample PostgreSQL database for testing.'''
 
 <span id="docker-installation"></span>
-= Docker installation =
+== Docker installation ==
 
 Our Docker container includes everything you need to run DreamFactory, including Ubuntu 22.04, PHP 8.1, and the NGINX web server. It also includes all required PHP extensions and a sample Postgres Database. With these tools you can begin experimenting with the latest DreamFactory version as quickly as you can spin up the container!
 

@@ -1,7 +1,18 @@
+{{#seo:
+|title=MCP Server - DreamFactory Documentation
+|title_mode=replace
+|description=Integrate DreamFactory with AI assistants and dev tools using the Model Context Protocol for database operations.
+|keywords=DreamFactory, MCP, Model Context Protocol, AI, LLM, database, integration
+|canonical=https://wiki.dreamfactory.com/AI_Services/Mcp_Service
+|og:title=MCP Server
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Integrate DreamFactory with AI assistants and dev tools using the Model Context Protocol for database operations.
+}}
 '''Integrate DreamFactory with AI assistants and dev tools using the Model Context Protocol (MCP) for database operations.'''
 
 <span id="mcp-server"></span>
-= MCP Server =
+== MCP Server ==
 
 The MCP (Model Context Protocol) server is a powerful feature in DreamFactory that enables integration with external tools and AI assistants through a standardized protocol. This server allows you to expose your DreamFactory database services as MCP-compatible endpoints, making them accessible to development tools, AI assistants, and other MCP clients. The server bridges DreamFactory's REST API with the Model Context Protocol, providing a consistent interface for interacting with your database services.
 

@@ -1,7 +1,18 @@
+{{#seo:
+|title=Event Scripts - DreamFactory Documentation
+|title_mode=replace
+|description=Execute custom scripts on API events to validate requests, modify responses, and add business logic.
+|keywords=DreamFactory, event scripts, API events, scripting, validation, business logic
+|canonical=https://wiki.dreamfactory.com/Event_Scripts
+|og:title=Event Scripts
+|og:type=article
+|og:site_name=DreamFactory Documentation
+|og:description=Execute custom scripts on API events to validate requests, modify responses, and add business logic.
+}}
 '''Execute custom scripts on API events to validate requests, modify responses, and add business logic to your APIs'''
 
 <span id="event-scripts"></span>
-= Event Scripts =
+== Event Scripts ==
 
 Event Scripting is a powerful feature in DreamFactory that allows you to execute custom scripts when specific system events occur. These scripts can modify requests and responses, perform additional actions, or interrupt the API call flow based on custom logic. These scripts are added to existing API services and can be used to extend the functionality of the API.
 
