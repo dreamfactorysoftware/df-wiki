@@ -35,6 +35,8 @@ except ImportError:
     print("Error: Missing dependencies. Run: pip install mwclient pyyaml")
     sys.exit(1)
 
+from postprocess import add_categories, add_see_also_section
+
 
 SCRIPT_DIR = Path(__file__).parent
 LAST_SYNC_FILE = SCRIPT_DIR / '.last_sync.json'
@@ -248,6 +250,27 @@ class WikiSyncer:
 
         return len(new_entries)
 
+    @staticmethod
+    def _enrich_content(content: str, source_path: str) -> str:
+        """Enrich .wiki content with categories and see-also links before deploy.
+
+        Only runs safe enrichment steps — no Pandoc cleanup, no link conversion.
+        Idempotent: skips pages that already have sufficient categories/links.
+        """
+        try:
+            # Skip redirects — they don't need enrichment
+            if content.strip().startswith('#REDIRECT'):
+                return content
+
+            # Categories from source path (no frontmatter needed)
+            content = add_categories(content, {}, source_path)
+
+            # See-also cross-links for under-linked pages
+            content = add_see_also_section(content, source_path)
+        except Exception as e:
+            print(f"  ⚠ enrich warning for {source_path}: {e}")
+        return content
+
     def deploy_page(self, page_name: str, content: str, summary: str = None) -> bool:
         """Deploy a single page to wiki."""
         if not summary:
@@ -322,6 +345,10 @@ class WikiSyncer:
                 wiki_content = src_file.read_text(encoding='utf-8')
             else:
                 wiki_content = self.convert_markdown_to_wiki(src_file)
+
+            # Enrich: auto-add categories and see-also links if missing
+            if wiki_content and src_file.suffix == '.wiki':
+                wiki_content = self._enrich_content(wiki_content, str(src_file))
 
             if wiki_content:
                 if self.deploy_page(page_name, wiki_content):

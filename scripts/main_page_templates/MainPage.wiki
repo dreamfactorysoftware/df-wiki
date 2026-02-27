@@ -94,11 +94,11 @@ __NOEDITSECTION__
 * [[Security/Rate Limiting|Rate Limiting]]
 </div>
 <div class="mp-popular-col">
-<h3>Reference</h3>
-* [[Event Scripts|Event Scripts]]
-* [[Scripting Resources|Scripting Resources]]
+<h3>API Reference</h3>
+* [[Api_Endpoints|API Endpoints]]
+* [[Query_Parameters|Query Parameters]]
+* [[Error_Codes|Error Codes]]
 * [[Appendix Configuration Parameters|Configuration Reference]]
-* [[System Settings/Cors Ssl|CORS &amp; SSL]]
 * [[Upgrading Migrating Dreamfactory|Upgrading]]
 </div>
 </div>
