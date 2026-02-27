@@ -1,0 +1,397 @@
+= Query Parameters Reference =
+
+Common query parameters for filtering, sorting, and paginating DreamFactory API responses.
+
+----
+
+== filter ==
+
+Filter records using SQL-like expressions.
+
+'''Syntax:''' <code>filter={field}{operator}{value}</code>
+
+=== Operators ===
+
+{| class="wikitable"
+! Operator !! Description !! Example
+|-
+| <code>=</code> || Equal || <code>filter=status='active'</code>
+|-
+| <code>!=</code> || Not equal || <code>filter=status!='deleted'</code>
+|-
+| <code>></code> || Greater than || <code>filter=age>21</code>
+|-
+| <code>>=</code> || Greater or equal || <code>filter=created_at>='2024-01-01'</code>
+|-
+| <code><</code> || Less than || <code>filter=price<100</code>
+|-
+| <code><=</code> || Less or equal || <code>filter=quantity<=10</code>
+|-
+| <code>like</code> || Pattern match || <code>filter=name like 'John%'</code>
+|-
+| <code>in</code> || Value in list || <code>filter=status in ('active','pending')</code>
+|-
+| <code>is null</code> || Null check || <code>filter=deleted_at is null</code>
+|-
+| <code>is not null</code> || Not null check || <code>filter=email is not null</code>
+|}
+
+=== Combining Filters ===
+
+Use <code>and</code> / <code>or</code> for compound conditions:
+
+<syntaxhighlight lang="text">
+filter=(status='active') and (created_at>='2024-01-01')
+filter=(type='admin') or (type='superuser')
+filter=((status='active') and (age>=18)) or (verified=true)
+</syntaxhighlight>
+
+=== Examples ===
+
+'''Find active users:'''
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/users?filter=status%3D'active'"
+</syntaxhighlight>
+
+'''Find orders over $100 from 2024:'''
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/orders?filter=(total>100)%20and%20(order_date>%3D'2024-01-01')"
+</syntaxhighlight>
+
+'''Search by name pattern:'''
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/contacts?filter=name%20like%20'%25smith%25'"
+</syntaxhighlight>
+
+'''Note:''' URL-encode special characters (<code>=</code> as <code>%3D</code>, space as <code>%20</code>, <code>%</code> as <code>%25</code>).
+
+----
+
+== limit ==
+
+Maximum number of records to return.
+
+'''Syntax:''' <code>limit={integer}</code>
+
+'''Default:''' Configured per-service (typically 1000)
+
+'''Examples:'''
+
+<syntaxhighlight lang="bash">
+# Get first 10 records
+curl "https://example.com/api/v2/db/_table/products?limit=10"
+
+# Get first 50 matching filter
+curl "https://example.com/api/v2/db/_table/orders?filter=status='pending'&limit=50"
+</syntaxhighlight>
+
+----
+
+== offset ==
+
+Number of records to skip before returning results.
+
+'''Syntax:''' <code>offset={integer}</code>
+
+'''Default:''' 0
+
+'''Use with <code>limit</code> for pagination:'''
+
+<syntaxhighlight lang="bash">
+# Page 1 (records 1-10)
+curl "https://example.com/api/v2/db/_table/products?limit=10&offset=0"
+
+# Page 2 (records 11-20)
+curl "https://example.com/api/v2/db/_table/products?limit=10&offset=10"
+
+# Page 3 (records 21-30)
+curl "https://example.com/api/v2/db/_table/products?limit=10&offset=20"
+</syntaxhighlight>
+
+'''Pagination formula:''' <code>offset = (page - 1) * limit</code>
+
+----
+
+== order ==
+
+Sort results by one or more fields.
+
+'''Syntax:''' <code>order={field} {direction}</code> or <code>order={field1} {dir},{field2} {dir}</code>
+
+'''Directions:''' <code>ASC</code> (ascending), <code>DESC</code> (descending)
+
+'''Examples:'''
+
+<syntaxhighlight lang="bash">
+# Sort by name ascending
+curl "https://example.com/api/v2/db/_table/contacts?order=name%20ASC"
+
+# Sort by date descending (newest first)
+curl "https://example.com/api/v2/db/_table/orders?order=created_at%20DESC"
+
+# Multi-column sort
+curl "https://example.com/api/v2/db/_table/products?order=category%20ASC,price%20DESC"
+</syntaxhighlight>
+
+----
+
+== fields ==
+
+Select specific fields to return (reduces payload size).
+
+'''Syntax:''' <code>fields={field1},{field2},{field3}</code>
+
+'''Examples:'''
+
+<syntaxhighlight lang="bash">
+# Return only id, name, email
+curl "https://example.com/api/v2/db/_table/users?fields=id,name,email"
+
+# Combine with filter
+curl "https://example.com/api/v2/db/_table/orders?filter=status='pending'&fields=id,total,customer_id"
+</syntaxhighlight>
+
+'''Default:''' All fields returned if not specified.
+
+----
+
+== related ==
+
+Include related records from foreign key relationships.
+
+'''Syntax:''' <code>related={table_name}</code> or <code>related={table1},{table2}</code>
+
+'''Examples:'''
+
+<syntaxhighlight lang="bash">
+# Get orders with customer data
+curl "https://example.com/api/v2/db/_table/orders?related=customers"
+
+# Get products with category and supplier
+curl "https://example.com/api/v2/db/_table/products?related=categories,suppliers"
+</syntaxhighlight>
+
+'''Response includes nested related data:'''
+
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "id": 1,
+      "product_name": "Widget",
+      "category_id": 5,
+      "categories_by_category_id": {
+        "id": 5,
+        "name": "Electronics"
+      }
+    }
+  ]
+}
+</syntaxhighlight>
+
+=== Filtering Related Data ===
+
+Use dot notation to filter on related fields:
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/orders?related=customers&filter=customers.country='USA'"
+</syntaxhighlight>
+
+----
+
+== include_count ==
+
+Include total record count in response (useful for pagination UI).
+
+'''Syntax:''' <code>include_count=true</code>
+
+'''Response includes meta field:'''
+
+<syntaxhighlight lang="json">
+{
+  "resource": [...],
+  "meta": {
+    "count": 1523
+  }
+}
+</syntaxhighlight>
+
+'''Example with pagination:'''
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/products?limit=10&offset=0&include_count=true"
+</syntaxhighlight>
+
+'''Note:''' May impact performance on large tables. Use sparingly.
+
+----
+
+== ids ==
+
+Filter by primary key values (alternative to filter for simple lookups).
+
+'''Syntax:''' <code>ids={id1},{id2},{id3}</code>
+
+'''Examples:'''
+
+<syntaxhighlight lang="bash">
+# Get specific records by ID
+curl "https://example.com/api/v2/db/_table/users?ids=1,5,10,15"
+
+# Delete multiple records
+curl -X DELETE "https://example.com/api/v2/db/_table/temp_data?ids=100,101,102"
+</syntaxhighlight>
+
+----
+
+== id_field ==
+
+Specify which field to use as the identifier (when not using default primary key).
+
+'''Syntax:''' <code>id_field={field_name}</code>
+
+'''Example:'''
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/products?ids=SKU001,SKU002&id_field=sku"
+</syntaxhighlight>
+
+----
+
+== group ==
+
+Group results by field values (for aggregate queries).
+
+'''Syntax:''' <code>group={field}</code> or <code>group={field1},{field2}</code>
+
+'''Example:'''
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/orders?group=status&fields=status,count(*)"
+</syntaxhighlight>
+
+----
+
+== having ==
+
+Filter grouped results (use with <code>group</code>).
+
+'''Syntax:''' <code>having={condition}</code>
+
+'''Example:'''
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/orders?group=customer_id&fields=customer_id,sum(total)&having=sum(total)>1000"
+</syntaxhighlight>
+
+----
+
+== count_only ==
+
+Return only the total record count, not the records themselves.
+
+'''Syntax:''' <code>count_only=true</code>
+
+'''Example:'''
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/users?filter=status='active'&count_only=true"
+</syntaxhighlight>
+
+'''Response:'''
+<syntaxhighlight lang="json">
+{
+  "meta": {
+    "count": 1523
+  }
+}
+</syntaxhighlight>
+
+----
+
+== Parameter Aliases ==
+
+Some parameters have alternative names for convenience:
+
+{| class="wikitable"
+! Parameter !! Aliases
+|-
+| <code>fields</code> || <code>select</code>
+|-
+| <code>filter</code> || <code>where</code>
+|-
+| <code>limit</code> || <code>top</code>
+|-
+| <code>offset</code> || <code>skip</code>
+|-
+| <code>order</code> || <code>sort</code>, <code>order_by</code>
+|-
+| <code>group</code> || <code>group_by</code>
+|}
+
+----
+
+== Complete Examples ==
+
+=== Paginated List with Count ===
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/products\
+?limit=20\
+&offset=40\
+&order=name%20ASC\
+&include_count=true\
+&fields=id,name,price,stock"
+</syntaxhighlight>
+
+=== Filtered Search with Related Data ===
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/orders\
+?filter=(status='pending')%20and%20(total>100)\
+&related=customers\
+&order=created_at%20DESC\
+&limit=50"
+</syntaxhighlight>
+
+=== Minimal Payload for Dropdown ===
+
+<syntaxhighlight lang="bash">
+curl "https://example.com/api/v2/db/_table/categories\
+?fields=id,name\
+&order=name%20ASC\
+&filter=active=true"
+</syntaxhighlight>
+
+----
+
+== URL Encoding Reference ==
+
+{| class="wikitable"
+! Character !! Encoded
+|-
+| Space || <code>%20</code> or <code>+</code>
+|-
+| <code>=</code> || <code>%3D</code>
+|-
+| <code>'</code> || <code>%27</code>
+|-
+| <code>%</code> || <code>%25</code>
+|-
+| <code>&</code> || <code>%26</code>
+|-
+| <code>(</code> || <code>%28</code>
+|-
+| <code>)</code> || <code>%29</code>
+|-
+| <code>,</code> || <code>%2C</code>
+|}
+
+'''Tip:''' Use your HTTP client's built-in URL encoding rather than manual encoding.
+
+----
+
+== See Also ==
+
+* [[API Endpoints]] - Complete endpoint reference
+* [[Error Codes]] - HTTP status codes and error handling

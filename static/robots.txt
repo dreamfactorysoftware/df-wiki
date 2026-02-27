@@ -1,9 +1,29 @@
 User-agent: *
+Allow: /
 Disallow: /index.php?
 Disallow: /Special:
 Disallow: /User:
 Disallow: /Wiki:General_disclaimer
 Disallow: /Wiki:Privacy_policy
+
+# AI crawlers — explicitly allow indexing for citation/grounding
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://wiki.dreamfactory.com/sitemap.xml
 Content-Signal: search=yes, ai-input=yes, ai-train=no

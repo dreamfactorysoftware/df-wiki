@@ -1,0 +1,505 @@
+= Memcached =
+
+Memcached is a high-performance, distributed memory caching system designed for simplicity and speed. DreamFactory supports Memcached as a caching backend for API response caching and general-purpose key-value storage.
+
+----
+
+== Use Cases ==
+
+* '''Simple key-value caching''': Store and retrieve data with minimal overhead
+* '''API response caching''': Cache database query results
+* '''Distributed caching''': Share cache across multiple application servers
+* '''High-throughput scenarios''': When raw speed matters more than features
+
+----
+
+== Memcached vs Redis ==
+
+{| class="wikitable"
+! Feature !! Memcached !! Redis
+|-
+| Data types || Strings only || Strings, lists, sets, hashes
+|-
+| Maximum key size || 250 bytes || 512 MB
+|-
+| Maximum value size || 1 MB (default) || 512 MB
+|-
+| Persistence || None || Optional
+|-
+| Replication || None || Master-slave
+|-
+| Memory efficiency || Excellent || Good
+|-
+| Threading || Multi-threaded || Single-threaded
+|-
+| Complexity || Simple || Feature-rich
+|}
+
+'''Choose Memcached when:'''
+* You need simple key-value caching
+* Maximum memory efficiency is critical
+* You don't need persistence or advanced data structures
+* Multi-threaded performance is beneficial
+
+'''Choose Redis when:'''
+* You need sessions, queues, or pub/sub
+* Data persistence is required
+* You use complex data structures
+
+----
+
+== Prerequisites ==
+
+=== Install Memcached ===
+
+'''Ubuntu/Debian:'''
+<syntaxhighlight lang="bash">
+sudo apt update
+sudo apt install memcached libmemcached-tools
+sudo systemctl enable memcached
+sudo systemctl start memcached
+</syntaxhighlight>
+
+'''CentOS/RHEL:'''
+<syntaxhighlight lang="bash">
+sudo yum install memcached
+sudo systemctl enable memcached
+sudo systemctl start memcached
+</syntaxhighlight>
+
+=== Verify Installation ===
+
+<syntaxhighlight lang="bash">
+echo "stats" | nc localhost 11211
+</syntaxhighlight>
+
+=== PHP Extension ===
+
+DreamFactory requires the PHP Memcached extension:
+
+<syntaxhighlight lang="bash">
+sudo apt install php-memcached
+sudo systemctl restart php-fpm
+</syntaxhighlight>
+
+----
+
+== Configuring Memcached in DreamFactory ==
+
+=== System Cache Configuration ===
+
+Set Memcached as the system cache backend in your DreamFactory environment file (<code>.env</code>):
+
+<syntaxhighlight lang="text">
+CACHE_DRIVER=memcached
+MEMCACHED_HOST=localhost
+MEMCACHED_PORT=11211
+</syntaxhighlight>
+
+=== Configuration Options ===
+
+{| class="wikitable"
+! Variable !! Required !! Default !! Description
+|-
+| <code>CACHE_DRIVER</code> || Yes || <code>file</code> || Set to <code>memcached</code> to enable
+|-
+| <code>MEMCACHED_HOST</code> || Yes || <code>localhost</code> || Memcached server hostname
+|-
+| <code>MEMCACHED_PORT</code> || No || <code>11211</code> || Memcached server port
+|-
+| <code>MEMCACHED_PERSISTENT_ID</code> || No || - || Persistent connection identifier
+|-
+| <code>MEMCACHED_USERNAME</code> || No || - || SASL authentication username
+|-
+| <code>MEMCACHED_PASSWORD</code> || No || - || SASL authentication password
+|}
+
+=== Multiple Servers ===
+
+For distributed caching across multiple Memcached servers:
+
+<syntaxhighlight lang="text">
+MEMCACHED_HOST=server1.example.com:11211,server2.example.com:11211,server3.example.com:11211
+</syntaxhighlight>
+
+----
+
+== Creating a Memcached Cache Service ==
+
+Create a Memcached service for direct cache API access.
+
+=== Step 1: Navigate to API Generation ===
+
+Log in to your DreamFactory instance and select '''API Generation & Connections'''. Set API Type to '''Cache'''.
+
+=== Step 2: Create New Service ===
+
+Click the plus button and select '''Memcached'''.
+
+=== Step 3: Configure Service Details ===
+
+{| class="wikitable"
+! Field !! Description !! Example
+|-
+| Name || Service name (used in API URL) || <code>memcache</code>
+|-
+| Label || Display name || <code>Memcached</code>
+|-
+| Description || Service description || <code>Application cache</code>
+|}
+
+=== Step 4: Configure Connection ===
+
+{| class="wikitable"
+! Field !! Required !! Default !! Description
+|-
+| Host || No || <code>127.0.0.1</code> || Memcached server hostname or IP
+|-
+| Port || No || <code>11211</code> || Memcached port number
+|-
+| Default TTL || No || <code>300</code> || Time to live in minutes before cached values expire
+|}
+
+=== Step 5: Save and Test ===
+
+Save the service and use API Docs to test operations.
+
+----
+
+== API Endpoints ==
+
+{| class="wikitable"
+! Method !! Endpoint !! Description
+|-
+| <code>GET</code> || <code>/api/v2/{service}/{key}</code> || Get value by key
+|-
+| <code>POST</code> || <code>/api/v2/{service}</code> || Store one or more key-value pairs
+|-
+| <code>PUT</code> || <code>/api/v2/{service}/{key}</code> || Update existing key
+|-
+| <code>DELETE</code> || <code>/api/v2/{service}/{key}</code> || Delete a key
+|-
+| <code>DELETE</code> || <code>/api/v2/{service}</code> || Flush all keys
+|}
+
+{{Note|Memcached does not support listing all keys. Use <code>GET</code> with specific keys only.}}
+
+----
+
+== API Examples ==
+
+=== Store a Value ===
+
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/memcache" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource": [
+      {
+        "key": "user:123:name",
+        "value": "John Doe",
+        "ttl": 3600
+      }
+    ]
+  }'
+</syntaxhighlight>
+
+'''Response:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "key": "user:123:name",
+      "success": true
+    }
+  ]
+}
+</syntaxhighlight>
+
+=== Store JSON Data ===
+
+Values are automatically serialized:
+
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/memcache" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource": [
+      {
+        "key": "config:app",
+        "value": {
+          "theme": "dark",
+          "language": "en",
+          "features": ["analytics", "reporting"]
+        },
+        "ttl": 86400
+      }
+    ]
+  }'
+</syntaxhighlight>
+
+=== Retrieve a Value ===
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/memcache/user:123:name" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+'''Response:'''
+<syntaxhighlight lang="json">
+{
+  "key": "user:123:name",
+  "value": "John Doe"
+}
+</syntaxhighlight>
+
+=== Retrieve Multiple Values ===
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/memcache?keys=user:123:name,user:456:name" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+=== Delete a Key ===
+
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/memcache/user:123:name" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+=== Flush All Keys ===
+
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/memcache" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+{{Warning|Flushing deletes all cached data. Use with caution in production.}}
+
+----
+
+== TTL (Time-To-Live) ==
+
+Set expiration times when storing values:
+
+{| class="wikitable"
+! TTL Value !! Behavior
+|-
+| Positive integer (< 30 days) || Expire after N seconds
+|-
+| <code>0</code> || No expiration
+|-
+| Unix timestamp (> 30 days) || Expire at specific time
+|}
+
+=== Memcached TTL Behavior ===
+
+Memcached has a maximum TTL of 30 days (2592000 seconds). Values larger than this are interpreted as Unix timestamps.
+
+<syntaxhighlight lang="json">
+// Expires in 1 hour
+{"key": "temp:data", "value": "...", "ttl": 3600}
+
+// Expires in 7 days
+{"key": "weekly:report", "value": "...", "ttl": 604800}
+
+// Expires at specific Unix timestamp
+{"key": "event:data", "value": "...", "ttl": 1740000000}
+</syntaxhighlight>
+
+----
+
+== Memcached Configuration ==
+
+=== Server Configuration ===
+
+Edit <code>/etc/memcached.conf</code>:
+
+<syntaxhighlight lang="text">
+# Listen address (localhost only for security)
+-l 127.0.0.1
+
+# Port
+-p 11211
+
+# Memory limit (MB)
+-m 256
+
+# Maximum connections
+-c 1024
+
+# Run as user
+-u memcached
+</syntaxhighlight>
+
+=== Memory Allocation ===
+
+{| class="wikitable"
+! Setting !! Description
+|-
+| <code>-m 256</code> || Allocate 256 MB for cache storage
+|-
+| <code>-I 2m</code> || Maximum item size (default 1 MB)
+|-
+| <code>-f 1.25</code> || Chunk size growth factor
+|}
+
+=== Security ===
+
+'''Bind to localhost:'''
+<syntaxhighlight lang="text">
+-l 127.0.0.1
+</syntaxhighlight>
+
+'''SASL Authentication''' (requires libmemcached with SASL):
+<syntaxhighlight lang="text">
+-S
+</syntaxhighlight>
+
+----
+
+== Distributed Caching ==
+
+=== Consistent Hashing ===
+
+When using multiple Memcached servers, DreamFactory uses consistent hashing to distribute keys. This minimizes cache invalidation when servers are added or removed.
+
+=== Server Weights ===
+
+Assign weights to servers based on capacity:
+
+<syntaxhighlight lang="text">
+MEMCACHED_HOST=server1.example.com:11211:2,server2.example.com:11211:1
+</syntaxhighlight>
+
+Server1 receives twice as many keys as server2.
+
+=== Failover Behavior ===
+
+If a Memcached server becomes unavailable:
+* Affected keys become cache misses
+* Keys are redistributed to remaining servers
+* No data is automatically replicated
+
+----
+
+== Monitoring ==
+
+=== Key Metrics ===
+
+{| class="wikitable"
+! Metric !! Description !! Concern Level
+|-
+| <code>curr_items</code> || Current cached items || -
+|-
+| <code>get_hits</code> || Successful cache hits || Higher is better
+|-
+| <code>get_misses</code> || Cache misses || High ratio indicates issues
+|-
+| <code>evictions</code> || Items evicted for memory || Any eviction may be concern
+|-
+| <code>bytes_read</code> || Network bytes read || -
+|-
+| <code>bytes_written</code> || Network bytes written || -
+|}
+
+=== Memcached Stats ===
+
+<syntaxhighlight lang="bash">
+# Get all stats
+echo "stats" | nc localhost 11211
+
+# Get specific stats
+echo "stats items" | nc localhost 11211
+echo "stats slabs" | nc localhost 11211
+</syntaxhighlight>
+
+=== Calculate Hit Ratio ===
+
+<syntaxhighlight lang="text">
+hit_ratio = get_hits / (get_hits + get_misses)
+</syntaxhighlight>
+
+A healthy cache should have a hit ratio above 80%.
+
+----
+
+== Common Errors ==
+
+{| class="wikitable"
+! Error Code !! Message !! Cause !! Solution
+|-
+| 400 || Bad Request || Invalid key or value || Check key length (max 250 bytes)
+|-
+| 401 || Unauthorized || Missing API key || Add API key header
+|-
+| 404 || Not Found || Key does not exist || Handle cache miss
+|-
+| 500 || Connection refused || Server unreachable || Check Memcached status
+|-
+| 500 || SERVER_ERROR || Value too large || Increase <code>-I</code> setting
+|}
+
+=== Troubleshooting ===
+
+<syntaxhighlight lang="bash">
+# Check if Memcached is running
+sudo systemctl status memcached
+
+# Test connection
+echo "stats" | nc localhost 11211
+
+# Check memory usage
+echo "stats" | nc localhost 11211 | grep bytes
+
+# View logs
+sudo journalctl -u memcached
+</syntaxhighlight>
+
+----
+
+== Performance Tuning ==
+
+=== Slab Allocation ===
+
+Memcached allocates memory in slabs. Monitor slab usage:
+
+<syntaxhighlight lang="bash">
+echo "stats slabs" | nc localhost 11211
+</syntaxhighlight>
+
+If certain slab classes fill up while others are empty, adjust the growth factor:
+
+<syntaxhighlight lang="text">
+-f 1.1  # Smaller chunks, more classes
+</syntaxhighlight>
+
+=== Connection Handling ===
+
+<syntaxhighlight lang="text">
+# Increase max connections
+-c 2048
+
+# Enable TCP_NODELAY
+-T
+</syntaxhighlight>
+
+=== UDP Mode ===
+
+For read-heavy workloads in trusted networks:
+
+<syntaxhighlight lang="text">
+-U 11211
+</syntaxhighlight>
+
+{{Warning|UDP mode is vulnerable to amplification attacks. Only use in secure networks.}}
+
+----
+
+== Next Steps ==
+
+* '''[[Cache Overview]]''': Compare caching backends
+* '''[[Redis]]''': Feature-rich alternative
+* '''[[Performance Tuning]]''': Optimize DreamFactory

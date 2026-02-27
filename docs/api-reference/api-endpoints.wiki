@@ -1,0 +1,563 @@
+= API Endpoints Reference =
+
+Complete reference for all DreamFactory REST API endpoints.
+
+== Base URL ==
+
+All endpoints use the base URL format:
+<syntaxhighlight lang="text">
+https://{your-instance}/api/v2/{service_name}
+</syntaxhighlight>
+
+== Authentication ==
+
+Include your API key or session token in request headers:
+<syntaxhighlight lang="text">
+X-DreamFactory-API-Key: your-api-key
+X-DreamFactory-Session-Token: your-session-token
+</syntaxhighlight>
+
+----
+
+== Table Operations ==
+
+=== <code>GET /api/v2/_table/{table_name}</code> ===
+
+Retrieve records from a table.
+
+'''Parameters:'''
+
+{| class="wikitable"
+! Parameter !! Type !! Description
+|-
+| <code>filter</code> || string || Filter expression (see [[Query Parameters]])
+|-
+| <code>limit</code> || integer || Maximum records to return
+|-
+| <code>offset</code> || integer || Number of records to skip
+|-
+| <code>order</code> || string || Sort order (e.g., <code>name ASC</code>)
+|-
+| <code>fields</code> || string || Comma-separated field names
+|-
+| <code>related</code> || string || Related tables to include
+|-
+| <code>include_count</code> || boolean || Include total record count
+|}
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/db/_table/contacts?limit=10&order=name%20ASC" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+'''Example Response:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  ]
+}
+</syntaxhighlight>
+
+----
+
+=== <code>POST /api/v2/_table/{table_name}</code> ===
+
+Create one or more records.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "name": "Jane Smith",
+      "email": "jane@example.com"
+    }
+  ]
+}
+</syntaxhighlight>
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/db/_table/contacts" \
+  -H "X-DreamFactory-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"resource": [{"name": "Jane Smith", "email": "jane@example.com"}]}'
+</syntaxhighlight>
+
+'''Example Response:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "id": 2
+    }
+  ]
+}
+</syntaxhighlight>
+
+----
+
+=== <code>PUT /api/v2/_table/{table_name}</code> ===
+
+Replace records (full update). Requires primary key in each record.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "id": 1,
+      "name": "John Updated",
+      "email": "john.updated@example.com"
+    }
+  ]
+}
+</syntaxhighlight>
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X PUT "https://example.com/api/v2/db/_table/contacts" \
+  -H "X-DreamFactory-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"resource": [{"id": 1, "name": "John Updated", "email": "john.updated@example.com"}]}'
+</syntaxhighlight>
+
+----
+
+=== <code>PATCH /api/v2/_table/{table_name}</code> ===
+
+Partial update of records. Only specified fields are modified.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "id": 1,
+      "email": "newemail@example.com"
+    }
+  ]
+}
+</syntaxhighlight>
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X PATCH "https://example.com/api/v2/db/_table/contacts" \
+  -H "X-DreamFactory-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"resource": [{"id": 1, "email": "newemail@example.com"}]}'
+</syntaxhighlight>
+
+----
+
+=== <code>DELETE /api/v2/_table/{table_name}</code> ===
+
+Delete records by IDs or filter.
+
+'''By IDs:'''
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/db/_table/contacts?ids=1,2,3" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+'''By Filter:'''
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/db/_table/contacts?filter=status%3D%27inactive%27" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+----
+
+== Schema Operations ==
+
+=== <code>GET /api/v2/_schema</code> ===
+
+List all tables in the database.
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/db/_schema" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+'''Example Response:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {"name": "contacts"},
+    {"name": "orders"},
+    {"name": "products"}
+  ]
+}
+</syntaxhighlight>
+
+----
+
+=== <code>GET /api/v2/_schema/{table_name}</code> ===
+
+Get table structure and field definitions.
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/db/_schema/contacts" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+'''Example Response:'''
+<syntaxhighlight lang="json">
+{
+  "name": "contacts",
+  "label": "Contacts",
+  "field": [
+    {
+      "name": "id",
+      "type": "integer",
+      "db_type": "int",
+      "is_primary_key": true,
+      "auto_increment": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "db_type": "varchar(255)",
+      "allow_null": false
+    }
+  ]
+}
+</syntaxhighlight>
+
+----
+
+=== <code>POST /api/v2/_schema</code> ===
+
+Create a new table.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "name": "new_table",
+      "label": "New Table",
+      "field": [
+        {
+          "name": "id",
+          "type": "id"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "length": 255
+        }
+      ]
+    }
+  ]
+}
+</syntaxhighlight>
+
+----
+
+=== <code>PUT /api/v2/_schema/{table_name}</code> ===
+
+Update table structure (add/modify columns).
+
+----
+
+=== <code>DELETE /api/v2/_schema/{table_name}</code> ===
+
+Drop a table from the database.
+
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/db/_schema/old_table" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+----
+
+== Stored Procedures ==
+
+=== <code>GET /api/v2/_proc/{procedure_name}</code> ===
+
+Execute a stored procedure (no parameters or IN parameters only).
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/db/_proc/get_active_users" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+----
+
+=== <code>POST /api/v2/_proc/{procedure_name}</code> ===
+
+Execute a stored procedure with parameters.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "params": [
+    {"name": "user_id", "value": 123},
+    {"name": "status", "value": "active"}
+  ]
+}
+</syntaxhighlight>
+
+'''Example Request:'''
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/db/_proc/update_user_status" \
+  -H "X-DreamFactory-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"params": [{"name": "user_id", "value": 123}, {"name": "status", "value": "active"}]}'
+</syntaxhighlight>
+
+----
+
+== Stored Functions ==
+
+=== <code>GET /api/v2/_func/{function_name}</code> ===
+
+Execute a stored function.
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/db/_func/calculate_total?order_id=456" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+----
+
+=== <code>POST /api/v2/_func/{function_name}</code> ===
+
+Execute a stored function with complex parameters.
+
+----
+
+== System APIs ==
+
+=== Service Management ===
+
+==== <code>GET /api/v2/system/service</code> ====
+
+List all configured services.
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/system/service" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+==== <code>POST /api/v2/system/service</code> ====
+
+Create a new service.
+
+==== <code>PUT /api/v2/system/service/{id}</code> ====
+
+Update a service configuration.
+
+==== <code>DELETE /api/v2/system/service/{id}</code> ====
+
+Delete a service.
+
+----
+
+=== Role Management ===
+
+==== <code>GET /api/v2/system/role</code> ====
+
+List all roles.
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/system/role" \
+  -H "X-DreamFactory-API-Key: your-api-key"
+</syntaxhighlight>
+
+==== <code>POST /api/v2/system/role</code> ====
+
+Create a new role.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "name": "read_only",
+      "description": "Read-only access to database",
+      "is_active": true
+    }
+  ]
+}
+</syntaxhighlight>
+
+==== <code>PUT /api/v2/system/role/{id}</code> ====
+
+Update a role.
+
+==== <code>DELETE /api/v2/system/role/{id}</code> ====
+
+Delete a role.
+
+----
+
+=== User Management ===
+
+==== <code>GET /api/v2/system/user</code> ====
+
+List all users (admin only).
+
+==== <code>POST /api/v2/system/user</code> ====
+
+Create a new user (admin only).
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "email": "newuser@example.com",
+      "password": "SecurePassword123!",
+      "first_name": "New",
+      "last_name": "User"
+    }
+  ]
+}
+</syntaxhighlight>
+
+==== <code>PUT /api/v2/system/user/{id}</code> ====
+
+Update a user.
+
+==== <code>DELETE /api/v2/system/user/{id}</code> ====
+
+Delete a user.
+
+----
+
+=== Application Management ===
+
+==== <code>GET /api/v2/system/app</code> ====
+
+List all applications.
+
+==== <code>POST /api/v2/system/app</code> ====
+
+Create a new application.
+
+==== <code>PUT /api/v2/system/app/{id}</code> ====
+
+Update an application.
+
+==== <code>DELETE /api/v2/system/app/{id}</code> ====
+
+Delete an application.
+
+----
+
+== User APIs ==
+
+=== Session Management ===
+
+==== <code>POST /api/v2/user/session</code> ====
+
+Login and create a session.
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+</syntaxhighlight>
+
+'''Example Response:'''
+<syntaxhighlight lang="json">
+{
+  "session_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "id": 5,
+  "name": "User Name",
+  "email": "user@example.com",
+  "is_sys_admin": false,
+  "session_id": "abc123..."
+}
+</syntaxhighlight>
+
+==== <code>GET /api/v2/user/session</code> ====
+
+Get current session info.
+
+==== <code>DELETE /api/v2/user/session</code> ====
+
+Logout and destroy session.
+
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/user/session" \
+  -H "X-DreamFactory-Session-Token: your-session-token"
+</syntaxhighlight>
+
+----
+
+=== User Registration ===
+
+==== <code>POST /api/v2/user/register</code> ====
+
+Register a new user (if open registration is enabled).
+
+'''Request Body:'''
+<syntaxhighlight lang="json">
+{
+  "email": "newuser@example.com",
+  "password": "SecurePassword123!",
+  "first_name": "John",
+  "last_name": "Doe"
+}
+</syntaxhighlight>
+
+----
+
+=== Password Management ===
+
+==== <code>POST /api/v2/user/password</code> ====
+
+Request password reset or change password.
+
+'''Request Reset Email:'''
+<syntaxhighlight lang="json">
+{
+  "email": "user@example.com"
+}
+</syntaxhighlight>
+
+'''Change Password (authenticated):'''
+<syntaxhighlight lang="json">
+{
+  "old_password": "current-password",
+  "new_password": "new-secure-password"
+}
+</syntaxhighlight>
+
+----
+
+== Response Wrapper ==
+
+All responses are wrapped in a <code>resource</code> array for consistency:
+
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    { ... },
+    { ... }
+  ]
+}
+</syntaxhighlight>
+
+Single record responses may omit the wrapper depending on the request.
+
+----
+
+== See Also ==
+
+* [[Query Parameters]] - Filter, sort, and paginate results
+* [[Error Codes]] - HTTP status codes and error handling
