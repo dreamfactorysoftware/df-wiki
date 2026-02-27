@@ -1,0 +1,457 @@
+= Redis =
+
+Redis is a high-performance, in-memory data store that DreamFactory uses for caching, session storage, and rate limiting. It provides sub-millisecond response times and supports advanced data structures for complex caching scenarios.
+
+----
+
+== Use Cases ==
+
+* '''API response caching''': Store database query results for faster subsequent requests
+* '''Session storage''': Distribute user sessions across multiple DreamFactory instances
+* '''Rate limiting''': Track API request counts with automatic expiry
+* '''Queue backend''': Process background jobs asynchronously
+* '''Pub/Sub messaging''': Real-time event distribution (advanced)
+
+----
+
+== Prerequisites ==
+
+=== Redis Server ===
+
+Install Redis on your server or use a managed service:
+
+'''Ubuntu/Debian:'''
+<syntaxhighlight lang="bash">
+sudo apt update
+sudo apt install redis-server
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+</syntaxhighlight>
+
+'''Managed Services:'''
+* AWS ElastiCache for Redis
+* Azure Cache for Redis
+* Google Cloud Memorystore
+* Redis Cloud
+
+=== Verify Installation ===
+
+<syntaxhighlight lang="bash">
+redis-cli ping
+# Expected response: PONG
+</syntaxhighlight>
+
+----
+
+== Configuring Redis in DreamFactory ==
+
+=== System Cache Configuration ===
+
+Set Redis as the system cache backend in your DreamFactory environment file (<code>.env</code>):
+
+<syntaxhighlight lang="text">
+CACHE_DRIVER=redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_secure_password
+REDIS_DATABASE=0
+</syntaxhighlight>
+
+=== Configuration Options ===
+
+{| class="wikitable"
+! Variable !! Required !! Default !! Description
+|-
+| <code>CACHE_DRIVER</code> || Yes || <code>file</code> || Set to <code>redis</code> to enable
+|-
+| <code>REDIS_HOST</code> || Yes || <code>localhost</code> || Redis server hostname or IP
+|-
+| <code>REDIS_PORT</code> || No || <code>6379</code> || Redis server port
+|-
+| <code>REDIS_PASSWORD</code> || No || - || Redis authentication password
+|-
+| <code>REDIS_DATABASE</code> || No || <code>0</code> || Redis database number (0-15)
+|-
+| <code>REDIS_PREFIX</code> || No || <code>dreamfactory</code> || Key prefix for namespacing
+|}
+
+=== Session Storage ===
+
+To store sessions in Redis:
+
+<syntaxhighlight lang="text">
+SESSION_DRIVER=redis
+</syntaxhighlight>
+
+=== Queue Backend ===
+
+To use Redis for background job queues:
+
+<syntaxhighlight lang="text">
+QUEUE_DRIVER=redis
+</syntaxhighlight>
+
+----
+
+== Creating a Redis Cache Service ==
+
+In addition to system caching, you can create a Redis service for direct cache API access.
+
+=== Step 1: Navigate to API Generation ===
+
+Log in to your DreamFactory instance and select '''API Generation & Connections'''. Set API Type to '''Cache'''.
+
+=== Step 2: Create New Service ===
+
+Click the plus button and select '''Redis'''.
+
+=== Step 3: Configure Service Details ===
+
+{| class="wikitable"
+! Field !! Description !! Example
+|-
+| Name || Service name (used in API URL) || <code>redis</code>
+|-
+| Label || Display name || <code>Redis Cache</code>
+|-
+| Description || Service description || <code>Application cache service</code>
+|}
+
+=== Step 4: Configure Connection ===
+
+{| class="wikitable"
+! Field !! Required !! Default !! Description
+|-
+| Host || No || <code>127.0.0.1</code> || Redis server hostname or IP
+|-
+| Port || No || <code>6379</code> || Redis port number
+|-
+| Password || No || - || Authentication password
+|-
+| Database Index || No || <code>0</code> || Redis database number (0-15)
+|-
+| Default TTL || No || <code>300</code> || Time to live in minutes before cached values expire
+|}
+
+=== Step 5: Save and Test ===
+
+Save the service and use API Docs to test cache operations.
+
+----
+
+== API Endpoints ==
+
+{| class="wikitable"
+! Method !! Endpoint !! Description
+|-
+| <code>GET</code> || <code>/api/v2/{service}/</code> || List all keys (use sparingly)
+|-
+| <code>GET</code> || <code>/api/v2/{service}/{key}</code> || Get value by key
+|-
+| <code>POST</code> || <code>/api/v2/{service}</code> || Store one or more key-value pairs
+|-
+| <code>PUT</code> || <code>/api/v2/{service}/{key}</code> || Update existing key
+|-
+| <code>DELETE</code> || <code>/api/v2/{service}/{key}</code> || Delete a key
+|-
+| <code>DELETE</code> || <code>/api/v2/{service}</code> || Flush all keys (dangerous)
+|}
+
+----
+
+== API Examples ==
+
+=== Store a Value ===
+
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/redis" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource": [
+      {
+        "key": "user:123:profile",
+        "value": {"name": "John Doe", "email": "john@example.com"},
+        "ttl": 3600
+      }
+    ]
+  }'
+</syntaxhighlight>
+
+'''Response:'''
+<syntaxhighlight lang="json">
+{
+  "resource": [
+    {
+      "key": "user:123:profile",
+      "success": true
+    }
+  ]
+}
+</syntaxhighlight>
+
+=== Store Multiple Values ===
+
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/redis" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource": [
+      {"key": "setting:theme", "value": "dark", "ttl": 86400},
+      {"key": "setting:language", "value": "en", "ttl": 86400},
+      {"key": "setting:timezone", "value": "UTC", "ttl": 86400}
+    ]
+  }'
+</syntaxhighlight>
+
+=== Retrieve a Value ===
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/redis/user:123:profile" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+'''Response:'''
+<syntaxhighlight lang="json">
+{
+  "key": "user:123:profile",
+  "value": {
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}
+</syntaxhighlight>
+
+=== Delete a Key ===
+
+<syntaxhighlight lang="bash">
+curl -X DELETE "https://example.com/api/v2/redis/user:123:profile" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+=== Check if Key Exists ===
+
+<syntaxhighlight lang="bash">
+curl -X GET "https://example.com/api/v2/redis/user:123:profile?check_exist=true" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY"
+</syntaxhighlight>
+
+'''Response:'''
+<syntaxhighlight lang="json">
+{
+  "key": "user:123:profile",
+  "exists": true
+}
+</syntaxhighlight>
+
+----
+
+== TTL (Time-To-Live) ==
+
+Set expiration times when storing values:
+
+{| class="wikitable"
+! TTL Value !! Behavior
+|-
+| Positive integer || Expire after N seconds
+|-
+| <code>0</code> || No expiration (persist indefinitely)
+|-
+| <code>-1</code> || Use default TTL from service config
+|}
+
+=== Recommended TTL Values ===
+
+{| class="wikitable"
+! Data Type !! TTL (seconds) !! Duration
+|-
+| Session data || 1800 || 30 minutes
+|-
+| User profiles || 300 || 5 minutes
+|-
+| Reference data || 86400 || 24 hours
+|-
+| Rate limit counters || 60 || 1 minute
+|-
+| Real-time data || 30 || 30 seconds
+|}
+
+----
+
+== Redis Configuration Best Practices ==
+
+=== Security ===
+
+'''Bind to localhost or private network:'''
+<syntaxhighlight lang="text">
+# /etc/redis/redis.conf
+bind 127.0.0.1
+</syntaxhighlight>
+
+'''Require authentication:'''
+<syntaxhighlight lang="text">
+requirepass your_strong_password_here
+</syntaxhighlight>
+
+'''Disable dangerous commands:'''
+<syntaxhighlight lang="text">
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+rename-command DEBUG ""
+</syntaxhighlight>
+
+=== Memory Management ===
+
+'''Set memory limit:'''
+<syntaxhighlight lang="text">
+maxmemory 256mb
+</syntaxhighlight>
+
+'''Configure eviction policy:'''
+<syntaxhighlight lang="text">
+maxmemory-policy allkeys-lru
+</syntaxhighlight>
+
+{| class="wikitable"
+! Policy !! Description
+|-
+| <code>noeviction</code> || Return error when memory limit reached
+|-
+| <code>allkeys-lru</code> || Evict least recently used keys (recommended)
+|-
+| <code>volatile-lru</code> || Evict LRU keys with TTL set
+|-
+| <code>allkeys-random</code> || Random eviction
+|}
+
+=== Persistence ===
+
+'''RDB snapshots (default):'''
+<syntaxhighlight lang="text">
+save 900 1    # Save if 1 key changed in 900 seconds
+save 300 10   # Save if 10 keys changed in 300 seconds
+save 60 10000 # Save if 10000 keys changed in 60 seconds
+</syntaxhighlight>
+
+'''AOF for durability:'''
+<syntaxhighlight lang="text">
+appendonly yes
+appendfsync everysec
+</syntaxhighlight>
+
+----
+
+== High Availability ==
+
+=== Redis Sentinel ===
+
+For automatic failover:
+
+<syntaxhighlight lang="text">
+REDIS_SENTINEL_HOST=sentinel1.example.com,sentinel2.example.com
+REDIS_SENTINEL_PORT=26379
+REDIS_SENTINEL_MASTER=mymaster
+</syntaxhighlight>
+
+=== Redis Cluster ===
+
+For horizontal scaling, configure multiple Redis nodes with clustering enabled.
+
+----
+
+== Monitoring ==
+
+=== Key Metrics to Watch ===
+
+{| class="wikitable"
+! Metric !! Description !! Alert Threshold
+|-
+| <code>used_memory</code> || Current memory usage || > 80% of maxmemory
+|-
+| <code>connected_clients</code> || Active connections || > 80% of maxclients
+|-
+| <code>keyspace_hits</code> || Cache hit count || -
+|-
+| <code>keyspace_misses</code> || Cache miss count || High miss ratio
+|-
+| <code>evicted_keys</code> || Keys removed due to memory || Any eviction
+|}
+
+=== Redis CLI Commands ===
+
+<syntaxhighlight lang="bash">
+# Check server status
+redis-cli info
+
+# Monitor memory
+redis-cli info memory
+
+# Check connected clients
+redis-cli client list
+
+# Get hit/miss ratio
+redis-cli info stats | grep keyspace
+</syntaxhighlight>
+
+----
+
+== Common Errors ==
+
+{| class="wikitable"
+! Error Code !! Message !! Cause !! Solution
+|-
+| 400 || Bad Request || Invalid key or value || Check request format
+|-
+| 401 || Unauthorized || Missing API key || Add API key header
+|-
+| 404 || Not Found || Key does not exist || Handle cache miss
+|-
+| 500 || Connection refused || Redis server unreachable || Check Redis server status
+|-
+| 500 || NOAUTH || Authentication required || Add REDIS_PASSWORD to .env
+|}
+
+=== Troubleshooting Connection Issues ===
+
+<syntaxhighlight lang="bash">
+# Test Redis connectivity
+redis-cli -h localhost -p 6379 ping
+
+# Test with password
+redis-cli -h localhost -p 6379 -a your_password ping
+
+# Check Redis logs
+sudo tail -f /var/log/redis/redis-server.log
+</syntaxhighlight>
+
+----
+
+== Performance Tuning ==
+
+=== Connection Pooling ===
+
+Configure persistent connections in Laravel/DreamFactory:
+
+<syntaxhighlight lang="text">
+REDIS_CLIENT=phpredis
+</syntaxhighlight>
+
+=== Pipelining ===
+
+For bulk operations, the API supports batch requests that are automatically pipelined.
+
+=== Key Design ===
+
+* Use colons <code>:</code> as separators: <code>user:123:profile</code>
+* Keep keys short but descriptive
+* Use consistent naming conventions
+* Avoid spaces and special characters
+
+----
+
+== Next Steps ==
+
+* '''[[Cache Overview]]''': Compare caching backends
+* '''[[Memcached]]''': Alternative caching option
+* '''[[Getting_Started/Optimizing_Dreamfactory/Database|Performance Tuning]]''': Optimize DreamFactory

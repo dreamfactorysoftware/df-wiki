@@ -1,0 +1,89 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'static/**'
+      - 'scripts/**'
+      - 'production-wiki-config/**'
+      - 'staging-wiki-config/**'
+
+jobs:
+  validate:
+    name: Wiki Content Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run content quality gate
+        working-directory: scripts
+        run: python content_score.py --dir ../docs/ --output score_report.csv --threshold 50
+
+      - name: Run wiki validation (PR branch)
+        working-directory: scripts
+        run: |
+          python validate_wiki.py --docs ../docs/ --format json > validation_report.json 2>&1 || true
+          python validate_wiki.py --docs ../docs/ 2>&1 || true
+
+      - name: Compare with main branch
+        run: |
+          # Get main branch docs to compare error counts
+          git fetch origin main
+          git worktree add /tmp/main-branch origin/main
+
+          # Use the PR branch's validator against main's docs
+          # (main may not have validate_wiki.py yet)
+          cd $GITHUB_WORKSPACE/scripts
+          python validate_wiki.py --docs /tmp/main-branch/docs/ --format json > /tmp/main_validation.json 2>&1 || true
+
+          # If main validation produced valid JSON, compare
+          if python -c "import json; json.load(open('/tmp/main_validation.json'))" 2>/dev/null; then
+            MAIN_ERRORS=$(python -c "import json; print(json.load(open('/tmp/main_validation.json'))['summary']['errors'])")
+          else
+            # First time validator runs — no baseline, just report
+            echo "No baseline from main (validator is new). Reporting PR results only."
+            MAIN_ERRORS=999999
+          fi
+
+          if python -c "import json; json.load(open('validation_report.json'))" 2>/dev/null; then
+            PR_ERRORS=$(python -c "import json; print(json.load(open('validation_report.json'))['summary']['errors'])")
+          else
+            echo "::error::PR validation failed to produce valid output"
+            exit 1
+          fi
+
+          echo "Main branch errors: $MAIN_ERRORS"
+          echo "PR branch errors:   $PR_ERRORS"
+
+          if [ "$MAIN_ERRORS" -eq 999999 ]; then
+            echo "First run — no regression check. PR has $PR_ERRORS error(s)."
+          elif [ "$PR_ERRORS" -gt "$MAIN_ERRORS" ]; then
+            NEW_ERRORS=$((PR_ERRORS - MAIN_ERRORS))
+            echo "::error::This PR introduces $NEW_ERRORS new validation error(s). Fix broken links or redirect targets before merging."
+            exit 1
+          else
+            FIXED=$((MAIN_ERRORS - PR_ERRORS))
+            echo "No new errors introduced. ($FIXED error(s) fixed by this PR)"
+          fi
+
+          git worktree remove /tmp/main-branch
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: |
+            scripts/validation_report.json
+            scripts/score_report.csv

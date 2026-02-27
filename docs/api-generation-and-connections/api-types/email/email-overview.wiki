@@ -1,0 +1,373 @@
+= Email Services Overview =
+
+DreamFactory provides email services for sending transactional emails through your APIs. Connect SMTP servers or cloud email providers to enable email functionality in your applications without exposing credentials to clients.
+
+----
+
+== Supported Email Services ==
+
+{| class="wikitable"
+! Service !! Type !! Use Case !! Documentation
+|-
+| '''SMTP''' || Protocol || Any SMTP server || [[SMTP]]
+|-
+| '''Mailgun''' || API || Transactional email || Commercial license
+|-
+| '''SendGrid''' || API || Transactional email || Commercial license
+|-
+| '''Amazon SES''' || API || AWS email service || Commercial license
+|-
+| '''Mandrill''' || API || Mailchimp transactional || Commercial license
+|-
+| '''SparkPost''' || API || High-volume email || Commercial license
+|-
+| '''Local''' || File || Development/testing || Built-in
+|}
+
+{{Note|SMTP is included in DreamFactory OSS. Cloud email provider connectors (Mailgun, SendGrid, SES, etc.) require a commercial license.}}
+
+----
+
+== Email Use Cases ==
+
+=== Transactional Email ===
+
+Send automated emails triggered by application events:
+
+* '''User registration''': Welcome emails, email verification
+* '''Password reset''': Secure reset links
+* '''Order confirmations''': E-commerce receipts
+* '''Notifications''': Alerts, reminders, updates
+* '''Reports''': Scheduled report delivery
+
+=== API-Driven Email ===
+
+Send emails directly through the DreamFactory API:
+
+<syntaxhighlight lang="bash">
+curl -X POST "https://example.com/api/v2/email" \
+  -H "X-DreamFactory-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": [{"email": "user@example.com", "name": "John Doe"}],
+    "subject": "Your Order Confirmation",
+    "body_html": "<h1>Thank you for your order!</h1>",
+    "body_text": "Thank you for your order!"
+  }'
+</syntaxhighlight>
+
+----
+
+== Choosing an Email Service ==
+
+=== SMTP vs API Providers ===
+
+{| class="wikitable"
+! Factor !! SMTP !! API Providers
+|-
+| Setup complexity || Medium || Simple
+|-
+| Deliverability || Depends on server reputation || Optimized
+|-
+| Rate limits || Server-dependent || Plan-dependent
+|-
+| Analytics || Basic (logs) || Detailed (opens, clicks)
+|-
+| Cost || Server hosting || Per-email pricing
+|-
+| Reliability || Self-managed || Provider SLA
+|}
+
+=== Provider Comparison ===
+
+{| class="wikitable"
+! Provider !! Best For !! Pricing Model
+|-
+| '''SMTP (self-hosted)''' || Full control, existing infrastructure || Server costs only
+|-
+| '''Amazon SES''' || AWS infrastructure, high volume, low cost || $0.10/1,000 emails
+|-
+| '''SendGrid''' || Developer-friendly, good deliverability || Free tier + paid plans
+|-
+| '''Mailgun''' || Developers, API-first approach || Pay-as-you-go
+|-
+| '''SparkPost''' || Enterprise, high-volume senders || Enterprise pricing
+|}
+
+=== Recommendations ===
+
+{| class="wikitable"
+! Scenario !! Recommended Service
+|-
+| Development/testing || Local or SMTP (Mailtrap)
+|-
+| Small applications || SendGrid free tier
+|-
+| AWS infrastructure || Amazon SES
+|-
+| High deliverability needs || Mailgun, SendGrid
+|-
+| Enterprise/high-volume || SparkPost, Amazon SES
+|}
+
+----
+
+== Email Service Architecture ==
+
+<syntaxhighlight lang="text">
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   API Client    │────▶│   DreamFactory   │────▶│  Email Service  │
+│  (App/Script)   │◀────│   (Email API)    │     │  (SMTP/API)     │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+        │                        │                        │
+    HTTP Request             Send Email              Deliver Email
+    + API Key                via configured              to inbox
+                             service
+</syntaxhighlight>
+
+=== Key Benefits ===
+
+# '''Credential protection''': SMTP/API credentials never exposed to clients
+# '''Unified interface''': Same API regardless of backend provider
+# '''Access control''': Role-based email permissions
+# '''Audit logging''': Track all sent emails
+# '''Rate limiting''': Prevent email abuse
+
+----
+
+== Common Configuration Options ==
+
+All email services share these configuration fields:
+
+{| class="wikitable"
+! Field !! Type !! Description
+|-
+| <code>name</code> || string || Service name (used in API URL)
+|-
+| <code>label</code> || string || Display name in admin console
+|-
+| <code>description</code> || string || Service description
+|-
+| <code>from_name</code> || string || Default sender name
+|-
+| <code>from_email</code> || string || Default sender email address
+|-
+| <code>reply_to_name</code> || string || Default reply-to name
+|-
+| <code>reply_to_email</code> || string || Default reply-to address
+|}
+
+----
+
+== API Endpoints ==
+
+{| class="wikitable"
+! Method !! Endpoint !! Description
+|-
+| <code>POST</code> || <code>/api/v2/{service}</code> || Send an email
+|-
+| <code>GET</code> || <code>/api/v2/{service}</code> || Get service configuration (admin only)
+|}
+
+----
+
+== Email Request Format ==
+
+=== Basic Email ===
+
+<syntaxhighlight lang="json">
+{
+  "to": [
+    {"email": "recipient@example.com", "name": "Recipient Name"}
+  ],
+  "subject": "Email Subject",
+  "body_text": "Plain text email body",
+  "body_html": "<h1>HTML email body</h1>"
+}
+</syntaxhighlight>
+
+=== Full Email Options ===
+
+<syntaxhighlight lang="json">
+{
+  "to": [
+    {"email": "recipient@example.com", "name": "Recipient"}
+  ],
+  "cc": [
+    {"email": "cc@example.com", "name": "CC Recipient"}
+  ],
+  "bcc": [
+    {"email": "bcc@example.com", "name": "BCC Recipient"}
+  ],
+  "from_name": "Sender Name",
+  "from_email": "sender@example.com",
+  "reply_to_name": "Reply Handler",
+  "reply_to_email": "reply@example.com",
+  "subject": "Email Subject",
+  "body_text": "Plain text version",
+  "body_html": "<html><body><h1>HTML version</h1></body></html>",
+  "attachments": [
+    {
+      "name": "document.pdf",
+      "content": "base64_encoded_content",
+      "content_type": "application/pdf"
+    }
+  ]
+}
+</syntaxhighlight>
+
+=== Email Fields ===
+
+{| class="wikitable"
+! Field !! Type !! Required !! Description
+|-
+| <code>to</code> || array || Yes || List of recipient objects
+|-
+| <code>subject</code> || string || Yes || Email subject line
+|-
+| <code>body_text</code> || string || No* || Plain text email body
+|-
+| <code>body_html</code> || string || No* || HTML email body
+|-
+| <code>from_name</code> || string || No || Override default sender name
+|-
+| <code>from_email</code> || string || No || Override default sender email
+|-
+| <code>cc</code> || array || No || Carbon copy recipients
+|-
+| <code>bcc</code> || array || No || Blind carbon copy recipients
+|-
+| <code>reply_to_name</code> || string || No || Reply-to name
+|-
+| <code>reply_to_email</code> || string || No || Reply-to email
+|-
+| <code>attachments</code> || array || No || File attachments
+|}
+
+*At least one of <code>body_text</code> or <code>body_html</code> is required.
+
+----
+
+== Email Templates ==
+
+For consistent branding, use templated emails:
+
+=== Simple Variable Replacement ===
+
+Use placeholders in your email body:
+
+<syntaxhighlight lang="json">
+{
+  "to": [{"email": "user@example.com"}],
+  "subject": "Welcome, {first_name}!",
+  "body_html": "<h1>Welcome to {company_name}</h1><p>Hello {first_name},</p>",
+  "template_data": {
+    "first_name": "John",
+    "company_name": "Acme Corp"
+  }
+}
+</syntaxhighlight>
+
+=== Provider Templates ===
+
+Some providers (SendGrid, Mailgun) support server-side templates:
+
+<syntaxhighlight lang="json">
+{
+  "to": [{"email": "user@example.com"}],
+  "template_id": "welcome-email-v2",
+  "template_data": {
+    "first_name": "John"
+  }
+}
+</syntaxhighlight>
+
+----
+
+== Security Best Practices ==
+
+=== Sender Authentication ===
+
+Configure SPF, DKIM, and DMARC for your sending domain:
+
+# '''SPF''': Authorize sending servers
+# '''DKIM''': Sign emails cryptographically
+# '''DMARC''': Policy for failed authentication
+
+=== Rate Limiting ===
+
+Apply rate limits to prevent abuse:
+
+{| class="wikitable"
+! User Type !! Recommended Limit
+|-
+| Regular users || 10 emails/hour
+|-
+| Power users || 100 emails/hour
+|-
+| Service accounts || Based on needs
+|}
+
+=== Role-Based Access ===
+
+Restrict email sending by role:
+
+# Navigate to '''Roles''' in admin console
+# Configure email service access
+# Limit recipients or templates if needed
+
+----
+
+== Common Errors ==
+
+{| class="wikitable"
+! Error Code !! Message !! Cause !! Solution
+|-
+| 400 || Bad Request || Invalid email format || Check recipient addresses
+|-
+| 401 || Unauthorized || Missing API key || Add API key header
+|-
+| 403 || Forbidden || Email sending not permitted || Check role permissions
+|-
+| 422 || Unprocessable Entity || Missing required fields || Include to, subject, body
+|-
+| 500 || Service Error || Email service failure || Check service configuration
+|-
+| 503 || Service Unavailable || SMTP/API unreachable || Check credentials and connectivity
+|}
+
+----
+
+== Development and Testing ==
+
+=== Local Email Service ===
+
+The <code>local</code> email driver saves emails to files instead of sending:
+
+<syntaxhighlight lang="text">
+MAIL_DRIVER=local
+</syntaxhighlight>
+
+Emails are saved to <code>storage/logs/</code> for inspection.
+
+=== Email Testing Services ===
+
+Use these services to test without sending real emails:
+
+{| class="wikitable"
+! Service !! Description
+|-
+| [https://mailtrap.io Mailtrap] || Fake SMTP server for testing
+|-
+| [https://github.com/mailhog/MailHog MailHog] || Self-hosted email testing
+|-
+| [https://mailcatcher.me Mailcatcher] || Local SMTP with web UI
+|}
+
+----
+
+== Next Steps ==
+
+* '''[[SMTP]]''': Configure SMTP email service
+* '''[[Security/Role_Based_Access|Role-Based Access Control]]''': Restrict email permissions
+* '''[[Security/Rate_Limiting|Rate Limiting]]''': Prevent email abuse

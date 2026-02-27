@@ -586,6 +586,50 @@ def add_categories(content: str, frontmatter: Dict, source_path: Optional[str] =
     return content
 
 
+def add_wikiseo_metadata(content: str, frontmatter: Dict) -> str:
+    """
+    Inject WikiSEO {{#seo:}} parser function for search engine and AI discoverability.
+
+    Uses the WikiSEO extension (already loaded in LocalSettings.php) to set
+    per-page meta tags: title, description, keywords, and OpenGraph properties.
+    This is critical for ranking wiki.dreamfactory.com pages in Google and
+    getting cited by LLMs.
+    """
+    title = frontmatter.get('title', '')
+    description = frontmatter.get('description', '')
+    keywords = frontmatter.get('keywords', [])
+
+    if not title and not description:
+        return content
+
+    seo_parts = ['{{#seo:']
+    if title:
+        seo_parts.append(f'|title={title} - DreamFactory Documentation')
+        seo_parts.append(f'|title_mode=replace')
+    if description:
+        # Strip surrounding quotes if present
+        desc = description.strip('"').strip("'")
+        seo_parts.append(f'|description={desc}')
+    if keywords:
+        if isinstance(keywords, list):
+            kw_str = ', '.join(keywords)
+        else:
+            kw_str = str(keywords)
+        seo_parts.append(f'|keywords={kw_str}')
+    # OpenGraph
+    if title:
+        seo_parts.append(f'|og:title={title}')
+        seo_parts.append(f'|og:type=article')
+        seo_parts.append(f'|og:site_name=DreamFactory Documentation')
+    if description:
+        desc = description.strip('"').strip("'")
+        seo_parts.append(f'|og:description={desc}')
+    seo_parts.append('}}')
+
+    seo_block = '\n'.join(seo_parts)
+    return seo_block + '\n' + content
+
+
 def add_page_metadata(content: str, frontmatter: Dict) -> str:
     """
     Add metadata section at the top of the page.
@@ -876,6 +920,7 @@ def postprocess_wiki_file(wiki_path: str, source_path: Optional[str] = None) -> 
     6. Convert internal links (using inventory mapping)
     7. Add categories
     8. Add page metadata (title, description)
+    9. Add WikiSEO metadata (must be last — prepends to content)
     """
     try:
         with open(wiki_path, 'r', encoding='utf-8') as f:
@@ -899,6 +944,7 @@ def postprocess_wiki_file(wiki_path: str, source_path: Optional[str] = None) -> 
         content = add_see_also_section(content, source_path)
         content = add_categories(content, frontmatter, source_path)
         content = add_page_metadata(content, frontmatter)
+        content = add_wikiseo_metadata(content, frontmatter)
 
         # Write back
         with open(wiki_path, 'w', encoding='utf-8') as f:
