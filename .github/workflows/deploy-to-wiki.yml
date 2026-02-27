@@ -8,6 +8,8 @@ on:
       - 'static/**'
       - 'scripts/mediawiki_templates/**'
       - 'scripts/main_page_templates/**'
+      - 'staging-wiki-config/**'
+      - 'production-wiki-config/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -138,8 +140,6 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
         run: python sync_to_wiki.py --verify
 
-      - name: Regenerate sitemap
+      - name: Sync server (git pull + nginx reload + sitemap)
         if: ${{ github.event.inputs.dry_run != 'true' }}
-        run: |
-          echo "Sitemap regeneration requires server access."
-          echo "For Docker-based deployments, run: ./scripts/generate_sitemap.sh production"
+        run: curl -sf "${{ secrets.WIKI_URL }}/hooks/deploy?token=${{ secrets.WEBHOOK_TOKEN }}"

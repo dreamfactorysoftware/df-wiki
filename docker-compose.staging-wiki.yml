@@ -63,6 +63,23 @@ services:
     networks:
       - staging-wiki-net
 
+  staging-wiki-hook:
+    image: almir/webhook
+    container_name: staging-wiki-hook
+    depends_on:
+      - staging-wiki-web
+    volumes:
+      - .:/repo
+      - ./scripts/hooks:/etc/webhook:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WEBHOOK_TOKEN: ${WEBHOOK_TOKEN}
+      NGINX_CONTAINER: staging-wiki-web
+      APP_CONTAINER: staging-wiki-app
+      WIKI_SERVER: http://localhost:8082
+    networks:
+      - staging-wiki-net
+
 volumes:
   staging_wiki_db_data:
   staging_wiki_html:
