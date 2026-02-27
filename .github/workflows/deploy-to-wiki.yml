@@ -138,8 +138,31 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.WIKI_PASSWORD }}
         run: python sync_to_wiki.py --verify
 
+      - name: Sync static files to server
+        if: ${{ github.event.inputs.dry_run != 'true' && secrets.WIKI_SSH_HOST != '' }}
+        env:
+          WIKI_SSH_HOST: ${{ secrets.WIKI_SSH_HOST }}
+          WIKI_SSH_USER: ${{ secrets.WIKI_SSH_USER }}
+          WIKI_SSH_KEY: ${{ secrets.WIKI_SSH_KEY }}
+          WIKI_DEPLOY_PATH: ${{ secrets.WIKI_DEPLOY_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$WIKI_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$WIKI_SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          DEPLOY_PATH="${WIKI_DEPLOY_PATH:-/opt/df-wiki}"
+          echo "Syncing static/ to $WIKI_SSH_HOST:$DEPLOY_PATH/static/"
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            static/ \
+            "$WIKI_SSH_USER@$WIKI_SSH_HOST:$DEPLOY_PATH/static/"
+
+          echo "✓ Static files synced (llms.txt, robots.txt, favicon.ico)"
+          rm -f ~/.ssh/deploy_key
+
       - name: Regenerate sitemap
-        if: ${{ github.event.inputs.dry_run != 'true' && github.event.inputs.environment == 'production' }}
+        if: ${{ github.event.inputs.dry_run != 'true' && secrets.WIKI_SSH_HOST != '' }}
         env:
           WIKI_SSH_HOST: ${{ secrets.WIKI_SSH_HOST }}
           WIKI_SSH_USER: ${{ secrets.WIKI_SSH_USER }}
