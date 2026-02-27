@@ -12,6 +12,9 @@ docker exec "$NGINX_CONTAINER" nginx -t
 echo "Reloading nginx..."
 docker exec "$NGINX_CONTAINER" nginx -s reload
 
+echo "Restarting MediaWiki (picks up LocalSettings.php changes)..."
+docker restart "$APP_CONTAINER"
+
 echo "Regenerating sitemap..."
 docker exec "$APP_CONTAINER" php maintenance/generateSitemap.php \
   --fspath=/var/www/html/ --server="$WIKI_SERVER" --urlpath=/ --compress=no
