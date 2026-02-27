@@ -369,5 +369,5 @@ Use these services to test without sending real emails:
 == Next Steps ==
 
 * '''[[SMTP]]''': Configure SMTP email service
-* '''[[Role-Based Access Control]]''': Restrict email permissions
-* '''[[Rate Limiting]]''': Prevent email abuse
+* '''[[Security/Role_Based_Access|Role-Based Access Control]]''': Restrict email permissions
+* '''[[Security/Rate_Limiting|Rate Limiting]]''': Prevent email abuse

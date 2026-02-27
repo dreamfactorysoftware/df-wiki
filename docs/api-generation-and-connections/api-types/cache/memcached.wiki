@@ -502,4 +502,4 @@ For read-heavy workloads in trusted networks:
 
 * '''[[Cache Overview]]''': Compare caching backends
 * '''[[Redis]]''': Feature-rich alternative
-* '''[[Performance Tuning]]''': Optimize DreamFactory
+* '''[[Getting_Started/Optimizing_Dreamfactory/Database|Performance Tuning]]''': Optimize DreamFactory

@@ -92,7 +92,7 @@ sudo yum install php-pgsql
 sudo systemctl restart httpd  # or php-fpm
 </syntaxhighlight>
 
-For complete driver installation instructions, refer to the [[Installing Additional Drivers]] guide.}}
+For complete driver installation instructions, refer to the [[Getting_Started/Installing_Additional_Drivers|Installing Additional Drivers]] guide.}}
 
 === A Note About API Capabilities ===
 
@@ -238,7 +238,7 @@ curl -X GET "https://your-dreamfactory-instance.com/api/v2/postgres/_table/order
   -H "X-DreamFactory-Session-Token: USER_JWT_TOKEN"
 </syntaxhighlight>
 
-For detailed authentication setup, see the [[Security and Authentication]] documentation.
+For detailed authentication setup, see the [[Security/Security_Authentication|Security and Authentication]] documentation.
 
 ----
 
@@ -304,8 +304,8 @@ Common issues and their solutions:
 
 Now that your PostgreSQL API is connected and secured, explore these advanced features:
 
-* '''[[Querying and Filtering]]''': Learn advanced query syntax and filtering options
-* '''[[Event Scripts]]''': Add custom business logic to API events
-* '''[[Role-Based Access Control]]''': Deep dive into advanced RBAC configurations
+* '''[[Querying_Filtering|Querying and Filtering]]''': Learn advanced query syntax and filtering options
+* '''[[Event_Scripts|Event Scripts]]''': Add custom business logic to API events
+* '''[[Security/Role_Based_Access|Role-Based Access Control]]''': Deep dive into advanced RBAC configurations
 
-For additional help, consult the [[Security FAQ]] or contact DreamFactory support.
+For additional help, consult the [[Security/Security_Faq|Security FAQ]] or contact DreamFactory support.

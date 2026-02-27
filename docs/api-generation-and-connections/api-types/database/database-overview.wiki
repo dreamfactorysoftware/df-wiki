@@ -17,7 +17,7 @@ These database connectors are included in DreamFactory OSS and all commercial ed
 |-
 | '''PostgreSQL''' || <code>pdo_pgsql</code> || 5432 || [[PostgreSQL]]
 |-
-| '''MySQL / MariaDB''' || <code>pdo_mysql</code> || 3306 || [[Generating a Database-Backed API]]
+| '''MySQL / MariaDB''' || <code>pdo_mysql</code> || 3306 || [[Generating_Database_Backed_Api|Generating a Database-Backed API]]
 |-
 | '''SQLite''' || <code>pdo_sqlite</code> || N/A (file) || [[SQLite]]
 |-
@@ -155,7 +155,7 @@ DreamFactory Cloud includes all drivers pre-installed. For self-managed installa
 | Oracle || <code>pdo_oci</code> || Requires Oracle Instant Client
 |}
 
-For complete installation instructions, see [[Installing Additional Drivers]].
+For complete installation instructions, see [[Getting_Started/Installing_Additional_Drivers|Installing Additional Drivers]].
 
 ----
 
@@ -213,8 +213,8 @@ Layer DreamFactory's RBAC on top of database permissions:
 
 == Next Steps ==
 
-* '''[[Generating a Database-Backed API]]''': Step-by-step guide for your first database API
-* '''[[Querying and Filtering]]''': Learn advanced query syntax
+* '''[[Generating_Database_Backed_Api|Generating a Database-Backed API]]''': Step-by-step guide for your first database API
+* '''[[Querying_Filtering|Querying and Filtering]]''': Learn advanced query syntax
 * '''[[PostgreSQL]]''': Connect PostgreSQL databases
 * '''[[SQLite]]''': Connect local SQLite databases
 * '''[[SQL Server]]''': Connect Microsoft SQL Server

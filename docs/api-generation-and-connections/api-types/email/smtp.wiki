@@ -450,5 +450,5 @@ MAIL_FROM_NAME=DreamFactory
 == Next Steps ==
 
 * '''[[Email Overview]]''': Compare email service options
-* '''[[Role-Based Access Control]]''': Restrict email permissions
-* '''[[Rate Limiting]]''': Prevent email abuse
+* '''[[Security/Role_Based_Access|Role-Based Access Control]]''': Restrict email permissions
+* '''[[Security/Rate_Limiting|Rate Limiting]]''': Prevent email abuse

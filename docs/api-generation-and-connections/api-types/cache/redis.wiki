@@ -454,4 +454,4 @@ For bulk operations, the API supports batch requests that are automatically pipe
 
 * '''[[Cache Overview]]''': Compare caching backends
 * '''[[Memcached]]''': Alternative caching option
-* '''[[Performance Tuning]]''': Optimize DreamFactory
+* '''[[Getting_Started/Optimizing_Dreamfactory/Database|Performance Tuning]]''': Optimize DreamFactory

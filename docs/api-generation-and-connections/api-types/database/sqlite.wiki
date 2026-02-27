@@ -197,7 +197,7 @@ curl -X GET "https://your-dreamfactory-instance.com/api/v2/localdb/_table/users"
   -H "X-DreamFactory-Api-Key: YOUR_API_KEY"
 </syntaxhighlight>
 
-For detailed authentication setup including JWT and SSO, see the [[Security and Authentication]] documentation.
+For detailed authentication setup including JWT and SSO, see the [[Security/Security_Authentication|Security and Authentication]] documentation.
 
 ----
 
@@ -282,8 +282,8 @@ Common issues and their solutions:
 
 Now that your SQLite API is connected and secured, explore these advanced features:
 
-* '''[[Querying and Filtering]]''': Learn advanced query syntax and filtering options
-* '''[[Event Scripts]]''': Add custom business logic to API events
-* '''[[Role-Based Access Control]]''': Deep dive into advanced RBAC configurations
+* '''[[Querying_Filtering|Querying and Filtering]]''': Learn advanced query syntax and filtering options
+* '''[[Event_Scripts|Event Scripts]]''': Add custom business logic to API events
+* '''[[Security/Role_Based_Access|Role-Based Access Control]]''': Deep dive into advanced RBAC configurations
 
-For additional help, consult the [[Security FAQ]] or contact DreamFactory support.
+For additional help, consult the [[Security/Security_Faq|Security FAQ]] or contact DreamFactory support.

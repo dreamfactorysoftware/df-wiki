@@ -1,0 +1,79 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'static/**'
+      - 'scripts/**'
+      - 'production-wiki-config/**'
+      - 'staging-wiki-config/**'
+
+jobs:
+  validate:
+    name: Wiki Content Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run content quality gate
+        working-directory: scripts
+        run: python content_score.py --dir ../docs/ --output score_report.csv --threshold 50
+
+      - name: Run wiki validation
+        working-directory: scripts
+        run: |
+          python validate_wiki.py --docs ../docs/ --format json > validation_report.json 2>&1 || true
+          python validate_wiki.py --docs ../docs/ 2>&1 || true
+
+          # Extract error count
+          ERRORS=$(python -c "import json; print(json.load(open('validation_report.json'))['summary']['errors'])")
+          WARNINGS=$(python -c "import json; print(json.load(open('validation_report.json'))['summary']['warnings'])")
+          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+          echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+
+      - name: Compare with main branch
+        run: |
+          # Get error count from main for comparison
+          git fetch origin main
+          git worktree add /tmp/main-branch origin/main
+
+          cd /tmp/main-branch/scripts
+          pip install -r requirements.txt -q 2>/dev/null || true
+          python validate_wiki.py --docs ../docs/ --format json > /tmp/main_validation.json 2>&1 || true
+
+          MAIN_ERRORS=$(python -c "import json; print(json.load(open('/tmp/main_validation.json'))['summary']['errors'])")
+          PR_ERRORS=$(python -c "import json; print(json.load(open('$GITHUB_WORKSPACE/scripts/validation_report.json'))['summary']['errors'])")
+
+          echo "Main branch errors: $MAIN_ERRORS"
+          echo "PR branch errors:   $PR_ERRORS"
+
+          if [ "$PR_ERRORS" -gt "$MAIN_ERRORS" ]; then
+            NEW_ERRORS=$((PR_ERRORS - MAIN_ERRORS))
+            echo "::error::This PR introduces $NEW_ERRORS new validation error(s). Fix broken links or redirect targets before merging."
+            exit 1
+          else
+            FIXED=$((MAIN_ERRORS - PR_ERRORS))
+            echo "✓ No new errors introduced. ($FIXED error(s) fixed by this PR)"
+          fi
+
+          git worktree remove /tmp/main-branch
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: |
+            scripts/validation_report.json
+            scripts/score_report.csv

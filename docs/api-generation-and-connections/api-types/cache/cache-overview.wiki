@@ -235,4 +235,4 @@ Examples:
 
 * '''[[Redis]]''': Configure Redis for production caching
 * '''[[Memcached]]''': Configure Memcached for simple caching
-* '''[[Performance Tuning]]''': Optimize DreamFactory performance
+* '''[[Getting_Started/Optimizing_Dreamfactory/Database|Performance Tuning]]''': Optimize DreamFactory performance
