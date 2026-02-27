@@ -63,6 +63,24 @@ services:
     networks:
       - wiki-net
 
+  wiki-hook:
+    image: almir/webhook
+    container_name: wiki-hook
+    restart: unless-stopped
+    depends_on:
+      - wiki-web
+    volumes:
+      - .:/repo
+      - ./scripts/hooks:/etc/webhook:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WEBHOOK_TOKEN: ${WEBHOOK_TOKEN}
+      NGINX_CONTAINER: wiki-web
+      APP_CONTAINER: wiki-app
+      WIKI_SERVER: https://wiki.dreamfactory.com
+    networks:
+      - wiki-net
+
 volumes:
   wiki_db_data:
   wiki_html:
