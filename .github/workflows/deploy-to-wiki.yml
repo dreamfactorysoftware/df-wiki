@@ -139,11 +139,7 @@ jobs:
         run: python sync_to_wiki.py --verify
 
       - name: Regenerate sitemap
-        if: ${{ github.event.inputs.dry_run != 'true' && github.event.inputs.environment == 'production' }}
-        env:
-          WIKI_SSH_HOST: ${{ secrets.WIKI_SSH_HOST }}
-          WIKI_SSH_USER: ${{ secrets.WIKI_SSH_USER }}
-          WIKI_SSH_KEY: ${{ secrets.WIKI_SSH_KEY }}
+        if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
           echo "Sitemap regeneration requires server access."
           echo "For Docker-based deployments, run: ./scripts/generate_sitemap.sh production"
