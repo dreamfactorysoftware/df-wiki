@@ -64,9 +64,10 @@ services:
       - wiki-net
 
   wiki-hook:
-    image: almir/webhook
+    build: ./scripts/hooks
     container_name: wiki-hook
     restart: unless-stopped
+    entrypoint: ["/bin/sh", "/etc/webhook/start.sh"]
     depends_on:
       - wiki-web
     volumes:
