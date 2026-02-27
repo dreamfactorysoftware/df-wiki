@@ -22,9 +22,13 @@
 * APIs & Connections
 ** Api Creation Management|API Creation & Management
 ** Api Generation And Connections/Api Discovery|API Discovery & Specs
+** Database_Overview|Database APIs
 ** Generating Database Backed Api|Database-Backed APIs
 ** Querying Filtering|Querying & Filtering
 ** Sql Server|SQL Server
+** Postgresql|PostgreSQL
+** Sqlite|SQLite
+** Alloydb|AlloyDB
 ** Advanced Database Api Features|Advanced DB Features
 ** Api Keys|API Keys
 ** Interacting With Api|Interacting with APIs
@@ -36,6 +40,12 @@
 ** Creating Sftp Rest Api|SFTP REST API
 ** Creating Aws S3 Rest Api|AWS S3 REST API
 ** Converting Excel To Json|Excel to JSON
+* Email & Cache
+** Email_Overview|Email Services
+** Smtp|SMTP Configuration
+** Cache_Overview|Caching Overview
+** Redis|Redis
+** Memcached|Memcached
 * Scripting
 ** Scripted Services And Endpoints|Scripted Services
 ** Scripting Resources|Scripting Resources
@@ -65,6 +75,10 @@
 ** Upgrading Migrating Dreamfactory|Upgrading DreamFactory
 ** Upgrades And Migrations/Upgrading Php|Upgrading PHP
 ** Upgrading Php Windows|Upgrading PHP (Windows)
+* API Reference
+** Api_Endpoints|API Endpoints
+** Query_Parameters|Query Parameters
+** Error_Codes|Error Codes
 * Reference
 ** Appendix Configuration Parameters|Configuration Parameters
 ** Architecture FAQ|Architecture FAQ
